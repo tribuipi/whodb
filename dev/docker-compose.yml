@@ -317,6 +317,25 @@ services:
     networks:
       - db
 
+  e2e_sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "WhoDB_Test123!"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - e2e_sqlserver:/var/opt/mssql
+    networks:
+      - db
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"WhoDB_Test123!\" -C -Q \"SELECT 1\" || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
   # ===== Database alias containers =====
 
   e2e_valkey:
@@ -867,3 +886,4 @@ volumes:
   e2e_yugabytedb:
   e2e_questdb:
   e2e_ferretdb_pg:
+  e2e_sqlserver:

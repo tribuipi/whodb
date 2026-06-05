@@ -1,0 +1,13 @@
+{
+  "type": "SQLServer",
+  "category": "sql",
+  "credentials": {
+    "hostname": "localhost",
+    "username": "sa",
+    "password": "WhoDB_Test123!",
+    "database": "master",
+    "advanced": [
+      { "key": "Port", "value": "1433" }
+    ]
+  }
+}
