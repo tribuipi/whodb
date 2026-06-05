@@ -195,6 +195,10 @@ func registerSessionMetadata() {
 		relationalObjectCreationMetadata(specs.DuckDBTypeDefinitions, "DEFAULT nextval()"),
 	)
 	RegisterObjectCreationMetadata(
+		string(engine.DatabaseType_SQLServer),
+		relationalObjectCreationMetadata(specs.SQLServerTypeDefinitions, "IDENTITY(1,1)"),
+	)
+	RegisterObjectCreationMetadata(
 		string(engine.DatabaseType_QuestDB),
 		questDBObjectCreationMetadata(specs.QuestDBTypeDefinitions),
 	)

@@ -67,10 +67,14 @@ func (p *SQLServerPlugin) GetTableInfoQuery() string {
 			SUM(a.used_pages) * 8192 AS total_size,
 			SUM(a.data_pages) * 8192 AS data_size
 		FROM INFORMATION_SCHEMA.TABLES t
-		LEFT JOIN sys.tables st ON st.name = t.TABLE_NAME
+		LEFT JOIN sys.tables st
+			ON st.name = t.TABLE_NAME
+			AND SCHEMA_NAME(st.schema_id) = t.TABLE_SCHEMA
 		LEFT JOIN sys.indexes i ON i.object_id = st.object_id
 		LEFT JOIN sys.partitions p ON p.object_id = i.object_id AND p.index_id = i.index_id
-		LEFT JOIN sys.allocation_units a ON a.container_id = p.partition_id
+		LEFT JOIN sys.allocation_units a
+			ON (a.type IN (1, 3) AND a.container_id = p.hobt_id)
+			OR (a.type = 2      AND a.container_id = p.partition_id)
 		WHERE t.TABLE_SCHEMA = ?
 		GROUP BY t.TABLE_NAME, t.TABLE_TYPE`
 }
