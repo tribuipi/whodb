@@ -364,3 +364,46 @@ var DuckDBTypeDefinitions = []engine.TypeDefinition{
 	{ID: "UNION", Label: "union", Category: engine.TypeCategoryOther},
 	{ID: "UUID", Label: "uuid", Category: engine.TypeCategoryOther},
 }
+
+var SQLServerSupportedOperators = map[string]string{
+	"=": "=", ">=": ">=", ">": ">", "<=": "<=", "<": "<", "<>": "<>",
+	"!=": "!=", opBetween: opBetween, opNotBetween: opNotBetween,
+	opLike: opLike, opNotLike: opNotLike, "IN": "IN", opNotIn: opNotIn,
+	opIsNull: opIsNull, opIsNotNull: opIsNotNull, "AND": "AND", "OR": "OR", "NOT": "NOT",
+}
+
+var SQLServerAliasMap = map[string]string{
+	"INTEGER":          "INT",
+	"NUMERIC":          "DECIMAL",
+	"DOUBLE PRECISION": "FLOAT",
+	"DATETIME":         "DATETIME2",
+	"SMALLDATETIME":    "DATETIME2",
+	"BOOLEAN":          "BIT",
+	"MONEY":            "DECIMAL",
+	"SMALLMONEY":       "DECIMAL",
+}
+
+var SQLServerTypeDefinitions = []engine.TypeDefinition{
+	{ID: "TINYINT", Label: "TINYINT", Category: engine.TypeCategoryNumeric},
+	{ID: typeSmallint, Label: typeSmallint, Category: engine.TypeCategoryNumeric},
+	{ID: "INT", Label: "INT", Category: engine.TypeCategoryNumeric},
+	{ID: typeBigint, Label: typeBigint, Category: engine.TypeCategoryNumeric},
+	{ID: typeDecimal, Label: typeDecimal, HasPrecision: true, DefaultPrecision: new(10), Category: engine.TypeCategoryNumeric},
+	{ID: "FLOAT", Label: "FLOAT", Category: engine.TypeCategoryNumeric},
+	{ID: "REAL", Label: "REAL", Category: engine.TypeCategoryNumeric},
+	{ID: typeVarchar, Label: typeVarchar, HasLength: true, DefaultLength: new(255), Category: engine.TypeCategoryText},
+	{ID: "NVARCHAR", Label: "NVARCHAR", HasLength: true, DefaultLength: new(255), Category: engine.TypeCategoryText},
+	{ID: "CHAR", Label: "CHAR", HasLength: true, DefaultLength: new(1), Category: engine.TypeCategoryText},
+	{ID: "NCHAR", Label: "NCHAR", HasLength: true, DefaultLength: new(1), Category: engine.TypeCategoryText},
+	{ID: typeText, Label: typeText, Category: engine.TypeCategoryText},
+	{ID: "NTEXT", Label: "NTEXT", Category: engine.TypeCategoryText},
+	{ID: "DATE", Label: "DATE", Category: engine.TypeCategoryDatetime},
+	{ID: "TIME", Label: "TIME", Category: engine.TypeCategoryDatetime},
+	{ID: "DATETIME2", Label: "DATETIME2", Category: engine.TypeCategoryDatetime},
+	{ID: "DATETIMEOFFSET", Label: "DATETIMEOFFSET", Category: engine.TypeCategoryDatetime},
+	{ID: "BIT", Label: "BIT", Category: engine.TypeCategoryBoolean},
+	{ID: "VARBINARY", Label: "VARBINARY", HasLength: true, DefaultLength: new(255), Category: engine.TypeCategoryBinary},
+	{ID: "UNIQUEIDENTIFIER", Label: "UNIQUEIDENTIFIER", Category: engine.TypeCategoryOther},
+	{ID: "JSON", Label: "JSON", Category: engine.TypeCategoryJSON},
+	{ID: "XML", Label: "XML", Category: engine.TypeCategoryOther},
+}
