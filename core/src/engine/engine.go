@@ -39,6 +39,7 @@ const (
 	DatabaseType_DuckDB        = "DuckDB"
 	DatabaseType_Memcached     = "Memcached"
 	DatabaseType_TiDB          = "TiDB"
+	DatabaseType_SQLServer     = "SQLServer"
 	DatabaseType_ElastiCache   = "ElastiCache" // Uses Redis plugin for now
 	DatabaseType_DocumentDB    = "DocumentDB"  // Uses MongoDB plugin for now
 
