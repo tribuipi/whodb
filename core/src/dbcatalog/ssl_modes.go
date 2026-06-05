@@ -26,7 +26,7 @@ import (
 
 func sslModesFor(dbType engine.DatabaseType) []source.SSLModeInfo {
 	switch dbType {
-	case engine.DatabaseType_Postgres, engine.DatabaseType_CockroachDB, engine.DatabaseType_QuestDB, engine.DatabaseType_YugabyteDB:
+	case engine.DatabaseType_Postgres, engine.DatabaseType_CockroachDB, engine.DatabaseType_QuestDB, engine.DatabaseType_YugabyteDB, engine.DatabaseType_SQLServer:
 		return cloneSSLModes(sslModesStandard("disable", "require", "verify-full"))
 	case engine.DatabaseType_MySQL, engine.DatabaseType_MariaDB, engine.DatabaseType_TiDB:
 		return cloneSSLModes(sslModesWithPreferred("DISABLED", "PREFERRED", "REQUIRED", "VERIFY_CA", "VERIFY_IDENTITY"))

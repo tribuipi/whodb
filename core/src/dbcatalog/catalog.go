@@ -202,6 +202,20 @@ var catalog = []ConnectableDatabase{
 		SSLModes:       sslModesFor(engine.DatabaseType_ClickHouse),
 	},
 	{
+		ID:         engine.DatabaseType_SQLServer,
+		Label:      "SQL Server",
+		PluginType: engine.DatabaseType_SQLServer,
+		Extra:      map[string]source.ConnectionExtraField{"Port": {DefaultValue: "1433"}},
+		Fields: FieldVisibility{
+			Hostname: true,
+			Username: true,
+			Password: true,
+			Database: true,
+		},
+		RequiredFields: FieldRequirements{Hostname: true, Username: true, Password: true, Database: true},
+		SSLModes:       sslModesFor(engine.DatabaseType_SQLServer),
+	},
+	{
 		ID:         engine.DatabaseType_DuckDB,
 		Label:      "DuckDB",
 		PluginType: engine.DatabaseType_DuckDB,

@@ -132,6 +132,10 @@ func registerSessionMetadata() {
 		SessionMetadataFromOperatorMap(specs.DuckDBTypeDefinitions, specs.DuckDBSupportedOperators, specs.DuckDBAliasMap),
 	)
 	RegisterSessionMetadata(
+		string(engine.DatabaseType_SQLServer),
+		SessionMetadataFromOperatorMap(specs.SQLServerTypeDefinitions, specs.SQLServerSupportedOperators, specs.SQLServerAliasMap),
+	)
+	RegisterSessionMetadata(
 		string(engine.DatabaseType_ElasticSearch),
 		SessionMetadataFromOperatorMap(specs.ElasticSearchTypeDefinitions, specs.ElasticSearchSupportedOperators, nil),
 	)

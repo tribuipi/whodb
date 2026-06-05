@@ -63,6 +63,7 @@ const (
 	connectorDuckDB        = "DuckDB"
 	connectorQuestDB       = "QuestDB"
 	connectorYugabyteDB    = "YugabyteDB"
+	connectorSQLServer     = "SQLServer"
 	connectorMongoDB       = "MongoDB"
 	connectorRedis         = "Redis"
 	connectorMemcached     = "Memcached"
@@ -202,6 +203,21 @@ var familySpecs = map[string]FamilySpec{
 	connectorYugabyteDB: {
 		Category:       source.CategoryDatabase,
 		Traits:         withExecutionTraits(postgresTraits(source.HostInputModeHostnameOrURL, source.HostInputURLParserPostgres), true, true),
+		Model:          source.ModelRelational,
+		Surfaces:       []source.Surface{source.SurfaceBrowser, source.SurfaceQuery, source.SurfaceChat, source.SurfaceGraph},
+		BrowsePath:     []source.ObjectKind{objectKindDatabase, objectKindSchema, objectKindTable},
+		DefaultObject:  objectKindTable,
+		GraphScopeKind: new(objectKindSchema),
+		ObjectTypes: []source.ObjectType{
+			metadataObjectType(objectKindDatabase, "Database", "Databases", true),
+			metadataObjectType(objectKindSchema, "Schema", "Schemas", true),
+			tabularObjectType(objectKindTable, "Table", "Tables"),
+			tabularReadOnlyObjectType(objectKindView, "View", "Views"),
+		},
+	},
+	connectorSQLServer: {
+		Category:       source.CategoryDatabase,
+		Traits:         withExecutionTraits(sqlserverTraits(), true, true),
 		Model:          source.ModelRelational,
 		Surfaces:       []source.Surface{source.SurfaceBrowser, source.SurfaceQuery, source.SurfaceChat, source.SurfaceGraph},
 		BrowsePath:     []source.ObjectKind{objectKindDatabase, objectKindSchema, objectKindTable},
@@ -884,6 +900,16 @@ func mysqlTraits() source.TypeTraits {
 		networkTraits(source.HostInputModeHostname, source.HostInputURLParserNone),
 		map[source.ObjectKind][]string{
 			source.ObjectKindDatabase: {"information_schema", "mysql", "performance_schema", "sys"},
+		},
+		nil,
+	)
+}
+
+func sqlserverTraits() source.TypeTraits {
+	return withHiddenObjectRules(
+		networkTraits(source.HostInputModeHostname, source.HostInputURLParserNone),
+		map[source.ObjectKind][]string{
+			source.ObjectKindSchema: {"sys", "INFORMATION_SCHEMA", "guest"},
 		},
 		nil,
 	)
