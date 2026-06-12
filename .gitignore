@@ -67,3 +67,6 @@ tools/
 frontend/build-ee
 frontend/.pi-lens
 core/.pi-lens
+
+# Superpowers brainstorm artifacts
+.superpowers/
