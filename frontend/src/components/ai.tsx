@@ -15,32 +15,19 @@
  */
 
 import { useLazyQuery } from "@apollo/client/react";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-    Button,
-    cn,
-    CommandItem,
-    Input,
-    Label,
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-    Sheet,
-    SheetContent,
-    Separator,
-    SheetFooter,
-    toast
-} from "@clidey/ux";
+    AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+    AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { CommandItem } from "@/components/ui/command";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Sheet, SheetContent, SheetFooter } from "@/components/ui/sheet";
 import { SearchSelect } from "./ux";
 import type { FC, ReactElement, ReactNode} from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -508,35 +495,8 @@ export const AIProvider: FC<ReturnType<typeof useAI> & {
         <Sheet open={addExternalModel} onOpenChange={setAddExternalModel}>
             <SheetContent className={cn("max-w-md mx-auto w-full flex flex-col gap-4", {
                 "px-8 py-10": !newUIEnabled,
-            })} footer={
-                <SheetFooter className="p-0">
-                    <div className="text-xs text-neutral-500 flex flex-col gap-2">
-                        <div className="font-bold">{t('localSetup')}</div>
-                        <div>
-                            {t('ollamaSetupText').split('<0>')[0]}
-                            <ExternalLink href="https://ollama.com/" className="font-semibold underline text-blue-600 hover:text-blue-800">Ollama</ExternalLink>
-                            {t('ollamaSetupText').split('</0>')[1]}
-                        </div>
-                        <div className="font-semibold">{t('downloadingModel')}</div>
-                        <div>
-                            {t('ollamaDownloadText').split('<0>')[0]}
-                            <ExternalLink href="https://ollama.com/library/llama3.1" className="font-semibold underline text-blue-600 hover:text-blue-800">Llama3.1 8b</ExternalLink>
-                            {t('ollamaDownloadText').split('</0>')[1]}
-                        </div>
-                        <div className="font-mono bg-neutral-100 dark:bg-neutral-900 rounded px-2 py-1 mb-1">
-                            {t('ollamaRunCommand')}
-                        </div>
-                        <div>
-                            {t('ollamaDocsText')}
-                        </div>
-                        <Button variant="secondary" className="w-full mt-2" onClick={handleOpenDocs}>
-                            {t('docs')}
-                            <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-                        </Button>
-                    </div>
-                </SheetFooter>
-            }>
-                <div className="flex flex-col gap-4">
+            })}>
+                <div className="flex flex-col gap-4 flex-1 overflow-y-auto">
                     <div className="text-lg font-semibold mb-2">{t('addExternalModel')}</div>
                     <div className="flex flex-col gap-2">
                         <Label>{t('modelType')}</Label>
@@ -576,24 +536,50 @@ export const AIProvider: FC<ReturnType<typeof useAI> & {
                         />
                     </div>
                 </div>
-                <div className={cn("flex items-center gap-sm self-end", {
-                    "mt-4": newUIEnabled,
-                })}>
-                    <Button
-                        onClick={handleAddExternalModel}
-                        data-testid="external-model-cancel"
-                        variant="secondary"
-                    >
-                        <XMarkIcon className="w-4 h-4" /> {t('cancel')}
-                    </Button>
-                    <Button
-                        onClick={handleExternalModelSubmit}
-                        disabled={getAIModelsLoading}
-                        data-testid="external-model-submit"
-                    >
-                        <CheckCircleIcon className="w-4 h-4" /> {t('submit')}
-                    </Button>
-                </div>
+                <SheetFooter className="flex-col gap-4">
+                    <div className={cn("flex items-center gap-sm self-end", {
+                        "mt-4": newUIEnabled,
+                    })}>
+                        <Button
+                            onClick={handleAddExternalModel}
+                            data-testid="external-model-cancel"
+                            variant="secondary"
+                        >
+                            <XMarkIcon className="w-4 h-4" /> {t('cancel')}
+                        </Button>
+                        <Button
+                            onClick={handleExternalModelSubmit}
+                            disabled={getAIModelsLoading}
+                            data-testid="external-model-submit"
+                        >
+                            <CheckCircleIcon className="w-4 h-4" /> {t('submit')}
+                        </Button>
+                    </div>
+                    <div className="text-xs text-neutral-500 flex flex-col gap-2 pt-4 border-t">
+                        <div className="font-bold">{t('localSetup')}</div>
+                        <div>
+                            {t('ollamaSetupText').split('<0>')[0]}
+                            <ExternalLink href="https://ollama.com/" className="font-semibold underline text-blue-600 hover:text-blue-800">Ollama</ExternalLink>
+                            {t('ollamaSetupText').split('</0>')[1]}
+                        </div>
+                        <div className="font-semibold">{t('downloadingModel')}</div>
+                        <div>
+                            {t('ollamaDownloadText').split('<0>')[0]}
+                            <ExternalLink href="https://ollama.com/library/llama3.1" className="font-semibold underline text-blue-600 hover:text-blue-800">Llama3.1 8b</ExternalLink>
+                            {t('ollamaDownloadText').split('</0>')[1]}
+                        </div>
+                        <div className="font-mono bg-neutral-100 dark:bg-neutral-900 rounded px-2 py-1 mb-1">
+                            {t('ollamaRunCommand')}
+                        </div>
+                        <div>
+                            {t('ollamaDocsText')}
+                        </div>
+                        <Button variant="secondary" className="w-full mt-2" onClick={handleOpenDocs}>
+                            {t('docs')}
+                            <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                        </Button>
+                    </div>
+                </SheetFooter>
             </SheetContent>
         </Sheet>
         <div className="flex w-full justify-between">
