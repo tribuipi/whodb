@@ -73,20 +73,31 @@ A new tree component styled pixel-for-pixel to pgconsole (we are **not** reusing
 - **Search box** filters objects across all groups live.
 - **Collapsible groups** by object type — Tables, Views, Functions, plus whatever the
   source exposes (Procedures, Materialized views, …) — each with a count badge.
-- **Single-click** an object → opens a new tab pre-filled with `SELECT * FROM <obj> LIMIT …`.
+- **Single-click** an object → opens a new **SQL tab** pre-filled with `SELECT * FROM <obj> LIMIT …`.
+- **Double-click** an object → opens a new **Structure tab**: a read-only panel showing the
+  table's columns, types, keys, and indexes (see component 8).
 - Data: fetched from the same source-catalog queries the app already uses to enumerate
   schema objects. (Grouping/counts logic is reimplemented in the new component rather
   than imported from `SchemaViewer`.)
 
 ### 3. Tabs (center, top)
 
-- Each tab = one independent SQL editor with its own code + results state.
-- **+** adds a new empty tab named `SQL N`.
-- **Double-click** a tab name to rename.
-- **✕** closes a tab (confirm if it has content). At least one tab always remains.
-- Tabs and their code **persist to `localStorage`** via the Redux slice (survive reload).
+Tabs come in two kinds:
+
+- **SQL tab** — an independent SQL editor with its own code + results state.
+- **Structure tab** — a read-only table-structure view (component 8); no editor, no code.
+
+Behavior:
+
+- **+** adds a new empty SQL tab named `SQL N`.
+- **Double-click** a tab name to rename (SQL tabs only).
+- **✕** closes a tab (confirm if a SQL tab has content). At least one tab always remains.
+- Tabs **persist to `localStorage`** via the Redux slice (survive reload). For structure
+  tabs only the target object ref is persisted; its data is re-fetched on load.
 
 ### 4. Toolbar (center) — Run & Format only
+
+(Shown for SQL tabs only; structure tabs have no toolbar.)
 
 - **Run** — executes the current tab's SQL, or the selected text if there is a selection.
   Keyboard: `⌘↵` / `Ctrl+↵`. Reuses the existing GraphQL mutation
@@ -125,15 +136,28 @@ editor's right panel — single source of truth.
 - Collapsible; width persisted.
 - Chat shares the current schema/source so generated SQL targets the right database.
 
+### 8. Table Structure panel (center, structure tab) — **new component**
+
+A read-only view rendering a table's structure, opened by double-clicking a tree object.
+
+- Shows **columns** (name, type, nullable, default), **keys** (primary/foreign), and
+  **indexes**.
+- Fetches column/structure metadata from the existing source-object metadata query the
+  Storage Units page already uses to render a table's columns (reuse that query rather
+  than adding a new one).
+- No toolbar, no editor — purely a display panel. Occupies the editor/results area of its
+  tab.
+
 ## State Management
 
 Replace the current `store/scratchpad.ts` slice (multi-page, multi-cell) with a
 simplified slice modeling **tabs**:
 
-- `tabs[]` — `{ id, name, code }`
+- `tabs[]` — `{ id, name, kind: 'sql' | 'structure', code?, target? }`
+  (`code` for SQL tabs; `target` = the object ref for structure tabs)
 - `activeTabId`
-- Actions: add tab, close tab, rename tab, update tab code, set active tab,
-  insert-text-at-cursor (for tree clicks / chat insert).
+- Actions: add SQL tab, open structure tab (for a target object), close tab, rename tab,
+  update tab code, set active tab, insert-text-at-cursor (for chat insert).
 - Persisted to `localStorage` (registered in `store/index.ts`, same persistence
   mechanism the scratchpad slice uses today).
 
@@ -163,6 +187,7 @@ Per-tab **results** are component-local state (not persisted), keyed by tab.
 **New**
 - Source selectors (profile + database dropdowns) for the left panel top.
 - DB object tree component.
+- Table structure panel component (structure tabs).
 - Three-panel layout shell for the editor page.
 
 **Modified**
@@ -186,10 +211,11 @@ Per-tab **results** are component-local state (not persisted), keyed by tab.
 - No lint errors (oxlint via the auto-hook).
 - No dead code — removed scratchpad multi-cell logic fully deleted, no orphaned imports.
 - Playwright E2E: update/extend the scratchpad E2E to exercise the new editor
-  (run a query, see results; click a tree object to open a SELECT tab; format SQL).
-- Manual: run a SELECT, run a destructive query (confirm dialog), click a tree object
-  (opens SELECT tab), insert from chat response, collapse/resize panels, reload
-  (tabs persist).
+  (run a query, see results; single-click a tree object to open a SELECT tab;
+  double-click to open a structure tab; format SQL).
+- Manual: run a SELECT, run a destructive query (confirm dialog), single-click a tree
+  object (opens SELECT tab), double-click a tree object (opens structure tab), insert
+  from chat response, collapse/resize panels, reload (tabs persist).
 
 ## Open Questions
 
