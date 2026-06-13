@@ -22,6 +22,7 @@ en_US:
   deselectRow: Deselect Row
   selectRow: Select Row
   editRow: Edit Row
+  export: Export
   exportAllAsCsv: Export All as CSV
   exportAllAsExcel: Export All as Excel
   exportSelectedAsCsv: Export Selected as CSV
