@@ -7,6 +7,7 @@ en_US:
   unableToDeleteRow: "Unable to Delete the Row: {message}"
   rowDeleted: Row Deleted
   copiedCellToClipboard: Copied Cell to Clipboard
+  copiedToClipboard: Copied to Clipboard
   maximumRowCount: Maximum Row Count Is {max}
   storageUnitRequired: Storage Unit Is Required for Mock Data Generation
   rowCountExceedsMax: Row Count Cannot Exceed {max}
