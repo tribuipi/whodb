@@ -74,6 +74,7 @@ export const ObjectTree: FC<IObjectTreeProps> = ({ onSelectObject, onOpenStructu
                             options={schemaOptions}
                             value={schema}
                             onChange={handleSchemaChange}
+                            buttonClassName="w-full"
                         />
                     </div>
                 )
