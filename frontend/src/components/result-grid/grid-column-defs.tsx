@@ -1,6 +1,6 @@
 import type { ColDef } from 'ag-grid-community';
 import { GridHeader } from './grid-header';
-import { getColumnIcons, getInputPropsForColumnType } from './column-icons';
+import { getColumnIcons } from './column-icons';
 
 const FIELD = (idx: number) => `c${idx}`;
 
@@ -31,9 +31,6 @@ export function buildColumnDefs(args: BuildColumnDefsArgs): ColDef[] {
     const icons = getColumnIcons(columns, columnTypes, t);
 
     return columns.map((name, idx): ColDef => {
-        const rawType = columnTypes?.[idx] ?? '';
-        const inputProps = getInputPropsForColumnType(rawType);
-        const isNumber = inputProps.type === 'number';
         return {
             field: FIELD(idx),
             headerName: name,
@@ -42,7 +39,10 @@ export function buildColumnDefs(args: BuildColumnDefsArgs): ColDef[] {
             filter: true,
             resizable: true,
             minWidth: 100,
-            cellEditor: isNumber ? 'agNumberCellEditor' : 'agTextCellEditor',
+            // Row values are strings and the backend accepts string values, so edit
+            // every column with the text editor. agNumberCellEditor does not commit a
+            // programmatically-set value when the underlying datum is a string.
+            cellEditor: 'agTextCellEditor',
             headerComponent: GridHeader,
             headerComponentParams: {
                 typeIcon: icons[idx],
