@@ -1,13 +1,15 @@
 import type { FC } from "react";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { skipToken, useQuery } from "@apollo/client/react";
 import { useTranslation } from "../../hooks/use-translation";
 import { ChevronRightIcon, ChevronDownIcon } from "../../components/heroicons";
-import { GetStorageUnitsDocument } from "@graphql";
+import { GetStorageUnitsDocument, GetSchemaDocument } from "@graphql";
 import type { GetStorageUnitsQuery } from "@graphql";
-import { useAppSelector } from "../../store/hooks";
+import { SearchSelect } from "../../components/ux";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { DatabaseActions } from "../../store/database";
 import { useSourceContract } from "../../hooks/useSourceContract";
-import { buildSourceParentRef } from "../../utils/source-refs";
+import { buildSourceParentRef, buildSourceSchemaQuery } from "../../utils/source-refs";
 
 type SourceBrowserObject = GetStorageUnitsQuery["StorageUnit"][number];
 
@@ -19,9 +21,10 @@ type IObjectTreeProps = {
 /** Left-panel DB object tree for the SQL editor. */
 export const ObjectTree: FC<IObjectTreeProps> = ({ onSelectObject, onOpenStructure }) => {
     const { t } = useTranslation("pages/raw-execute");
+    const dispatch = useAppDispatch();
     const current = useAppSelector(state => state.auth.current);
     const schema = useAppSelector(state => state.database.schema);
-    const { item } = useSourceContract(current?.Type);
+    const { item, supportsSchema } = useSourceContract(current?.Type);
     const [search, setSearch] = useState("");
     const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
@@ -30,6 +33,22 @@ export const ObjectTree: FC<IObjectTreeProps> = ({ onSelectObject, onOpenStructu
         ? { variables: { parent: parentRef } }
         : skipToken;
     const { data } = useQuery(GetStorageUnitsDocument, queryOptions);
+
+    const schemaQueryVariables = useMemo(() => buildSourceSchemaQuery(item, current), [item, current]);
+    const schemaQueryOptions = current != null && supportsSchema
+        ? { variables: schemaQueryVariables }
+        : skipToken;
+    const { data: availableSchemas } = useQuery(GetSchemaDocument, schemaQueryOptions);
+    const schemaOptions = useMemo(
+        () => (availableSchemas?.Schema ?? []).map(s => ({ value: s.Name, label: s.Name })),
+        [availableSchemas],
+    );
+
+    const handleSchemaChange = useCallback((value: string) => {
+        if (value !== "") {
+            dispatch(DatabaseActions.setSchema(value));
+        }
+    }, [dispatch]);
 
     const groups = useMemo(() => {
         const allObjs: SourceBrowserObject[] = data?.StorageUnit ?? [];
@@ -47,9 +66,22 @@ export const ObjectTree: FC<IObjectTreeProps> = ({ onSelectObject, onOpenStructu
 
     return (
         <div className="flex flex-col h-full overflow-hidden" data-testid="sql-editor-object-tree">
-            <div className="px-2 py-1 text-xs font-bold uppercase text-neutral-500">
-                {schema || t("schemaHeader")}
-            </div>
+            {supportsSchema
+                ? (
+                    <div className="px-2 py-1" data-testid="sql-editor-schema-select">
+                        <SearchSelect
+                            label={t("schemaHeader")}
+                            options={schemaOptions}
+                            value={schema}
+                            onChange={handleSchemaChange}
+                        />
+                    </div>
+                )
+                : (
+                    <div className="px-2 py-1 text-xs font-bold uppercase text-neutral-500">
+                        {schema || t("schemaHeader")}
+                    </div>
+                )}
             <input
                 value={search}
                 onChange={e => { setSearch(e.target.value); }}
