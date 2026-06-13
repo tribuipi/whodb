@@ -115,3 +115,110 @@ export {
   TableCell,
   TableCaption,
 }
+
+function TableHeadRow({ className, style, ...props }: React.ComponentProps<"tr">) {
+  return (
+    <tr
+      className={cn("border-b transition-colors", className)}
+      style={style}
+      {...props}
+    />
+  );
+}
+
+type VirtualizedTableBodyProps = {
+  rowCount: number;
+  rowHeight?: number | ((args: { index: number }) => number);
+  height?: number;
+  className?: string;
+  style?: React.CSSProperties;
+  overscan?: number;
+  children: (index: number, style: React.CSSProperties) => React.ReactNode;
+};
+
+function VirtualizedTableBody({
+  rowCount,
+  rowHeight = 40,
+  height = 400,
+  className,
+  style,
+  overscan = 3,
+  children,
+}: VirtualizedTableBodyProps) {
+  const [scrollTop, setScrollTop] = React.useState(0);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const rafRef = React.useRef<number | null>(null);
+
+  const getRowHeight = (index: number) =>
+    typeof rowHeight === "function" ? rowHeight({ index }) : rowHeight;
+
+  const totalHeight = React.useMemo(() => {
+    let total = 0;
+    for (let i = 0; i < rowCount; i++) total += getRowHeight(i);
+    return total;
+  }, [rowCount, rowHeight]);
+
+  const prefixSums = React.useMemo(() => {
+    if (typeof rowHeight === "number") return null;
+    const sums = new Array(rowCount + 1);
+    sums[0] = 0;
+    for (let i = 0; i < rowCount; i++) sums[i + 1] = sums[i] + getRowHeight(i);
+    return sums;
+  }, [rowCount, rowHeight]);
+
+  const findStartIndex = (top: number): number => {
+    if (typeof rowHeight === "number") return Math.floor(top / rowHeight);
+    if (!prefixSums) return 0;
+    let lo = 0, hi = rowCount - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (prefixSums[mid + 1] <= top) lo = mid + 1;
+      else hi = mid;
+    }
+    return lo;
+  };
+
+  const startIndex = Math.max(0, findStartIndex(scrollTop) - overscan);
+  let endIndex = startIndex;
+  let accumulated = prefixSums ? prefixSums[startIndex] : startIndex * (rowHeight as number);
+  while (endIndex < rowCount && accumulated - scrollTop < height + (typeof rowHeight === "number" ? rowHeight * overscan : 200)) {
+    accumulated += getRowHeight(endIndex);
+    endIndex++;
+  }
+  endIndex = Math.min(rowCount, endIndex + overscan);
+
+  const handleScroll = React.useCallback(() => {
+    if (rafRef.current !== null) return;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      if (containerRef.current) setScrollTop(containerRef.current.scrollTop);
+    });
+  }, []);
+
+  const offsetTop = prefixSums
+    ? prefixSums[startIndex]
+    : startIndex * (rowHeight as number);
+
+  const rows: React.ReactNode[] = [];
+  for (let i = startIndex; i < endIndex; i++) {
+    const h = getRowHeight(i);
+    rows.push(children(i, { height: h }));
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className={cn("overflow-auto", className)}
+      style={{ height, ...style }}
+      onScroll={handleScroll}
+    >
+      <div style={{ height: totalHeight, position: "relative" }}>
+        <table style={{ position: "absolute", top: offsetTop, width: "100%" }}>
+          <tbody>{rows}</tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+export { TableHeadRow, VirtualizedTableBody };
