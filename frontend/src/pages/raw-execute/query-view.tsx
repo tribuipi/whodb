@@ -19,7 +19,7 @@ import {Button} from "@clidey/ux";
 import type {FC} from "react";
 import React, { useEffect} from "react";
 import {useTranslation} from "../../hooks/use-translation";
-import {StorageUnitTable} from "../../components/table";
+import { ResultGrid } from "../../components/result-grid";
 import {RawExecuteDocument} from "../../generated/graphql";
 import {ArrowDownCircleIcon, CheckCircleIcon} from "../../components/heroicons";
 import {useAppSelector} from "../../store/hooks";
@@ -116,19 +116,16 @@ export const QueryView: FC<IPluginProps> = ({ code, handleExecuteRef, containerW
                 </div>
                 {
                     data.RawExecute.Columns.length > 0 && (
-                        <StorageUnitTable
+                        <ResultGrid
                             key={containerWidth}
-                            columns={data.RawExecute.Columns.map((c: any) => c.Name)}
-                            columnTypes={data.RawExecute.Columns.map((c: any) => c.Type)}
-                            rows={data.RawExecute.Rows}
-                            disableEdit={true}
-                            limitContextMenu={true}
-                            height={Math.max(200, (height ?? 360) - TABLE_CHROME)}
-                            enforceMinHeight={true}
+                            data={{
+                                columns: data.RawExecute.Columns.map((c: any) => c.Name),
+                                columnTypes: data.RawExecute.Columns.map((c: any) => c.Type),
+                                rows: data.RawExecute.Rows,
+                            }}
+                            layout={{ height: Math.max(200, (height ?? 360) - TABLE_CHROME), enforceMinHeight: true }}
+                            actions={{ rawQuery: code, hideFooterControls: true }}
                             databaseType={currentType}
-                            rawQuery={code}
-                            totalCount={data.RawExecute.TotalCount}
-                            hideFooterControls={true}
                         />
                     )
                 }

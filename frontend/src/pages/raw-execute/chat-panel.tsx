@@ -39,7 +39,7 @@ import {Tip} from "../../components/tip";
 import {CodeEditor} from "../../components/editor";
 import {ErrorState} from "../../components/error-state";
 import {Loading} from "../../components/loading";
-import {StorageUnitTable} from "../../components/table";
+import { ResultGrid } from "../../components/result-grid";
 import {copyToClipboard} from "../../services/clipboard";
 import {MessageCopyAction} from "../../components/message-copy-action";
 import {extensions, featureFlags} from "../../config/features";
@@ -189,18 +189,17 @@ const TablePreview: FC<{ type: string, data: TableData, text: string, containerW
                 </div>
                 :  (data != null && data.Rows.length > 0) || type === "sql:get"
                     ? <div className="w-full">
-                        <StorageUnitTable
+                        <ResultGrid
                             key={containerWidth}
-                            columns={data?.Columns?.map(c => c.Name) ?? []}
-                            columnTypes={data?.Columns?.map(c => c.Type) ?? []}
-                            rows={data?.Rows ?? []}
-                            disableEdit={true}
+                            data={{
+                                columns: data?.Columns?.map(c => c.Name) ?? [],
+                                columnTypes: data?.Columns?.map(c => c.Type) ?? [],
+                                rows: data?.Rows ?? [],
+                            }}
+                            layout={{ height: 200, enforceMinHeight: true }}
+                            actions={{ rawQuery: text }}
                             limitContextMenu={true}
                             databaseType={currentType}
-                            rawQuery={text}
-                            height={200}
-                            enforceMinHeight={true}
-                            totalCount={data?.Rows?.length ?? 0}
                         />
                     </div>
                     : (type.startsWith("sql:") && (type === "sql:insert" || type === "sql:update" || type === "sql:delete" || type === "sql:create" || type === "sql:alter" || type === "sql:drop"))
