@@ -27,6 +27,17 @@ type ISqlTabProps = {
   tabId: string;
 };
 
+/** Apollo aborts in-flight requests when its subscription is torn down; those rejections are not real query errors. */
+function isAbortError(err: unknown): boolean {
+  if (err == null || typeof err !== "object") {
+    return false;
+  }
+  const e = err as { name?: string; message?: string; networkError?: { name?: string; message?: string } };
+  const name = e.name ?? e.networkError?.name;
+  const message = e.message ?? e.networkError?.message ?? "";
+  return name === "AbortError" || /operation was aborted/i.test(message);
+}
+
 /** A single SQL editor tab: editor on top, results below, with destructive-query confirmation. */
 export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
   const { t } = useTranslation("pages/raw-execute");
@@ -83,6 +94,9 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
     setError(null);
     setTotalCount(null);
     void handleExecuteRef.current?.(sql)?.catch((err: unknown) => {
+      if (isAbortError(err)) {
+        return;
+      }
       setError(err instanceof Error ? err : new Error(String(err)));
     });
   }, []);
@@ -104,13 +118,18 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
   }, [code, doExecute]);
 
   // Run once when the tab is opened from the object tree, then clear the flag.
-  const autoRunDone = useRef(false);
+  // Defer to a timer so StrictMode's mount/cleanup/mount cycle doesn't abort the
+  // in-flight query — the discarded mount's timer is cancelled in cleanup, so only
+  // the stable mount actually fires the query.
   useEffect(() => {
-    if (autoRun && !autoRunDone.current) {
-      autoRunDone.current = true;
+    if (!autoRun) {
+      return;
+    }
+    const id = setTimeout(() => {
       onRun();
       dispatch(SqlEditorActions.clearAutoRun({ tabId }));
-    }
+    }, 0);
+    return () => { clearTimeout(id); };
   }, [autoRun, onRun, dispatch, tabId]);
 
   const onFormat = useCallback(() => {
