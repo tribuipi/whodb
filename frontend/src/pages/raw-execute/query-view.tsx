@@ -15,11 +15,13 @@
  */
 
 import {useLazyQuery} from "@apollo/client/react";
+import {Button} from "@clidey/ux";
 import type {FC} from "react";
 import React, { useEffect} from "react";
+import {useTranslation} from "../../hooks/use-translation";
 import {StorageUnitTable} from "../../components/table";
 import {RawExecuteDocument} from "../../generated/graphql";
-import {CheckCircleIcon} from "../../components/heroicons";
+import {ArrowDownCircleIcon, CheckCircleIcon} from "../../components/heroicons";
 import {useAppSelector} from "../../store/hooks";
 
 type PromiseFunction = (code: string) => Promise<any>;
@@ -33,6 +35,7 @@ export type IPluginProps = {
     schema: string;
     containerWidth?: number;
     height?: number;
+    onResult?: (totalCount: number | null) => void;
 }
 
 // Vertical space the table reserves for its header row and footer chrome,
@@ -57,11 +60,21 @@ function isSQLQueryAction(code?: string): boolean {
     return /^(select|with|values|show|explain|describe)\b/.test(cleaned);
 }
 
-export const QueryView: FC<IPluginProps> = ({ code, handleExecuteRef, containerWidth, height }) => {
+export const QueryView: FC<IPluginProps> = ({ code, handleExecuteRef, containerWidth, height, onResult }) => {
+    const { t } = useTranslation("pages/raw-execute");
     const [rawExecute, { data }] = useLazyQuery(RawExecuteDocument, {
         fetchPolicy: 'network-only',
     });
     const currentType = useAppSelector(state => state.auth.current?.Type);
+
+    // Surface the result's total count to the host (shown in the editor's status bar).
+    useEffect(() => {
+        onResult?.(data?.RawExecute?.TotalCount ?? null);
+    }, [data, onResult]);
+
+    const triggerExport = () => {
+        window.dispatchEvent(new CustomEvent("menu:trigger-export"));
+    };
 
     // Set the ref to a function that executes the query and returns a promise
     useEffect(() => {
@@ -86,7 +99,21 @@ export const QueryView: FC<IPluginProps> = ({ code, handleExecuteRef, containerW
 
     if (isSQLQueryAction(code) || data.RawExecute.Rows.length > 0) {
         return (
-            <div className="flex flex-col w-full" data-testid="cell-query-output">
+            <div className="flex flex-col w-full h-full" data-testid="cell-query-output">
+                <div
+                    className="flex items-center justify-end gap-2 px-2 py-1 border-b border-neutral-200 dark:border-neutral-800 flex-shrink-0"
+                    data-testid="sql-editor-results-toolbar"
+                >
+                    <Button
+                        variant="secondary"
+                        onClick={triggerExport}
+                        className="flex gap-sm"
+                        data-testid="sql-editor-export"
+                    >
+                        <ArrowDownCircleIcon className="w-4 h-4" />
+                        {t("export")}
+                    </Button>
+                </div>
                 {
                     data.RawExecute.Columns.length > 0 && (
                         <StorageUnitTable
@@ -101,6 +128,7 @@ export const QueryView: FC<IPluginProps> = ({ code, handleExecuteRef, containerW
                             databaseType={currentType}
                             rawQuery={code}
                             totalCount={data.RawExecute.TotalCount}
+                            hideFooterControls={true}
                         />
                     )
                 }

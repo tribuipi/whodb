@@ -317,6 +317,8 @@ interface TableProps {
     enforceMinHeight?: boolean;
     // Enable keyboard shortcuts - should only be true on the explore-storage-unit page
     enableKeyboardShortcuts?: boolean;
+    // Hide the built-in footer controls (total count, import, export) so a host can render its own
+    hideFooterControls?: boolean;
 }
 
 export const StorageUnitTable: FC<TableProps> = ({
@@ -357,6 +359,7 @@ export const StorageUnitTable: FC<TableProps> = ({
     rawQuery,
     enforceMinHeight = false,
     enableKeyboardShortcuts = false,
+    hideFooterControls = false,
 }) => {
     const { t, language } = useTranslation('components/table');
     const [editIndex, setEditIndex] = useState<number | null>(null);
@@ -1610,7 +1613,7 @@ export const StorageUnitTable: FC<TableProps> = ({
                         })}
                     />
                 </div>
-                <div className="flex justify-end items-center mb-2 gap-4">
+                <div className={cn("flex justify-end items-center mb-2 gap-4", { "hidden": hideFooterControls })}>
                     {totalCount != null && totalCount > 0 && (
                         <div className="text-sm" data-testid="total-count-bottom">
                             <span className="font-semibold">{t('totalCount')}</span> {formatNumber(totalCount, language)}

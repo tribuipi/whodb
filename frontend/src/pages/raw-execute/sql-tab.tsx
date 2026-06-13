@@ -42,6 +42,7 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
   const containerWidth = useContainerWidth(resultsContainerRef);
   const [pendingCode, setPendingCode] = useState<string | null>(null);
   const [error, setError] = useState<Error | null>(null);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
   const [editorHeight, setEditorHeight] = useState(260);
   const [resultsHeight, setResultsHeight] = useState(0);
 
@@ -79,9 +80,14 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
 
   const doExecute = useCallback((sql: string) => {
     setError(null);
+    setTotalCount(null);
     void handleExecuteRef.current?.(sql)?.catch((err: unknown) => {
       setError(err instanceof Error ? err : new Error(String(err)));
     });
+  }, []);
+
+  const handleResult = useCallback((count: number | null) => {
+    setTotalCount(count);
   }, []);
 
   const onRun = useCallback((sql?: string) => {
@@ -117,6 +123,9 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
       <div style={{ height: editorHeight }} className="flex-shrink-0 overflow-auto">
         <CodeEditor language="sql" value={code} setValue={setCode} onRun={(lineText) => { onRun(lineText); }} />
       </div>
+      <div className="px-2 py-0.5 text-[10px] text-neutral-500 border-t border-neutral-200 dark:border-neutral-800 flex-shrink-0">
+        {t("searchPath", { schema: currentDatabase ?? "" })}
+      </div>
       <div
         onMouseDown={startResize}
         className="h-1 bg-neutral-200 dark:bg-neutral-800 cursor-row-resize flex-shrink-0 hover:bg-blue-400/40"
@@ -137,10 +146,14 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
           providerId={currentId}
           containerWidth={containerWidth}
           height={resultsHeight}
+          onResult={handleResult}
         />
       </div>
-      <div className="px-2 py-1 text-[10px] text-neutral-500 border-t border-neutral-200 dark:border-neutral-800 flex-shrink-0">
-        {t("searchPath", { schema: currentDatabase ?? "" })}
+      <div
+        className="px-2 py-1 text-[10px] text-neutral-500 border-t border-neutral-200 dark:border-neutral-800 flex-shrink-0"
+        data-testid="sql-editor-status-bar"
+      >
+        {totalCount != null && t("totalCount", { count: totalCount })}
       </div>
       <AlertDialog open={pendingCode != null} onOpenChange={(open) => { if (!open) { handleCancel(); } }}>
         <AlertDialogContent>
