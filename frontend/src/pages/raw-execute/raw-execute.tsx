@@ -6,6 +6,7 @@ import { InternalRoutes } from "../../config/routes";
 import { useTranslation } from "../../hooks/use-translation";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { SqlEditorActions } from "../../store/sql-editor";
+import { formatSql } from "../../utils/format-sql";
 import { ChatPanel } from "./chat-panel";
 import { EditorTabs } from "./editor-tabs";
 import { ObjectTree } from "./object-tree";
@@ -22,6 +23,7 @@ export const RawExecutePage: FC = () => {
   const tabs = useAppSelector(state => state.sqlEditor.tabs);
   const activeTabId = useAppSelector(state => state.sqlEditor.activeTabId);
   const schema = useAppSelector(state => state.database.schema);
+  const currentType = useAppSelector(state => state.auth.current?.Type);
   const [rightCollapsed, setRightCollapsed] = useState(true);
 
   useEffect(() => {
@@ -48,7 +50,7 @@ export const RawExecutePage: FC = () => {
             const qualified = schema ? `${schema}.${obj.Name}` : obj.Name;
             dispatch(SqlEditorActions.addSqlTab({
               name: obj.Name,
-              code: `SELECT * FROM ${qualified} LIMIT 100;`,
+              code: formatSql(`SELECT * FROM ${qualified} LIMIT 100;`, currentType),
               autoRun: true,
             }));
           }}
