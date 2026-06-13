@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import {Button, ModeToggle, SidebarProvider, Tooltip, TooltipContent, TooltipTrigger} from "@clidey/ux";
+import {Button} from "@/components/ui/button";
+import {ModeToggle} from "@/components/ui/mode-toggle";
+import {SidebarProvider} from "@/components/ui/sidebar";
+import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
 import classNames from "classnames";
 import type {FC, ReactNode} from "react";
 import {twMerge} from "tailwind-merge";

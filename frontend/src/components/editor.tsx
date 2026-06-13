@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {useTheme} from "@clidey/ux";
+import {useTheme} from "@/components/theme/provider";
 import {json} from "@codemirror/lang-json";
 import {markdown} from "@codemirror/lang-markdown";
 import {sql} from "@codemirror/lang-sql";

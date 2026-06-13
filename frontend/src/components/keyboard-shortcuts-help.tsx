@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-import {Dialog, DialogContent, DialogHeader, DialogTitle, Kbd, SearchInput,} from "@clidey/ux";
+import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import {Kbd} from "@/components/ui/kbd";
+import {SearchInput} from "@/components/ui/search-input";
 import type {FC} from "react";
 import { useCallback, useEffect, useState, useMemo} from "react";
 import {useTranslation} from "@/hooks/use-translation";
