@@ -8,7 +8,7 @@ en_US:
   databaseSpecificSuggestionsLabel: Suggested queries based on your database schema
   autoScroll: "Auto-scroll"
   scratchpadNotSupported: Scratchpad Is Not Supported for This Database Type
-  queryMoved: Query Moved to Scratchpad
+  queryMoved: Query opened in editor
   moveToScratchpad: Move to Scratchpad
   unableToQuery: Unable to Query. Try Again.
   failedToExecuteSQL: Failed to Execute SQL. Try Again.

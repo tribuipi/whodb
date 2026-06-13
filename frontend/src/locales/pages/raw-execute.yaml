@@ -1,28 +1,30 @@
 en_US:
-  copyCode: Copy Code
-  queryHistory: Query History
-  addCell: Add a New Cell
-  clearEditor: Clear the Editor
-  deleteCell: Delete the Cell
-  deleteCellTitle: Delete Cell?
-  deleteCellDescription: Are you sure you want to delete this cell? This action cannot be undone.
-  noHistoryTitle: No History Yet
-  noHistoryDescription: Run a Query to See Your History
-  success: Success
-  error: Error
-  copyToClipboard: Copy to Clipboard
-  copied: Copied!
-  cloneToEditor: Clone to Editor
-  clearHistory: Clear History
-  clearHistoryTitle: Clear Query History
-  clearHistoryDescription: Are you sure you want to clear all query history? This action cannot be undone.
-  deletePage: Delete {pageName}?
-  deletePageDescription: This action cannot be undone. This will permanently delete "{pageName}" and remove its data.
-  doubleClickEdit: Double click to edit
-  deletePageButton: Delete page
-  options: Options
-  addPage: Add Page
+  run: Run
+  format: Format
+  addTab: Add SQL tab
+  closeTab: Close tab
+  toggleChat: Toggle chat panel
+  showChat: Chat
+  hideChat: Chat
+  back: Back to tables
+  searchObjects: Search...
+  schemaHeader: Schema
+  searchPath: "search_path: {schema}"
+  loading: Loading...
+  colName: Name
+  colType: Type
+  colNullable: Nullable
+  colDefault: Default
+  colKey: Key
+  keyPrimary: PK
+  keyForeign: FK
+  keyUnique: Unique
+  yes: "Yes"
+  no: "No"
+  confirmExecutionTitle: Confirm Execution
   confirmExecutionDescription: This query will modify your database. This action cannot be undone.
+  cancel: Cancel
+  executeQuery: Execute Query
 
 ar_AE:
   copyCode: "نسخ الرمز"
