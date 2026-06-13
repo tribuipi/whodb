@@ -37,7 +37,6 @@ import {InternalRoutes} from "@/config/routes";
 import {
     ArrowLeftStartOnRectangleIcon,
     ArrowPathIcon,
-    ChatBubbleLeftRightIcon,
     ChevronUpDownIcon,
     CircleStackIcon,
     CogIcon,
@@ -67,7 +66,7 @@ const CommandPalette: FC<CommandPaletteProps> = ({open, onOpenChange}) => {
     const isEmbedded = useAppSelector(state => state.auth.isEmbedded);
     const isMac = useEffectiveIsMac();
     const [availableColumns, setAvailableColumns] = useState<string[]>([]);
-    const { supportsChat, supportsGraph, supportsScratchpad } = useSourceContract(currentType);
+    const { supportsGraph, supportsScratchpad } = useSourceContract(currentType);
 
     // Listen for columns broadcast from storage unit page
     useEffect(() => {
@@ -90,20 +89,6 @@ const CommandPalette: FC<CommandPaletteProps> = ({open, onOpenChange}) => {
         const navDefs = [SHORTCUTS.navFirst, SHORTCUTS.navSecond, SHORTCUTS.navThird, SHORTCUTS.navFourth];
 
         let shortcutIndex = 0;
-
-        if (supportsChat) {
-            navigationActions.push({
-                id: "nav-chat",
-                label: t('goToChat'),
-                icon: <ChatBubbleLeftRightIcon className="w-4 h-4" />,
-                shortcut: resolveShortcut(navDefs[shortcutIndex]).displayKeys,
-                onSelect: () => {
-                    void navigate(InternalRoutes.Chat.path);
-                    onOpenChange(false);
-                },
-            });
-            shortcutIndex += 1;
-        }
 
         navigationActions.push({
             id: "nav-storage-units",

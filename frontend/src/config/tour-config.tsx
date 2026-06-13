@@ -18,7 +18,6 @@
 
 import type { TourConfig } from '../components/tour/tour-step';
 import {
-    ChatBubbleLeftRightIcon,
     CodeBracketIcon,
     ShareIcon,
     SparklesIcon,
@@ -37,14 +36,6 @@ export const sampleDatabaseTour: TourConfig = {
             description: 'Let\'s take a quick tour to show you how to make the most of WhoDB with our sample database. This will only take a minute!',
             icon: <SparklesIcon className="w-6 h-6 text-brand-foreground" />,
             position: 'center',
-            path: InternalRoutes.Dashboard.StorageUnit.path,
-        },
-        {
-            target: `[href="${withBasePath(InternalRoutes.Chat.path)}"]`,
-            title: 'AI Chat Assistant',
-            description: 'Ask questions in plain English like "Show me all customers" or "What are the top products?". The AI will generate and run SQL queries for you.',
-            icon: <ChatBubbleLeftRightIcon className="w-6 h-6 text-brand-foreground" />,
-            position: 'right',
             path: InternalRoutes.Dashboard.StorageUnit.path,
         },
         {

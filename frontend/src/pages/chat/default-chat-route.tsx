@@ -14,49 +14,10 @@
  * limitations under the License.
  */
 
-import {skipToken, useQuery} from "@apollo/client/react";
 import type { FC } from "react";
-import { GetAiModelsDocument } from '@graphql';
-import { Loading } from "../../components/loading";
 import { Navigate } from "react-router-dom";
-import { InternalRoutes } from "../../config/routes";
 import { getSurfaceFallbackPath } from "../../config/route-registry";
-import { useSourceContract } from "../../hooks/useSourceContract";
-import { InternalPage } from "../../components/page";
-import { useAppSelector } from "../../store/hooks";
-import { availableInternalModelTypes } from "../../store/ai-models";
-import { hasComponent } from "../../config/component-registry";
 
 export const NavigateToDefault: FC = () => {
-    const currentType = useAppSelector(state => state.auth.current?.Type);
-    const { supportsChat } = useSourceContract(currentType);
-
-    const defaultModelType = availableInternalModelTypes[0];
-    const aiModelsQueryOptions = currentType && supportsChat && defaultModelType
-        ? {
-            variables: {
-                modelType: defaultModelType,
-            }
-        }
-        : skipToken;
-    const { data, error } = useQuery(GetAiModelsDocument, aiModelsQueryOptions);
-
-    if (hasComponent('sql-agent')) {
-        return <Navigate to={InternalRoutes.Chat.path} />
-    }
-
-    if (!supportsChat ||  error != null) {
-        return <Navigate to={getSurfaceFallbackPath()} />
-    }
-
-    if (data?.AIModel != null) {
-        if (data.AIModel.length > 0) {
-            return <Navigate to={InternalRoutes.Chat.path} />
-        }
-        return <Navigate to={getSurfaceFallbackPath()} />
-    }
-
-    return <InternalPage>
-        <Loading />
-    </InternalPage>
+    return <Navigate to={getSurfaceFallbackPath()} />
   }

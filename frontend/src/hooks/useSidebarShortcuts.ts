@@ -25,7 +25,7 @@ export const useSidebarShortcuts = () => {
     const navigate = useNavigate();
     const currentType = useAppSelector(state => state.auth.current?.Type);
     const isLoggedIn = useAppSelector(state => state.auth.status === "logged-in");
-    const { supportsChat, supportsGraph, supportsScratchpad } = useSourceContract(currentType);
+    const { supportsGraph, supportsScratchpad } = useSourceContract(currentType);
 
     const handleKeyDown = useCallback((event: KeyboardEvent) => {
         // Only handle when logged in
@@ -42,11 +42,6 @@ export const useSidebarShortcuts = () => {
 
         // Build route list based on database type (same logic as sidebar)
         const routes: string[] = [];
-
-        // Chat is first for SQL databases
-        if (supportsChat) {
-            routes.push(InternalRoutes.Chat.path);
-        }
 
         // Storage Units
         routes.push(InternalRoutes.Dashboard.StorageUnit.path);
@@ -81,7 +76,6 @@ export const useSidebarShortcuts = () => {
     }, [
 	isLoggedIn,
 	navigate,
-	supportsChat,
 	supportsGraph,
 	supportsScratchpad
 ]);

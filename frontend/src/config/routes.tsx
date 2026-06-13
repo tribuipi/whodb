@@ -40,16 +40,8 @@ const GraphPage = lazy(() => import("../pages/graph/graph").then(m => ({ default
 const ExploreStorageUnit = lazy(() => import("../pages/storage-unit/explore-storage-unit").then(m => ({ default: m.ExploreStorageUnit })));
 const StorageUnitPage = lazy(() => import("../pages/storage-unit/storage-unit").then(m => ({ default: m.StorageUnitPage })));
 const RawExecutePage = lazy(() => import("../pages/raw-execute/raw-execute").then(m => ({ default: m.RawExecutePage })));
-const ChatPage = lazy(() => import("../pages/chat/chat").then(m => ({ default: m.ChatPage })));
 const SettingsPage = lazy(() => import("../pages/settings/settings").then(m => ({ default: m.SettingsPage })));
 const ContactUsPage = lazy(() => import("../pages/contact-us/contact-us").then(m => ({ default: m.ContactUsPage })));
-const ChatRouteComponent: FC = () => {
-    const Agent = getComponent('sql-agent');
-    if (Agent) {
-        return <Suspense fallback={<LoadingPage />}><Agent /></Suspense>;
-    }
-    return <SourceSurfaceRoute surface="chat" component={<LazyRoute component={ChatPage} />} />;
-};
 
 // Wrapper component for lazy loaded routes
 const LazyRoute: FC<{ component: React.ComponentType<any> }> = ({ component: Component }) => (
@@ -59,21 +51,19 @@ const LazyRoute: FC<{ component: React.ComponentType<any> }> = ({ component: Com
 );
 
 const SourceSurfaceRoute: FC<{
-    surface: "chat" | "graph" | "scratchpad";
+    surface: "graph" | "scratchpad";
     component: ReactNode;
 }> = ({ surface, component }) => {
     const currentType = useAppSelector(state => state.auth.current?.Type);
-    const { loading, supportsChat, supportsGraph, supportsScratchpad } = useSourceContract(currentType);
+    const { loading, supportsGraph, supportsScratchpad } = useSourceContract(currentType);
 
     if (loading) {
         return <LoadingPage />;
     }
 
-    const isAllowed = surface === "chat"
-        ? supportsChat
-        : surface === "graph"
-            ? supportsGraph
-            : supportsScratchpad;
+    const isAllowed = surface === "graph"
+        ? supportsGraph
+        : supportsScratchpad;
 
     if (!isAllowed) {
         return <Navigate to={getSurfaceFallbackPath()} replace />;
@@ -119,11 +109,6 @@ export const InternalRoutes = {
         name: "Scratchpad",
         path: "/scratchpad",
         component: <SourceSurfaceRoute surface="scratchpad" component={<LazyRoute component={RawExecutePage} />} />,
-    },
-    Chat: {
-        name: "Chat",
-        path: "/chat",
-        component: <ChatRouteComponent />,
     },
     Logout: {
         name: "Logout",

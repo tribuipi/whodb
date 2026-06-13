@@ -83,7 +83,6 @@ import {
     PlusCircleIcon,
     QuestionMarkCircleIcon,
     RectangleGroupIcon,
-    SparklesIcon,
     TableCellsIcon
 } from "../heroicons";
 import {Icons} from "../icons";
@@ -208,7 +207,6 @@ export const Sidebar: FC = () => {
     const {
         item,
         storageUnitLabel,
-        supportsChat,
         supportsGraph,
         supportsScratchpad,
         supportsSchema,
@@ -363,13 +361,6 @@ export const Sidebar: FC = () => {
                 path: InternalRoutes.Dashboard.StorageUnit.path,
             },
         ];
-        if (supportsChat) {
-            routes.unshift({
-                title: t('chat'),
-                icon: <SparklesIcon className="w-4 h-4" />,
-                path: InternalRoutes.Chat.path,
-            });
-        }
         if (supportsGraph) {
             routes.push({
                 title: t('graph'),
@@ -385,7 +376,7 @@ export const Sidebar: FC = () => {
             });
         }
         return routes;
-    }, [current, storageUnitLabel, supportsChat, supportsGraph, supportsScratchpad, t]);
+    }, [current, storageUnitLabel, supportsGraph, supportsScratchpad, t]);
 
     // Logout single profile — show dialog first, remove after switch
     const handleLogoutProfile = useCallback(() => {
