@@ -32,6 +32,10 @@ import {isDesktopApp} from './utils/external-links';
 import {PosthogConsentBanner} from './components/analytics/posthog-consent-banner';
 import {ErrorBoundary} from './components/error-boundary';
 import {getBasePath} from './utils/base-path';
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+
+// Register all ag-grid Community features once for the whole app.
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 // Detect desktop Linux and add a class for CSS-based overrides (e.g., fonts)
 try {
