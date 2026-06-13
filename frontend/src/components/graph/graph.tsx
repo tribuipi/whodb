@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { Button, Tabs, TabsList, TabsTrigger } from '@clidey/ux';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowDownTrayIcon, RectangleGroupIcon } from '../heroicons';
 import classNames from 'classnames';
 import type { Dispatch, FC, ReactNode, SetStateAction} from "react";

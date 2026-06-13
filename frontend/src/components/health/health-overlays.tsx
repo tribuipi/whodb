@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { Button, cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, toast } from '@clidey/ux';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { createPortal } from 'react-dom';
 import { useTranslation } from '@/hooks/use-translation';
 import { useAppSelector } from '@/store/hooks';

@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-import {Alert, AlertDescription, AlertTitle, CopyButton, toast} from "@clidey/ux";
+import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CopyButton } from "@/components/ui/copy-button";
 import {BellAlertIcon} from "./heroicons";
 import {useTranslation} from "@/hooks/use-translation";
 

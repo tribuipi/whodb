@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { Alert, AlertDescription, Button, Input, Label, TextArea, cn } from '@clidey/ux';
+import { cn } from '@/lib/utils';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import type { FC} from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SearchSelect } from './ux';
@@ -406,7 +411,7 @@ const CertificateInput: FC<CertificateInputProps> = ({
           )}
         </div>
       ) : (
-        <TextArea
+        <Textarea
           value={contentValue}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>{  onContentChange(e.target.value); }}
           placeholder={"-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"}
