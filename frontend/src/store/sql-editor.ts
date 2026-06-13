@@ -84,7 +84,7 @@ export const sqlEditorSlice = createSlice({
     },
     updateTabCode: (state, action: PayloadAction<{ tabId: string; code: string }>) => {
       const tab = state.tabs.find(t => t.id === action.payload.tabId);
-      if (tab && tab.kind === 'sql') tab.code = action.payload.code;
+      if (tab?.kind === 'sql') tab.code = action.payload.code;
     },
     setActiveTab: (state, action: PayloadAction<{ tabId: string }>) => {
       if (state.tabs.some(t => t.id === action.payload.tabId)) {
