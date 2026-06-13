@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { Input, Label } from '@clidey/ux';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from '../hooks/use-translation';
 import { SearchSelect } from './ux';

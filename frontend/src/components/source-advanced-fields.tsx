@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-import { Input, Label, Switch } from '@clidey/ux';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { SourceConnectionFieldKind } from '@graphql';
 import type { FC } from 'react';
 import type { SourceTypeItem } from '@/config/source-types';

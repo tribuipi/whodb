@@ -16,7 +16,7 @@
 
 import type {FC} from "react";
 
-import {Spinner} from "@clidey/ux";
+import {Spinner} from "@/components/ui/spinner";
 import {useTranslation} from "@/hooks/use-translation";
 
 type ILoadingProps = {

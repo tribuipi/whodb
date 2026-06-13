@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {Button} from "@clidey/ux";
+import {Button} from "@/components/ui/button";
 import {Component, type ErrorInfo, type ReactNode} from "react";
 import {captureException} from "../config/posthog";
 import {navigateWithBasePath} from "../utils/base-path";

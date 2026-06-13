@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-import { Badge, Button, Card } from '@clidey/ux';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import type { FC, ReactElement} from 'react';
 import { useEffect, useState } from 'react';

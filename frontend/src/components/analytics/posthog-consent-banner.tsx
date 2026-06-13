@@ -15,7 +15,8 @@
  */
 
 import {useCallback, useEffect, useState} from 'react';
-import {Button, cn} from '@clidey/ux';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {useAppDispatch, useAppSelector} from '../../store/hooks';
 import {SettingsActions} from '../../store/settings';
 import {getStoredConsentState, optInUser, optOutUser} from '../../config/posthog';

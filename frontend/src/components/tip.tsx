@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import {cn, Tooltip, TooltipContent, TooltipTrigger} from "@clidey/ux";
+import {cn} from "@/lib/utils";
+import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
 import type {FC, ReactNode} from "react";
 
 export const Tip: FC<{

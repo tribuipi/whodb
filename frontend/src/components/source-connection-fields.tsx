@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { Button, cn, Input, Label, Switch } from '@clidey/ux';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { ph } from '@/utils/privacy';
 import {
     SourceConnectionFieldKind,
