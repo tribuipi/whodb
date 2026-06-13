@@ -73,7 +73,7 @@ A new tree component styled pixel-for-pixel to pgconsole (we are **not** reusing
 - **Search box** filters objects across all groups live.
 - **Collapsible groups** by object type — Tables, Views, Functions, plus whatever the
   source exposes (Procedures, Materialized views, …) — each with a count badge.
-- **Double-click** an object → inserts its name into the active editor at the cursor.
+- **Single-click** an object → opens a new tab pre-filled with `SELECT * FROM <obj> LIMIT …`.
 - Data: fetched from the same source-catalog queries the app already uses to enumerate
   schema objects. (Grouping/counts logic is reimplemented in the new component rather
   than imported from `SchemaViewer`.)
@@ -186,9 +186,9 @@ Per-tab **results** are component-local state (not persisted), keyed by tab.
 - No lint errors (oxlint via the auto-hook).
 - No dead code — removed scratchpad multi-cell logic fully deleted, no orphaned imports.
 - Playwright E2E: update/extend the scratchpad E2E to exercise the new editor
-  (run a query, see results; insert an object name from the tree; format SQL).
-- Manual: run a SELECT, run a destructive query (confirm dialog), insert from tree
-  (double-click), insert from chat response, collapse/resize panels, reload
+  (run a query, see results; click a tree object to open a SELECT tab; format SQL).
+- Manual: run a SELECT, run a destructive query (confirm dialog), click a tree object
+  (opens SELECT tab), insert from chat response, collapse/resize panels, reload
   (tabs persist).
 
 ## Open Questions
