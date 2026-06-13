@@ -90,6 +90,8 @@ en_US:
   deleteRowConfirmTitle_other: Delete Rows?
   deleteRowConfirmDescription: Are you sure you want to delete {count} rows? This action cannot be undone.
   deleteRowConfirmDescription_one: Are you sure you want to delete {count} row? This action cannot be undone.
+  totalCount: "Total:"
+  importAction: Import
 
 ar_AE:
   rowCopiedToClipboard: "تم نسخ الصف إلى الحافظة"
