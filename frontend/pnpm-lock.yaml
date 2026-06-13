@@ -71,9 +71,15 @@ importers:
       ag-grid-react:
         specifier: 35.3.1
         version: 35.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      class-variance-authority:
+        specifier: 0.7.1
+        version: 0.7.1
       classnames:
         specifier: 2.5.1
         version: 2.5.1
+      clsx:
+        specifier: 2.1.1
+        version: 2.1.1
       codemirror:
         specifier: 6.0.2
         version: 6.0.2
@@ -89,6 +95,9 @@ importers:
       lodash:
         specifier: 4.18.1
         version: 4.18.1
+      next-themes:
+        specifier: 0.4.6
+        version: 0.4.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       posthog-js:
         specifier: 1.342.1
         version: 1.342.1
@@ -122,6 +131,9 @@ importers:
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
+      sonner:
+        specifier: 2.0.7
+        version: 2.0.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       sql-formatter:
         specifier: 15.8.1
         version: 15.8.1
