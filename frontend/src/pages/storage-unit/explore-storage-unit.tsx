@@ -81,7 +81,7 @@ import {
 import {Loading, LoadingPage} from "../../components/loading";
 import {InternalPage} from "../../components/page";
 import {SchemaViewer} from "../../components/schema-viewer";
-import {getColumnIcons, getInputPropsForColumnType, StorageUnitTable} from "../../components/table";
+import {getColumnIcons, getInputPropsForColumnType, ResultGrid} from "../../components/result-grid";
 import {Tip} from "../../components/tip";
 import {InternalRoutes} from "../../config/routes";
 import {useSourceContract} from "../../hooks/useSourceContract";
@@ -1106,45 +1106,45 @@ export const ExploreStorageUnit: FC = () => {
                         <Loading />
                     </div>
                 ) : rows != null ? (
-                    <StorageUnitTable
-                        columns={columns}
-                        rows={rows.Rows}
-                        onRowUpdate={handleRowUpdate}
-                        columnTypes={columnTypes}
-                        columnIsPrimary={columnIsPrimary}
-                        columnIsForeignKey={columnIsForeignKey}
-                        schema={schema}
-                        storageUnit={unitName}
-                        objectRef={currentUnitRef}
-                        onRefresh={handleSubmitRequest}
-                        onColumnSort={handleColumnSort}
-                        sortedColumns={sortedColumnsMap}
-                        searchRef={searchRef}
-                        pageSize={pageSize}
-                        height={tableHeight}
-                        // Server-side pagination props
-                        totalCount={Number.parseInt(totalCount, 10)}
-                        currentPage={currentPage}
-                        onPageChange={handlePageChange}
-                        showPagination={true}
-                        // Foreign key functionality
-                        isValidForeignKey={isValidForeignKey}
-                        onEntitySearch={handleEntitySearch}
+                    <ResultGrid
+                        data={{
+                            columns,
+                            columnTypes,
+                            columnIsPrimary,
+                            columnIsForeignKey,
+                            rows: rows.Rows,
+                        }}
+                        layout={{ height: tableHeight }}
+                        editing={{
+                            onRowUpdate: handleRowUpdate,
+                            allowRowUpdate: allowsUpdateData,
+                            allowRowDelete: allowsDeleteData,
+                            objectRef: currentUnitRef,
+                            storageUnit: unitName,
+                            onRefresh: handleSubmitRequest,
+                        }}
+                        sorting={{ onColumnSort: handleColumnSort, sortedColumns: sortedColumnsMap }}
+                        pagination={{
+                            totalCount: Number.parseInt(totalCount, 10),
+                            currentPage,
+                            onPageChange: handlePageChange,
+                            pageSize,
+                            show: true,
+                        }}
+                        actions={{ allowImport: true, isMockDataGenerationAllowed }}
+                        foreignKeys={{ isValidForeignKey, onEntitySearch: handleEntitySearch }}
                         databaseType={current?.Type}
-                        allowRowUpdate={allowsUpdateData}
-                        allowRowDelete={allowsDeleteData}
-                        // Mock data control - disabled for views/materialized views
-                        isMockDataGenerationAllowed={isMockDataGenerationAllowed}
-                        // Import control - enabled for explore view
-                        allowImport={true}
+                        searchRef={searchRef}
                         enableKeyboardShortcuts={true}
                     >
-                        {allowsInsertData && <div className="flex gap-2">
-                            <Button onClick={handleOpenAddSheet} disabled={adding} data-testid="add-row-button">
-                                <PlusCircleIcon className="w-4 h-4" /> {t('addRowButton')}
-                            </Button>
-                        </div>}
-                    </StorageUnitTable>
+                        {allowsInsertData && (
+                            <div className="flex gap-2">
+                                <Button onClick={handleOpenAddSheet} disabled={adding} data-testid="add-row-button">
+                                    <PlusCircleIcon className="w-4 h-4" /> {t('addRowButton')}
+                                </Button>
+                            </div>
+                        )}
+                    </ResultGrid>
                 ) : null}
             </div>
         </div>
@@ -1178,19 +1178,17 @@ export const ExploreStorageUnit: FC = () => {
                     )}
                     {rawExecuteData != null && (
                         !isDestructiveQuery(code) || rawExecuteData.RawExecute.Rows.length > 0 ? (
-                            <StorageUnitTable
+                            <ResultGrid
                                 key={scratchpadContainerWidth}
-                                columns={rawExecuteData.RawExecute.Columns.map(c => c.Name)}
-                                columnTypes={rawExecuteData.RawExecute.Columns.map(c => c.Type)}
-                                rows={rawExecuteData.RawExecute.Rows}
-                                disableEdit={true}
+                                data={{
+                                    columns: rawExecuteData.RawExecute.Columns.map(c => c.Name),
+                                    columnTypes: rawExecuteData.RawExecute.Columns.map(c => c.Type),
+                                    rows: rawExecuteData.RawExecute.Rows,
+                                }}
+                                layout={{ enforceMinHeight: false }}
+                                actions={{ hideFooterControls: true }}
                                 limitContextMenu={true}
-                                schema={schema}
-                                storageUnit={unitName}
-                                onRefresh={handleSubmitRequest}
-                                showPagination={false}
                                 databaseType={current?.Type}
-                                totalCount={Number.parseInt(totalCount, 10)}
                             />
                         ) : (
                             <div className="bg-white/10 text-neutral-800 dark:text-neutral-300 rounded-lg p-2 flex gap-sm self-start items-center my-4">
