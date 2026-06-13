@@ -191,15 +191,18 @@ export const AwsConnectionPicker: FC<AwsConnectionPickerProps> = ({
                     <CloudIcon className="w-5 h-5" />
                     <Label className="font-medium">{t('awsConnections')}</Label>
                     <Popover>
-                        <PopoverTrigger asChild>
-                            <button
-                                type="button"
-                                className="text-muted-foreground hover:text-foreground transition-colors"
-                                aria-label={t('helpLabel')}
-                            >
-                                <QuestionMarkCircleIcon className="w-4 h-4" />
-                            </button>
-                        </PopoverTrigger>
+                        <PopoverTrigger
+                            render={(triggerProps) => (
+                                <button
+                                    {...triggerProps}
+                                    type="button"
+                                    className="text-muted-foreground hover:text-foreground transition-colors"
+                                    aria-label={t('helpLabel')}
+                                >
+                                    <QuestionMarkCircleIcon className="w-4 h-4" />
+                                </button>
+                            )}
+                        />
                         <PopoverContent className="w-80 p-4" side="bottom" align="start">
                             <div className="flex flex-col gap-3">
                                 <h4 className="font-medium text-sm">{t('helpTitle')}</h4>

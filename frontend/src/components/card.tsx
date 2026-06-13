@@ -19,7 +19,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card as UxCard, CardContent, CardHeader } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Spinner } from "@/components/ui/spinner";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import type { FC, ReactElement, ReactNode} from "react";
 import {cloneElement, useEffect, useState,} from "react";
 import {useTranslation} from "@/hooks/use-translation";
@@ -121,9 +120,9 @@ export const ExpandableCard: FC<IExpandableCardProps> = (props) => {
         </Card>
       </div>
       <SheetContent side="right" className="p-0">
-        <VisuallyHidden>
+        <span className="sr-only">
           <SheetTitle>{t('details')}</SheetTitle>
-        </VisuallyHidden>
+        </span>
         <div className="flex flex-col w-full justify-center p-8 h-full">
           {props.loading ? null : props.children[1]}
         </div>

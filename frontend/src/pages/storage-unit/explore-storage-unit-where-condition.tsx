@@ -75,9 +75,7 @@ const PopoverCard: FC<IPopoverCardProps> = ({
     }, [isEditing, handleSaveFilter, editingIndex, handleAddFilter]);
 
     return  <Popover open={open} onOpenChange={onOpenChange}>
-        <PopoverTrigger asChild>
-            <div />
-        </PopoverTrigger>
+        <PopoverTrigger render={<div />} />
         <PopoverContent
             className={cn("flex flex-col gap-md z-[5] py-4 px-6 mt-1 rounded-lg shadow-md min-w-[260px]", className)}
             side="bottom"
@@ -92,7 +90,7 @@ const PopoverCard: FC<IPopoverCardProps> = ({
                     value={currentFilter.Key}
                     options={fieldsDropdownItems}
                     onChange={handleFieldSelect}
-                    contentClassName="w-[var(--radix-popover-trigger-width)]"
+                    contentClassName="w-[var(--anchor-width)]"
                     buttonProps={{
                         "data-testid": "field-key",
                     }}
@@ -106,7 +104,7 @@ const PopoverCard: FC<IPopoverCardProps> = ({
                     value={currentFilter.Operator}
                     options={validOperators}
                     onChange={handleOperatorSelector}
-                    contentClassName="w-[var(--radix-popover-trigger-width)]"
+                    contentClassName="w-[var(--anchor-width)]"
                     buttonProps={{
                         "data-testid": "field-operator",
                     }}

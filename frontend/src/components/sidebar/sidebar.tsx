@@ -36,7 +36,6 @@ import {
     SourceFieldOptionsDocument,
 } from '@graphql';
 import {useTranslation} from '@/hooks/use-translation';
-import {VisuallyHidden} from "@radix-ui/react-visually-hidden";
 import type {FC, LazyExoticComponent, ReactElement, ReactNode} from "react";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useDispatch} from "react-redux";
@@ -904,9 +903,9 @@ export const Sidebar: FC = () => {
             </SidebarComponent>
             <Sheet open={showLoginCard} onOpenChange={setShowLoginCard}>
                 <SheetContent side="right" className="p-8">
-                    <VisuallyHidden>
+                    <span className="sr-only">
                         <SheetTitle>{t('databaseLogin')}</SheetTitle>
-                    </VisuallyHidden>
+                    </span>
                     <LoginForm advancedDirection="vertical" onLoginSuccess={handleLoginSuccess}/>
                 </SheetContent>
             </Sheet>

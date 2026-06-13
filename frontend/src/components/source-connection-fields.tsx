@@ -170,7 +170,7 @@ export function SourceConnectionFields({
                                 'aria-invalid': hasError ? 'true' : undefined,
                                 'aria-describedby': hasError ? errorId : undefined,
                             }}
-                            contentClassName="w-[var(--radix-popover-trigger-width)] login-select-popover"
+                            contentClassName="w-[var(--anchor-width)] login-select-popover"
                             rightIcon={<ChevronDownIcon className="w-4 h-4" />}
                         />
                     ) : (

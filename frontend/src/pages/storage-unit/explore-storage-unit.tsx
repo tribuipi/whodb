@@ -1190,15 +1190,13 @@ export const ExploreStorageUnit: FC = () => {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                             <AlertDialogCancel data-testid="execute-query-cancel" onClick={() =>{  setPendingScratchpadQuery(null); }}>{t('cancel')}</AlertDialogCancel>
-                            <AlertDialogAction asChild>
-                                <Button variant="destructive" data-testid="execute-query-confirm" onClick={() => {
+                            <AlertDialogAction variant="destructive" data-testid="execute-query-confirm" onClick={() => {
                                     if (pendingScratchpadQuery != null) {
                                         doScratchpadExecute(pendingScratchpadQuery);
                                         setPendingScratchpadQuery(null);
                                     }
                                 }}>
-                                    {t('run')}
-                                </Button>
+                                {t('run')}
                             </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>

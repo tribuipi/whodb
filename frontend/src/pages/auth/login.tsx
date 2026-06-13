@@ -985,7 +985,7 @@ export const LoginForm: FC<LoginFormProps> = ({
                                                 buttonProps={{
                                                     "data-testid": "database-type-select",
                                                 }}
-                                                contentClassName="w-[var(--radix-popover-trigger-width)] login-select-popover"
+                                                contentClassName="w-[var(--anchor-width)] login-select-popover"
                                                 rightIcon={<ChevronDownIcon className="w-4 h-4"/>}
                                             />
                                         </div>
@@ -1060,7 +1060,7 @@ export const LoginForm: FC<LoginFormProps> = ({
                                 value={selectedAvailableProfile}
                                 onChange={handleAvailableProfileChange}
                                 placeholder={t('selectProfile')}
-                                contentClassName="w-[var(--radix-popover-trigger-width)]"
+                                contentClassName="w-[var(--anchor-width)]"
                                 options={availableProfiles}
                                 buttonProps={{
                                     "data-testid": "available-profiles-select",

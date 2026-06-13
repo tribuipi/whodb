@@ -15,7 +15,8 @@
  */
 
 import {cn} from "@/lib/utils";
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import * as React from "react";
 import type {FC, ReactNode} from "react";
 
 export const Tip: FC<{
@@ -23,13 +24,19 @@ export const Tip: FC<{
     children: [ReactNode, ReactNode]
 }> = ({children, className}) => {
     return (
-        <Tooltip>
-            <TooltipTrigger className={cn("w-full", className)}>
-                {children[0]}
-            </TooltipTrigger>
-            <TooltipContent>
-                {children[1]}
-            </TooltipContent>
-        </Tooltip>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger
+                    render={(triggerProps) => (
+                        <span {...triggerProps} className={cn("w-full", className, triggerProps.className)}>
+                            {children[0]}
+                        </span>
+                    )}
+                />
+                <TooltipContent>
+                    {children[1]}
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
     )
 }

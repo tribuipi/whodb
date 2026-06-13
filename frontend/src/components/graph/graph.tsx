@@ -226,7 +226,7 @@ export const Graph: FC<IGraphProps> = (props) => {
             <div className="flex flex-col gap-2">
                 <Tabs value={undefined} onValueChange={() => {}}>
                     <TabsList dir="column" className="px-1">
-                        <TabsTrigger value="download" asChild>
+                        <TabsTrigger value="download">
                             <Tip className="w-[30px]">
                                 <Button
                                     data-testid="graph-download-button"
@@ -239,7 +239,7 @@ export const Graph: FC<IGraphProps> = (props) => {
                                 {t('download')}
                             </Tip>
                         </TabsTrigger>
-                        <TabsTrigger value="layout" asChild>
+                        <TabsTrigger value="layout">
                             <Tip className="w-[30px]">
                                 <Button
                                     data-testid="graph-layout-button"

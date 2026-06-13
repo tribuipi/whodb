@@ -17,7 +17,7 @@
 import {Button} from "@/components/ui/button";
 import {ModeToggle} from "@/components/ui/mode-toggle";
 import {SidebarProvider} from "@/components/ui/sidebar";
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import classNames from "classnames";
 import type {FC, ReactNode} from "react";
 import {twMerge} from "tailwind-merge";
@@ -100,22 +100,27 @@ const KeyboardShortcutsHint: FC = () => {
     };
 
     return (
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleClick}
-                    className="gap-1.5 h-9"
-                    aria-label={t('showShortcuts')}
-                >
-                    <QuestionMarkCircleIcon className="h-4 w-4" />
-                </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-                <p>{t('hint')}</p>
-            </TooltipContent>
-        </Tooltip>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger
+                    render={(triggerProps) => (
+                        <Button
+                            {...triggerProps}
+                            variant="outline"
+                            size="sm"
+                            onClick={handleClick}
+                            className="gap-1.5 h-9"
+                            aria-label={t('showShortcuts')}
+                        >
+                            <QuestionMarkCircleIcon className="h-4 w-4" />
+                        </Button>
+                    )}
+                />
+                <TooltipContent side="bottom">
+                    <p>{t('hint')}</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
     );
 };
 

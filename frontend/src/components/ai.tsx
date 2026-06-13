@@ -667,17 +667,20 @@ export const AIProvider: FC<ReturnType<typeof useAI> & {
                 )}
             </div>
             <AlertDialog>
-                <AlertDialogTrigger asChild>
-                    <Button
-                        data-testid="chat-delete-provider"
-                        variant="secondary"
-                        className={cn({
-                            "hidden": disableNewChat ?? modelType?.isEnvironmentDefined ?? modelType?.isPlatformProvider,
-                        })}
-                    >
-                        <TrashIcon className="w-4 h-4" /> {t('deleteProvider')}
-                    </Button>
-                </AlertDialogTrigger>
+                <AlertDialogTrigger
+                    render={(triggerProps) => (
+                        <Button
+                            {...triggerProps}
+                            data-testid="chat-delete-provider"
+                            variant="secondary"
+                            className={cn({
+                                "hidden": disableNewChat ?? modelType?.isEnvironmentDefined ?? modelType?.isPlatformProvider,
+                            })}
+                        >
+                            <TrashIcon className="w-4 h-4" /> {t('deleteProvider')}
+                        </Button>
+                    )}
+                />
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>{t('deleteProvider')}</AlertDialogTitle>
@@ -687,14 +690,12 @@ export const AIProvider: FC<ReturnType<typeof useAI> & {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-                        <AlertDialogAction asChild>
-                            <Button
-                                data-testid="chat-delete-provider-confirm"
-                                onClick={() => { void handleDeleteProvider(modelType?.id); }}
-                                variant="destructive"
-                            >
-                                {t('delete')}
-                            </Button>
+                        <AlertDialogAction
+                            data-testid="chat-delete-provider-confirm"
+                            onClick={() => { void handleDeleteProvider(modelType?.id); }}
+                            variant="destructive"
+                        >
+                            {t('delete')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

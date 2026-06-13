@@ -95,20 +95,23 @@ export const DatabaseIconWithBadge: FC<DatabaseIconWithBadgeProps> = ({
             )}
             {showSslBadge && (
                 <Tooltip>
-                    <TooltipTrigger asChild>
-                        <div
-                            data-testid="ssl-badge"
-                            className={cn(
-                                "absolute rounded-full bg-background border border-border flex items-center justify-center",
-                                sslBadgeSizeClasses[size]
-                            )}
-                        >
-                            <ShieldCheckIcon className={cn(
-                                "text-green-500",
-                                size === "sm" ? "w-1.5 h-1.5" : size === "md" ? "w-2 h-2" : "w-2.5 h-2.5"
-                            )} />
-                        </div>
-                    </TooltipTrigger>
+                    <TooltipTrigger
+                        render={(triggerProps) => (
+                            <div
+                                {...triggerProps}
+                                data-testid="ssl-badge"
+                                className={cn(
+                                    "absolute rounded-full bg-background border border-border flex items-center justify-center",
+                                    sslBadgeSizeClasses[size]
+                                )}
+                            >
+                                <ShieldCheckIcon className={cn(
+                                    "text-green-500",
+                                    size === "sm" ? "w-1.5 h-1.5" : size === "md" ? "w-2 h-2" : "w-2.5 h-2.5"
+                                )} />
+                            </div>
+                        )}
+                    />
                     <TooltipContent>
                         {tSidebar('sslSecured', { mode: sslStatus?.Mode })}
                     </TooltipContent>

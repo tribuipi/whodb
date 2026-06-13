@@ -24,7 +24,6 @@ import type {FC} from "react";
 import { useCallback, useEffect, useMemo, useState} from "react";
 import {useExportToCSV} from "./hooks";
 import {ShareIcon} from "./heroicons";
-import {VisuallyHidden} from "@radix-ui/react-visually-hidden";
 import {useTranslation} from "@/hooks/use-translation";
 import {useSourceContract} from "@/hooks/useSourceContract";
 import {sourceDefaultObjectIsTabular} from "@/config/source-types";
@@ -120,9 +119,9 @@ export const Export: FC<IExportProps> = ({
             <Sheet open={open} onOpenChange={onOpenChange}>
                 <SheetContent side="right" className="max-w-md w-full p-8 flex flex-col" data-testid="export-dialog">
                     <SheetTitle className="flex items-center gap-2"><ShareIcon className="w-4 h-4" /> {t('exportData')}</SheetTitle>
-                    <VisuallyHidden>
+                    <span className="sr-only">
                         <SheetTitle>{t('exportData')}</SheetTitle>
-                    </VisuallyHidden>
+                    </span>
                     <div className="flex flex-col gap-lg flex-1 overflow-y-auto">
                         <div className="space-y-4 grow">
                             <p>

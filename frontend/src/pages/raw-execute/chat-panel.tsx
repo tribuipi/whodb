@@ -146,11 +146,13 @@ const TablePreview: FC<{ type: string, data: TableData, text: string, containerW
             "opacity-100": dropdownOpen,
         })}>
             <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
-                <DropdownMenuTrigger>
-                    <Button variant="outline" size="sm" data-testid="icon-button" aria-label={t('actions')}>
-                        <EllipsisHorizontalIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
-                </DropdownMenuTrigger>
+                <DropdownMenuTrigger
+                    render={(triggerProps) => (
+                        <Button {...triggerProps} variant="outline" size="sm" data-testid="icon-button" aria-label={t('actions')}>
+                            <EllipsisHorizontalIcon className="w-5 h-5" aria-hidden="true" />
+                        </Button>
+                    )}
+                />
                 <DropdownMenuContent align="start">
                     <DropdownMenuItem onClick={handleCodeToggle} data-testid="toggle-view-option">
                         {showSQL ? (

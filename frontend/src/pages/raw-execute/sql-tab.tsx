@@ -186,10 +186,8 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel data-testid="execute-query-cancel" onClick={handleCancel}>{t("cancel")}</AlertDialogCancel>
-            <AlertDialogAction asChild>
-              <Button variant="destructive" data-testid="execute-query-confirm" onClick={handleConfirm}>
-                {t("executeQuery")}
-              </Button>
+            <AlertDialogAction variant="destructive" data-testid="execute-query-confirm" onClick={handleConfirm}>
+              {t("executeQuery")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

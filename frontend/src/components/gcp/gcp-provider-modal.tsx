@@ -348,7 +348,7 @@ export const GcpProviderModal: FC<GcpProviderModalProps> = ({
                             onChange={setRegion}
                             options={regionOptions}
                             placeholder={t('selectRegion')}
-                            contentClassName="w-[var(--radix-popover-trigger-width)]"
+                            contentClassName="w-[var(--anchor-width)]"
                             rightIcon={<ChevronDownIcon className="w-4 h-4" />}
                         />
                     </div>

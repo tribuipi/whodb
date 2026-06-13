@@ -350,7 +350,7 @@ export const AzureProviderModal: FC<AzureProviderModalProps> = ({
                             onChange={setAuthMethod}
                             options={authMethodOptions}
                             placeholder={t('selectAuthMethod')}
-                            contentClassName="w-[var(--radix-popover-trigger-width)]"
+                            contentClassName="w-[var(--anchor-width)]"
                             rightIcon={<ChevronDownIcon className="w-4 h-4" />}
                         />
                         <p className="text-xs text-muted-foreground">
@@ -419,7 +419,7 @@ export const AzureProviderModal: FC<AzureProviderModalProps> = ({
                                 onChange={setRegion}
                                 options={regionOptions}
                                 placeholder={t('selectRegion')}
-                                contentClassName="w-[var(--radix-popover-trigger-width)]"
+                                contentClassName="w-[var(--anchor-width)]"
                                 rightIcon={<ChevronDownIcon className="w-4 h-4" />}
                             />
                         </div>

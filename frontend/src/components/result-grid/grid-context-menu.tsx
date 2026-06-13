@@ -61,7 +61,7 @@ export function GridContextMenu(props: GridContextMenuProps) {
     } = props;
     return (
         <ContextMenu>
-            <ContextMenuTrigger asChild>
+            <ContextMenuTrigger className="contents">
                 {children}
             </ContextMenuTrigger>
             <ContextMenuContent className="w-52 max-h-[calc(100vh-2rem)] overflow-y-auto" collisionPadding={{ top: 20, right: 20, bottom: 20, left: 20 }}>

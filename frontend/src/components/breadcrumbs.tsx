@@ -55,17 +55,17 @@ export const Breadcrumb: FC<IBreadcrumbProps> = ({ routes, active }) => {
                 </BreadcrumbPage>
               ) : (
                 <BreadcrumbLink
-                  asChild
                   className="cursor-pointer"
                   onClick={() => { void navigate(route.path); }}
-                >
-                  <div className="flex items-center gap-xs" onClick={() => { void navigate(InternalRoutes.Dashboard.StorageUnit.path); }}>
-                    {i === 0 && (
-                        <HomeIcon className="w-4 h-4"/>
-                    )}
-                    {route.name}
-                  </div>
-                </BreadcrumbLink>
+                  render={
+                    <div className="flex items-center gap-xs" onClick={() => { void navigate(InternalRoutes.Dashboard.StorageUnit.path); }}>
+                      {i === 0 && (
+                          <HomeIcon className="w-4 h-4"/>
+                      )}
+                      {route.name}
+                    </div>
+                  }
+                />
               )}
             </BreadcrumbItem>
           );
