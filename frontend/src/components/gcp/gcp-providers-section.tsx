@@ -17,7 +17,10 @@
 import { useMutation } from "@apollo/client/react";
 import type { FC} from "react";
 import { useCallback, useMemo } from "react";
-import { Badge, Button, cn, toast } from "@clidey/ux";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
     CloudProviderStatus,
     CloudProviderType,
