@@ -46,7 +46,7 @@ toolbar/header area lets users navigate back to the rest of WhoDB.
 |-------|---------------|----------|
 | DB object tree (left) | 220px | Resizable via right-edge drag handle |
 | Editor + results (center) | flex (fills) | Editor/results split is vertically resizable |
-| Chat (right) | 360px | Resizable via left-edge drag handle; collapsible; width persisted |
+| Chat (right) | 360px | Collapsed by default; toggle to expand; resizable via left-edge drag handle; collapsed/expanded state + width persisted |
 
 ## Components
 
@@ -133,7 +133,7 @@ panel component used solely here.
   (chat is already non-GraphQL; embedding reuses it unchanged).
 - Each AI response containing SQL gets actions: **▶ Run**, **⤵ Insert into active editor**,
   **⎘ Copy**.
-- Collapsible; width persisted.
+- **Collapsed by default**; a toggle expands/collapses it. Collapsed state and width persist.
 - Chat shares the current schema/source so generated SQL targets the right database.
 
 ### 8. Table Structure panel (center, structure tab) — **new component**
