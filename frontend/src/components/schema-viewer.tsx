@@ -15,17 +15,10 @@
  */
 
 import { skipToken, useQuery } from "@apollo/client/react";
-import type {
-    TreeDataItem} from "@clidey/ux";
-import {
-    SearchInput,
-    Sidebar as SidebarComponent,
-    SidebarContent,
-    SidebarGroup,
-    SidebarHeader,
-    toTitleCase,
-    Tree
-} from "@clidey/ux";
+import { toTitleCase } from "@/lib/utils";
+import { SearchInput } from "@/components/ui/search-input";
+import { Sidebar as SidebarComponent, SidebarContent, SidebarGroup, SidebarHeader } from "@/components/ui/sidebar";
+import { Tree, type TreeDataItem } from "@/components/ui/tree";
 import type { GetStorageUnitsQuery, SourceObjectRefInput} from "@graphql";
 import {GetStorageUnitsDocument, SourceAction} from "@graphql";
 import {FolderIcon, TableCellsIcon} from "./heroicons";
@@ -170,7 +163,7 @@ export const SchemaViewer: FC<SchemaViewerProps> = ({ parentRef: explicitParentR
 
     return (
         <div className="flex h-full dark" data-testid="schema-viewer">
-            <SidebarComponent variant="embed" className="w-64 h-full flex flex-col">
+            <SidebarComponent variant="inset" className="w-64 h-full flex flex-col">
                 <SidebarContent>
                     <SidebarHeader>
                         <h1 className="text-lg font-semibold pt-8 px-4">

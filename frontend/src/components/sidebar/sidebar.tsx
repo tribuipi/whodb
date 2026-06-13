@@ -15,37 +15,18 @@
  */
 
 import {skipToken, useQuery} from "@apollo/client/react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { CommandItem } from "@/components/ui/command";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import {
-    Button,
-    cn,
-    CommandItem,
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-    Sheet,
-    SheetContent,
-    SheetTitle,
-    Sidebar as SidebarComponent,
-    SidebarContent,
-    SidebarGroup,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarSeparator,
-    SidebarTrigger,
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-    useSidebar
-} from "@clidey/ux";
+    Sidebar as SidebarComponent, SidebarContent, SidebarGroup, SidebarHeader,
+    SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarSeparator, SidebarTrigger,
+    useSidebar,
+} from "@/components/ui/sidebar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {SearchSelect} from "../ux";
 import {
     GetSchemaDocument,
