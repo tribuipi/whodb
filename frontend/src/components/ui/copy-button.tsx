@@ -30,16 +30,17 @@ function CopyButton({ text, onCopy, tooltipLabel = "Copy", copiedLabel = "Copied
     return (
         <TooltipProvider>
             <Tooltip>
-                <TooltipTrigger asChild>
+                <TooltipTrigger render={(triggerProps) => (
                     <Button
+                        {...triggerProps}
                         variant={variant}
                         size={size}
-                        className={cn("h-7 w-7", className)}
+                        className={cn("h-7 w-7", triggerProps.className, className)}
                         onClick={handleCopy}
                         {...props}
-                    >
-                        {copied ? <CheckIcon className="h-3.5 w-3.5" /> : <ClipboardIcon className="h-3.5 w-3.5" />}
-                    </Button>
+                    />
+                )}>
+                    {copied ? <CheckIcon className="h-3.5 w-3.5" /> : <ClipboardIcon className="h-3.5 w-3.5" />}
                 </TooltipTrigger>
                 <TooltipContent>
                     <p>{copied ? copiedLabel : tooltipLabel}</p>
