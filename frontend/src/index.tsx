@@ -27,7 +27,7 @@ import {PersistGate} from 'redux-persist/integration/react';
 import {PostHogProvider} from 'posthog-js/react';
 import type {PostHog} from 'posthog-js';
 import {initPosthog} from "./config/posthog";
-import {ThemeProvider} from '@clidey/ux'
+import {ThemeProvider} from '@/components/theme/provider';
 import {isDesktopApp} from './utils/external-links';
 import {PosthogConsentBanner} from './components/analytics/posthog-consent-banner';
 import {ErrorBoundary} from './components/error-boundary';

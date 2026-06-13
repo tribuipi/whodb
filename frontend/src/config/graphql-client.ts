@@ -19,7 +19,7 @@ import {CombinedGraphQLErrors, CombinedProtocolErrors, ServerError} from '@apoll
 import {setContext} from '@apollo/client/link/context';
 import {onError} from '@apollo/client/link/error';
 import {HttpLink} from '@apollo/client/link/http';
-import {toast} from '@clidey/ux';
+import {toast} from 'sonner';
 import {print} from 'graphql';
 import type {
     LoginSourceMutationVariables,

@@ -15,7 +15,7 @@
  */
 
 import {useMutation, useQuery} from "@apollo/client/react";
-import {Toaster} from "@clidey/ux";
+import {Toaster} from "@/components/ui/sonner";
 import {SettingsConfigDocument, UpdateSettingsDocument} from '@graphql';
 import {Suspense, useEffect} from "react";
 import {Route, Routes} from "react-router-dom";
