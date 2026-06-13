@@ -15,25 +15,16 @@
  */
 
 import {useLazyQuery, useQuery} from "@apollo/client/react";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { SearchInput } from "@/components/ui/search-input";
+import { SheetTitle } from "@/components/ui/sheet";
+import { StackList, StackListItem } from "@/components/ui/stack-list";
 import {
-    Badge,
-    Button,
-    cn,
-    SearchInput,
-    SheetTitle,
-    StackList,
-    StackListItem,
-    Table,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableHeadRow,
-    TableRow,
-    Tabs,
-    TabsList,
-    TabsTrigger,
-    VirtualizedTableBody
-} from '@clidey/ux';
+    Table, TableCell, TableHead, TableHeader, TableHeadRow, TableRow, VirtualizedTableBody,
+} from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
     GetColumnsBatchQuery,
     GetGraphQuery,
