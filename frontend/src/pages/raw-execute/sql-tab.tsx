@@ -1,16 +1,10 @@
 import type { FC } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  Button,
-} from "@clidey/ux";
+    AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+    AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import { useTranslation } from "../../hooks/use-translation";
 import { useContainerWidth } from "../../hooks/use-container-width";
 import { CodeEditor } from "../../components/editor";

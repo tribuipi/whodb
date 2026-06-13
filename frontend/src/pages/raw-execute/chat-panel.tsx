@@ -1,20 +1,13 @@
 import {useLazyQuery, useMutation} from "@apollo/client/react";
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
-    Button,
-    Card,
-    Checkbox,
-    cn,
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-    EmptyState,
-    Input,
-    toast
-} from "@clidey/ux";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Input } from "@/components/ui/input";
 import type { GetAiChatQuery} from '@graphql';
 import {ExecuteConfirmedSqlDocument, GenerateChatTitleDocument, GetDatabaseQuerySuggestionsDocument} from '@graphql';
 import {

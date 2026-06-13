@@ -15,7 +15,7 @@
  */
 
 import {useLazyQuery} from "@apollo/client/react";
-import {Button} from "@clidey/ux";
+import {Button} from "@/components/ui/button";
 import type {FC} from "react";
 import React, { useEffect} from "react";
 import {useTranslation} from "../../hooks/use-translation";
