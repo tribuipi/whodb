@@ -37,18 +37,12 @@ import {useSourceContract} from "../../hooks/useSourceContract";
 import {useAppSelector} from "../../store/hooks";
 import {StorageUnitGraphCard} from "../storage-unit/storage-unit";
 import {useTranslation} from '@/hooks/use-translation';
-import {
-    Button,
-    Checkbox,
-    cn,
-    EmptyState,
-    SearchInput,
-    Sidebar as SidebarComponent,
-    SidebarContent,
-    SidebarGroup,
-    SidebarHeader,
-    toTitleCase
-} from "@clidey/ux";
+import { cn, toTitleCase } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SearchInput } from "@/components/ui/search-input";
+import { Sidebar as SidebarComponent, SidebarContent, SidebarGroup, SidebarHeader } from "@/components/ui/sidebar";
 import {useNavigate} from "react-router-dom";
 import {FolderIcon, RectangleGroupIcon, TableCellsIcon} from "../../components/heroicons";
 import {buildSourceScopeRef, getObjectNameFromRef} from "../../utils/source-refs";
@@ -128,7 +122,7 @@ const GraphSidebar: FC<GraphSidebarProps> = ({
 
     return (
         <div className="dark flex grow">
-            <SidebarComponent variant="embed" className="w-64 h-full flex flex-col">
+            <SidebarComponent className="w-64 h-full flex flex-col">
                 <SidebarContent data-testid="graph-sidebar-content">
                     <SidebarHeader>
                         <h1 className="text-lg font-semibold pt-8 px-4">
