@@ -21,6 +21,8 @@ import { useSourceContract } from '@/hooks/useSourceContract';
 import { sourceObjectSupportsAction } from '@/config/source-types';
 import { DeleteRowDocument, SourceAction } from '@graphql';
 import { formatNumber } from '@/utils/functions';
+import { MockDataSheet } from './mock-data-sheet';
+import { useGridShortcuts } from './use-grid-shortcuts';
 
 const DEFAULT_ROW_HEIGHT = 48;
 
@@ -43,6 +45,10 @@ export function ResultGrid(props: ResultGridProps) {
     const isRowDeleteSupported = sourceObjectSupportsAction(item, objectRef?.Kind, SourceAction.DeleteData);
     const canEditRows = !!editing && (editing.allowRowUpdate ?? true) && isRowUpdateSupported;
     const canDeleteRows = !!editing && (editing.allowRowDelete ?? true) && isRowDeleteSupported && objectRef != null;
+    const isMockDataSupported = sourceObjectSupportsAction(item, objectRef?.Kind, SourceAction.GenerateMockData) && (props.actions?.isMockDataGenerationAllowed ?? true);
+
+    // Mock-data sheet state
+    const [showMockDataSheet, setShowMockDataSheet] = useState(false);
 
     // Selection tracking
     const [selectedRows, setSelectedRows] = useState<Record<string, string>[]>([]);
@@ -241,6 +247,19 @@ export function ResultGrid(props: ResultGridProps) {
 
     const triggerExport = () => window.dispatchEvent(new CustomEvent('menu:trigger-export'));
 
+    useGridShortcuts({
+        enabled: !!props.enableKeyboardShortcuts,
+        api: apiRef.current,
+        onExport: isExportSupported ? () =>{  openExport(); } : undefined,
+        onImport: (isImportSupported && props.actions?.allowImport) ? () =>{  setShowImport(true); } : undefined,
+        onMockData: (isMockDataSupported && objectRef) ? () =>{  setShowMockDataSheet(true); } : undefined,
+        onRefresh: props.editing?.onRefresh,
+        onEditFocused: canEditRows ? () => { const c = apiRef.current?.getFocusedCell(); if (c) apiRef.current?.startEditingCell({ rowIndex: c.rowIndex, colKey: c.column.getColId() }); } : undefined,
+        onDeleteFocused: canDeleteRows ? () => { const c = apiRef.current?.getFocusedCell(); if (c) setPendingDeleteIndexes([c.rowIndex ?? 0]); } : undefined,
+        onNextPage: props.pagination?.show ? () => { const cur = props.pagination?.currentPage ?? 1; const tp = Math.ceil((props.pagination?.totalCount ?? 0) / (props.pagination?.pageSize ?? 100)); if (cur < tp) props.pagination?.onPageChange?.(cur + 1); } : undefined,
+        onPrevPage: props.pagination?.show ? () => { const cur = props.pagination?.currentPage ?? 1; if (cur > 1) props.pagination?.onPageChange?.(cur - 1); } : undefined,
+    });
+
     const totalCount = props.pagination?.totalCount ?? data.rows.length;
 
     const rowHeight = layout?.rowHeight ?? DEFAULT_ROW_HEIGHT;
@@ -269,6 +288,7 @@ export function ResultGrid(props: ResultGridProps) {
                 onDeleteRow={canDeleteRows ? onDeleteRow : undefined}
                 onDeleteSelected={canDeleteRows ? onDeleteSelected : undefined}
                 onForeignKey={onForeignKey}
+                onMockData={(!props.limitContextMenu && isMockDataSupported && objectRef) ? () =>{  setShowMockDataSheet(true); } : undefined}
                 t={t}
             >
                 <div style={{ height, width: '100%' }}>
@@ -338,6 +358,16 @@ export function ResultGrid(props: ResultGridProps) {
                     objectRef={objectRef}
                     databaseType={props.databaseType}
                     onImportSuccess={props.editing?.onRefresh}
+                />
+            )}
+            {isMockDataSupported && objectRef && (
+                <MockDataSheet
+                    open={showMockDataSheet}
+                    onOpenChange={setShowMockDataSheet}
+                    objectRef={objectRef}
+                    storageUnit={props.editing?.storageUnit}
+                    databaseType={props.databaseType}
+                    onGenerated={() => props.editing?.onRefresh?.()}
                 />
             )}
             <AlertDialog open={pendingDeleteIndexes != null} onOpenChange={(open) => { if (!open) setPendingDeleteIndexes(null); }}>
