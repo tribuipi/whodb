@@ -29,8 +29,6 @@ import { WhereConditionType } from '@graphql';
 import type { FC} from "react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AdjustmentsHorizontalIcon, ChevronDownIcon, PencilIcon, PlusCircleIcon, XCircleIcon } from "../../components/heroicons";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { ScratchpadActions } from "../../store/scratchpad";
 import { useTranslation } from "@/hooks/use-translation";
 
 type IExploreStorageUnitWhereConditionSheetProps = {
@@ -48,8 +46,6 @@ export const ExploreStorageUnitWhereConditionSheet: FC<IExploreStorageUnitWhereC
     onChange, 
     operators 
 }) => {
-    const dispatch = useAppDispatch();
-    const { pages } = useAppSelector(state => state.scratchpad);
     const { t } = useTranslation('pages/where-condition');
     const [filters, setFilters] = useState<WhereCondition>(defaultWhere ?? {
         Type: WhereConditionType.And,
@@ -170,13 +166,6 @@ export const ExploreStorageUnitWhereConditionSheet: FC<IExploreStorageUnitWhereC
     useEffect(() => {
         setFilters(defaultWhere ?? { Type: WhereConditionType.And, And: { Children: [] } });
     }, [defaultWhere]);
-
-    // Initialize scratchpad if needed
-    useEffect(() => {
-        if (pages.length === 0) {
-            dispatch(ScratchpadActions.ensurePagesHaveCells());
-        }
-    }, [dispatch, pages.length]);
 
     // Existing conditions list
     const existingFilters = filters.And?.Children ?? [];

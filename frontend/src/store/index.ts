@@ -23,8 +23,7 @@ import { databaseReducers } from './database';
 import { settingsReducers } from "./settings";
 import { houdiniReducers } from './chat';
 import { aiModelsReducers } from './ai-models';
-import type { IScratchpadState } from './scratchpad';
-import { scratchpadReducers } from './scratchpad';
+import { sqlEditorReducers } from './sql-editor';
 import type { IChatState } from './chat';
 import { tourReducers } from './tour';
 import { providersReducers } from './providers';
@@ -34,85 +33,6 @@ import { runMigrations } from './migrations';
 
 // Run migrations before initializing the store
 runMigrations();
-
-// Clear any corrupted scratchpad data on startup to prevent date serialization issues
-if (typeof window !== 'undefined') {
-  try {
-    const scratchpadData = localStorage.getItem('persist:scratchpad');
-    if (scratchpadData) {
-      const parsed = JSON.parse(scratchpadData);
-      if (parsed?.cells) {
-        // Check if any cells have invalid date strings in history
-        const hasInvalidDates = Object.values(parsed.cells).some((cell: any) => {
-          if (cell?.history && Array.isArray(cell.history)) {
-            return cell.history.some((item: any) => 
-              item.date && typeof item.date === 'string' && isNaN(new Date(item.date).getTime())
-            );
-          }
-          return false;
-        });
-        
-        if (hasInvalidDates) {
-          console.warn('Clearing corrupted scratchpad data due to invalid dates');
-          localStorage.removeItem('persist:scratchpad');
-        }
-      }
-    }
-  } catch (error) {
-    console.warn('Error checking scratchpad data, clearing it:', error);
-    localStorage.removeItem('persist:scratchpad');
-  }
-}
-
-// Transform function to handle date serialization/deserialization for scratchpad
-const scratchpadTransform = createTransform(
-  // Transform state on its way to being serialized and persisted
-  (inboundState: IScratchpadState) => {
-    return inboundState;
-  },
-  // Transform state being rehydrated
-  (outboundState: any) => {
-    if (!outboundState?.cells) {
-      return outboundState;
-    }
-
-    // Convert date strings back to Date objects in cell history
-    const transformedCells: Record<string, any> = {};
-    Object.keys(outboundState.cells).forEach(cellId => {
-      const cell = outboundState.cells[cellId];
-      if (cell?.history && Array.isArray(cell.history)) {
-        transformedCells[cellId] = {
-          ...cell,
-          history: cell.history.map((historyItem: any) => {
-            let date = historyItem.date;
-            // Handle various date formats
-            if (typeof date === 'string') {
-              date = new Date(date);
-            } else if (!(date instanceof Date)) {
-              date = new Date();
-            }
-            // Ensure the date is valid
-            if (isNaN(date.getTime())) {
-              date = new Date();
-            }
-            return {
-              ...historyItem,
-              date
-            };
-          })
-        };
-      } else {
-        transformedCells[cellId] = cell;
-      }
-    });
-
-    return {
-      ...outboundState,
-      cells: transformedCells
-    };
-  },
-  { whitelist: ['scratchpad'] }
-);
 
 // Transform function to handle date serialization/deserialization for chat sessions
 const chatTransform = createTransform(
@@ -171,7 +91,7 @@ const ceReducerMap = {
   settings: persistReducer({ key: "settings", storage, transforms: [settingsPersistTransform] }, settingsReducers),
   houdini: persistReducer({ key: "houdini", storage, transforms: [chatTransform], throttle: PERSIST_THROTTLE }, houdiniReducers),
   aiModels: persistReducer({ key: "aiModels", storage }, aiModelsReducers),
-  scratchpad: persistReducer({ key: "scratchpad", storage, transforms: [scratchpadTransform], throttle: PERSIST_THROTTLE }, scratchpadReducers),
+  sqlEditor: persistReducer({ key: "sqlEditor", storage, throttle: PERSIST_THROTTLE }, sqlEditorReducers),
   tour: persistReducer({ key: "tour", storage }, tourReducers),
   providers: persistReducer({ key: "providers", storage }, providersReducers),
   health: healthReducers,
