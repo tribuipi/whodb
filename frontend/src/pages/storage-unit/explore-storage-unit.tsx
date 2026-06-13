@@ -14,36 +14,20 @@
  * limitations under the License.
  */
 
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    Badge,
-    Button,
-    cn,
-    Drawer,
-    DrawerContent,
-    DrawerHeader,
-    DrawerTitle,
-    Input,
-    Label,
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    Sheet,
-    SheetContent,
-    SheetFooter,
-    SheetTitle,
-    StackList,
-    StackListItem,
-    toast,
-} from "@clidey/ux";
+    AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+    AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetFooter, SheetTitle } from "@/components/ui/sheet";
+import { StackList, StackListItem } from "@/components/ui/stack-list";
 import {skipToken, useLazyQuery, useMutation, useQuery} from "@apollo/client/react";
 import type {
     GetStorageUnitsQuery,
