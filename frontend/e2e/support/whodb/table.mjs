@@ -50,12 +50,17 @@ export const tableMethods = {
 
     /**
      * Get one rendered data cell by row and cell index.
+     * Addresses ag-grid cells by their stable `col-id` (c0, c1, …) so the leading
+     * selection-checkbox column doesn't offset the index; falls back to positional
+     * selection for native tables.
      * @param {number} rowIndex
      * @param {number} cellIndex
      * @returns {import("@playwright/test").Locator}
      */
     dataCell(rowIndex, cellIndex) {
-        return this.dataRow(rowIndex).locator(DATA_CELL_SELECTOR).nth(cellIndex);
+        const row = this.dataRow(rowIndex);
+        const byColId = row.locator(`[role="gridcell"][col-id="c${cellIndex}"]`);
+        return byColId.or(row.locator("td").nth(cellIndex));
     },
 
     /**
@@ -182,7 +187,7 @@ export const tableMethods = {
         if (typeof columnNameOrIndex === "string") {
             await this.page.locator(`[data-column-name="${columnNameOrIndex}"]`).click();
         } else {
-            await this.page.locator("th").nth(columnNameOrIndex + 1).click();
+            await this.page.locator("[data-column-name]").nth(columnNameOrIndex).click();
         }
     },
 
@@ -236,6 +241,9 @@ export const tableMethods = {
                 .find((el) => el.querySelector('[role="row"] [role="gridcell"]'));
             if (!grid) return { columns: [], rows: [] };
 
+            // Read cells/headers in DOM order. ag-grid renders the selection-checkbox
+            // column first, so it occupies index 0 (empty text) and data columns follow
+            // at index 1+ — matching the indexing the feature specs are calibrated to.
             const headerRow = Array.from(grid.querySelectorAll('[role="row"]'))
                 .find((row) => row.querySelector('[role="columnheader"]'));
             const columns = headerRow

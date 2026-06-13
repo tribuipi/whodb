@@ -198,70 +198,37 @@ export const rowsMethods = {
     },
 
     /**
-     * Update a row via context menu
+     * Update a single cell via ag-grid inline editing.
+     * Double-clicks the target cell to enter edit mode, replaces the value, then
+     * commits with Enter or aborts with Escape. (The legacy whole-row edit sheet
+     * has been replaced by per-cell editing.)
      * @param {number} rowIndex
      * @param {number} columnIndex
      * @param {string} text
-     * @param {boolean} cancel
+     * @param {boolean} cancel - when true, abort the edit (Escape) instead of committing
      */
     async updateRow(rowIndex, columnIndex, text, cancel = true) {
-        // Required: state stabilization before opening context menu
+        // Required: state stabilization before interacting with the grid
         await this.page.waitForTimeout(500);
-        await this.openContextMenu(rowIndex);
 
-        const editBtn = this.page.locator('[data-testid="context-menu-edit-row"]');
-        await editBtn.scrollIntoViewIfNeeded();
-        await editBtn.waitFor({ timeout: TIMEOUT.ELEMENT });
-        await editBtn.click({ force: true });
+        const cell = this.dataCell(rowIndex, columnIndex);
+        await cell.scrollIntoViewIfNeeded();
+        await cell.waitFor({ state: "visible", timeout: TIMEOUT.ELEMENT });
+        await cell.dblclick();
 
-        const standardField = this.page.locator(`[data-testid="editable-field-${columnIndex}"]`);
-        if ((await standardField.count()) > 0) {
-            await standardField.clear();
-            await standardField.fill(text);
-        } else {
-            const targetElement = await this.page.evaluate(() => {
-                const elements = document.querySelectorAll('textarea, input[type="text"]');
-                for (const el of elements) {
-                    const value = el.value;
-                    if (value === "" || value.startsWith("{") || value.startsWith("[")) {
-                        return true;
-                    }
-                }
-                return false;
-            });
-
-            if (targetElement) {
-                const textareas = this.page.locator('textarea, input[type="text"]');
-                const count = await textareas.count();
-                let filled = false;
-                for (let i = 0; i < count; i++) {
-                    const el = textareas.nth(i);
-                    const value = await el.inputValue();
-                    if (value === "" || value.startsWith("{") || value.startsWith("[")) {
-                        await el.clear();
-                        await el.fill(text);
-                        filled = true;
-                        break;
-                    }
-                }
-                if (!filled) {
-                    await textareas.first().clear();
-                    await textareas.first().fill(text);
-                }
-            } else {
-                await this.page.locator('textarea, input[type="text"]').first().clear();
-                await this.page.locator('textarea, input[type="text"]').first().fill(text);
-            }
-        }
+        // ag-grid renders the active editor input/textarea inside the editing cell.
+        const editor = this.page
+            .locator('.ag-cell-inline-editing input, .ag-cell-inline-editing textarea, .ag-popup-editor input, .ag-popup-editor textarea')
+            .first();
+        await editor.waitFor({ state: "visible", timeout: TIMEOUT.ELEMENT });
+        await editor.fill(text);
 
         if (cancel) {
-            await this.page.locator('[data-testid="cancel-edit-row"]').click();
-            await this.page.getByText("Edit Row").first().waitFor({ state: "hidden" });
-            await expect(this.page.locator("body")).not.toHaveAttribute("data-scroll-locked", /.+/, { timeout: TIMEOUT.ELEMENT });
+            await this.page.keyboard.press("Escape");
+            await expect(this.page.locator(".ag-cell-inline-editing")).toHaveCount(0, { timeout: TIMEOUT.ELEMENT });
         } else {
-            await this.page.locator('[data-testid="update-button"]').click();
-            await this.page.locator('[data-testid="update-button"]').waitFor({ state: "hidden", timeout: TIMEOUT.SLOW });
-            await expect(this.page.locator("body")).not.toHaveAttribute("data-scroll-locked", /.+/, { timeout: TIMEOUT.SLOW });
+            await this.page.keyboard.press("Enter");
+            await expect(this.page.locator(".ag-cell-inline-editing")).toHaveCount(0, { timeout: TIMEOUT.ELEMENT });
             await this.waitForDataTable();
         }
     },

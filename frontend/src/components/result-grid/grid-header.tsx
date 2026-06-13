@@ -31,14 +31,19 @@ export function GridHeader(params: GridHeaderParams) {
         <div
             className="flex items-center gap-1 w-full cursor-pointer select-none"
             data-testid={`column-header-${displayName}`}
+            data-column-name={displayName}
+            data-sort-direction={dir || undefined}
             onClick={handleClick}
         >
             {typeIcon}
             <span className="truncate flex-1">{displayName}</span>
             {isPrimary && <KeyIcon className="w-3 h-3 opacity-70" />}
             {isForeignKey && <ShareIcon className="w-3 h-3 opacity-70" />}
-            {dir === 'asc' && <ChevronUpIcon className="w-3 h-3" />}
-            {dir === 'desc' && <ChevronDownIcon className="w-3 h-3" />}
+            {dir && (
+                <span data-testid="sort-indicator">
+                    {dir === 'asc' ? <ChevronUpIcon className="w-3 h-3" /> : <ChevronDownIcon className="w-3 h-3" />}
+                </span>
+            )}
         </div>
     );
 }
