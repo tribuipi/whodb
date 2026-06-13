@@ -26,9 +26,11 @@ the chat panel.
    **Double-click = edit the cell** (ag-grid's native default), not copy-row. Editing
    also starts via **Enter/F2** or a context-menu **"Edit cell"** action. Copy-row
    moves to the context menu ("Copy row").
-7. **Search:** keep the existing highlight-and-cycle behavior (imperative
-   `searchRef`), reimplemented on ag-grid's API. Not the native quick filter (which
-   hides rows).
+7. **Search/filter:** use ag-grid's **native filtering** (Community). The existing
+   search input drives `quickFilterText` — a global filter across all columns that
+   **hides non-matching rows** (replaces the custom highlight-and-cycle). ag-grid's
+   per-column header filters come along for free. The imperative `searchRef` is kept
+   only as a thin setter for `quickFilterText`.
 
 ## Verified External Facts (proof)
 
@@ -79,7 +81,6 @@ grid-header.tsx        Custom header cell: type icon + PK/FK badge + sort indica
 grid-context-menu.tsx  Controlled @clidey/ux ContextMenu at the right-clicked cell
 mock-data-sheet.tsx    Extracted from table.tsx (dependency analysis + generate)
 use-grid-theme.ts      themeQuartz light/dark wired to useTheme()
-use-grid-search.ts     Imperative searchRef → ensureIndexVisible/ensureColumnVisible + highlight
 use-grid-shortcuts.ts  App-level keyboard shortcuts (non-native)
 column-icons.tsx       getColumnIcons + type Sets + getInputPropsForColumnType (moved here)
 types.ts               Props and shared types
@@ -140,10 +141,9 @@ Read-only call sites (SQL editor, chat) pass only `data`, `layout`, `actions.raw
 - **Click-to-copy:** `onCellClicked` → `copyToClipboard(cell)`, fired after a ~200ms
   debounce that is cancelled by a double-click (which enters edit instead). Copy-row
   (tab-joined) is available from the context menu, not from double-click.
-- **Search:** `searchRef.current = (term) => ...` scans `rows`, finds matches, and on
-  each call advances to the next match: `api.ensureIndexVisible(row)`,
-  `api.ensureColumnVisible(col)`, then flash/highlight the cell (cellClassRules or
-  `flashCells`). Cycling state mirrors the current implementation.
+- **Search/filter:** native. `searchRef.current = (term) => api.setGridOption(
+  "quickFilterText", term)`. Quick filter hides non-matching rows across all columns;
+  per-column header filters (`colDef.filter`) are enabled by default.
 - **Export/Import/Mock:** reuse `Export` and `ImportData` unchanged; extract the
   mock-data sheet into `mock-data-sheet.tsx`. Triggered via context menu, the existing
   `menu:trigger-export` / `menu:trigger-import` window events, and keyboard shortcuts.
@@ -208,4 +208,4 @@ strings (e.g. context-menu "Edit cell" if not already present).
 - Playwright E2E green for: explorer (view/edit/delete/sort/paginate/export/import/FK/
   mock), SQL editor results, chat results.
 - Manual verification per `verify` skill: edit a cell, delete a row, sort, paginate,
-  export CSV, FK navigate, search highlight, dark/light theme.
+  export CSV, FK navigate, quick-filter search + column filter, dark/light theme.
