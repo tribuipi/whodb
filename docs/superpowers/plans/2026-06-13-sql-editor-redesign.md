@@ -117,22 +117,6 @@ Expected: `package.json` gains `"sql-formatter": "^15.x"` under dependencies; `p
 
 Create `frontend/src/utils/format-sql.ts`:
 ```typescript
-/*
- * Copyright 2026 Clidey, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import { format } from 'sql-formatter';
 
 /** Maps a WhoDB source type to a sql-formatter dialect. Falls back to the generic 'sql' dialect. */
@@ -198,22 +182,6 @@ Replaces the multi-cell `scratchpad` slice with a tabs model.
 
 Create `frontend/src/store/sql-editor.ts`:
 ```typescript
-/*
- * Copyright 2026 Clidey, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import type { SourceObjectRefInput } from '@graphql';
@@ -402,7 +370,6 @@ A presentational shell: left (fixed-width, resizable), center (flex), right (col
 
 Create `frontend/src/pages/raw-execute/sql-editor-layout.tsx`:
 ```tsx
-/* (license header — copy from Task 1) */
 import type { FC, ReactNode } from "react";
 import { useState, useCallback } from "react";
 
@@ -504,7 +471,6 @@ Expected: shows how `switchProfile` is obtained (a hook like `const { switchProf
 
 Create `frontend/src/pages/raw-execute/source-selectors.tsx`:
 ```tsx
-/* (license header) */
 import type { FC } from "react";
 import { useMemo } from "react";
 import { useQuery } from "@apollo/client/react";
@@ -582,7 +548,6 @@ git commit -m "feat(sql-editor): profile + database source selectors"
 
 Create `frontend/src/pages/raw-execute/object-tree.tsx`. It fetches objects via `GetStorageUnitsDocument`, groups by `Kind`, renders collapsible groups with counts and a search box, and exposes two callbacks: `onSelectObject(obj)` (single-click) and `onOpenStructure(obj)` (double-click).
 ```tsx
-/* (license header) */
 import type { FC } from "react";
 import { useMemo, useState } from "react";
 import { useQuery } from "@apollo/client/react";
@@ -694,7 +659,6 @@ git commit -m "feat(sql-editor): DB object tree with grouped collapsible objects
 
 Create `frontend/src/pages/raw-execute/editor-tabs.tsx`. Reads tabs from the slice, renders each tab (with ✕), a `+` button, and the chat toggle on the far right. Rename on double-click for SQL tabs.
 ```tsx
-/* (license header) */
 import type { FC } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -791,7 +755,6 @@ git commit -m "feat(sql-editor): tab strip with add/close/rename and chat toggle
 
 Create `frontend/src/pages/raw-execute/editor-toolbar.tsx`:
 ```tsx
-/* (license header) */
 import type { FC } from "react";
 import { useTranslation } from "react-i18next";
 import { PlayIcon } from "../../components/heroicons";
@@ -844,7 +807,6 @@ Wires `CodeEditor`, the toolbar, `QueryView`, and the destructive-query `AlertDi
 
 Create `frontend/src/pages/raw-execute/sql-tab.tsx`:
 ```tsx
-/* (license header) */
 import type { FC } from "react";
 import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -960,7 +922,6 @@ git commit -m "feat(sql-editor): SQL tab wiring editor, results, format, destruc
 
 Create `frontend/src/pages/raw-execute/structure-tab.tsx`. Fetches `SourceFieldConstraintsDocument` for the tab's `target` ref and renders a read-only columns table (name, type, nullable, default, key flags).
 ```tsx
-/* (license header) */
 import type { FC } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@apollo/client/react";
@@ -1097,7 +1058,6 @@ If there are no other importers, drop it. If there are (e.g. EE), keep the expor
 
 New `raw-execute.tsx`:
 ```tsx
-/* (license header) */
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
