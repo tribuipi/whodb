@@ -4,13 +4,6 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-interface VirtualizedTableBodyProps {
-  rowCount: number
-  header?: React.ReactNode
-  children: (rowIndex: number) => React.ReactNode
-  className?: string
-}
-
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
@@ -64,7 +57,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-selected:bg-muted",
+        "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
         className
       )}
       {...props}
@@ -77,7 +70,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0",
+        "h-12 px-3 text-left align-middle text-xs font-medium tracking-wider whitespace-nowrap text-muted-foreground uppercase [&:has([role=checkbox])]:pr-0",
         className
       )}
       {...props}
@@ -90,7 +83,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0",
+        "p-3 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0",
         className
       )}
       {...props}
@@ -111,26 +104,6 @@ function TableCaption({
   )
 }
 
-// Alias used by storage-unit page
-const TableHeadRow = TableRow
-
-function VirtualizedTableBody({ rowCount, header, children, className }: VirtualizedTableBodyProps) {
-  return (
-    <div className={cn("w-full overflow-auto", className)}>
-      <table data-slot="table" className="w-full caption-bottom text-sm">
-        {header && (
-          <thead data-slot="table-header" className="[&_tr]:border-b">
-            {header}
-          </thead>
-        )}
-        <tbody data-slot="table-body" className="[&_tr:last-child]:border-0">
-          {Array.from({ length: rowCount }, (_, i) => children(i))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
 export {
   Table,
   TableHeader,
@@ -140,6 +113,4 @@ export {
   TableRow,
   TableCell,
   TableCaption,
-  TableHeadRow,
-  VirtualizedTableBody,
 }

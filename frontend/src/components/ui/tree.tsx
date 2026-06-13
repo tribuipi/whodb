@@ -64,8 +64,8 @@ function Tree({
             <div key={item.id}>
                 <div
                     className={cn(
-                        "flex items-center gap-1 rounded-md px-2 py-1 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
-                        isSelected && "bg-accent text-accent-foreground font-medium",
+                        "flex items-center gap-2 rounded-none px-3 py-2 text-sm cursor-default hover:bg-muted hover:text-foreground",
+                        isSelected && "bg-muted text-foreground",
                     )}
                     style={{ paddingLeft: `${depth * 12 + 8}px` }}
                     onClick={() => {

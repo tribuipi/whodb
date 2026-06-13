@@ -38,9 +38,9 @@ export type IPluginProps = {
     onResult?: (totalCount: number | null) => void;
 }
 
-// Vertical space the table reserves for its header row and footer chrome,
-// subtracted from the available pane height so the grid fits without clipping.
-const TABLE_CHROME = 100;
+// Vertical space the toolbar occupies (button h-9 + py-1 ≈ 44px),
+// subtracted from the available pane height so the grid fills the rest exactly.
+const TABLE_CHROME = 45;
 
 function isSQLQueryAction(code?: string): boolean {
     if (code == null) {
@@ -101,7 +101,7 @@ export const QueryView: FC<IPluginProps> = ({ code, handleExecuteRef, containerW
         return (
             <div className="flex flex-col w-full h-full" data-testid="cell-query-output">
                 <div
-                    className="flex items-center justify-end gap-2 px-2 py-1 border-b border-neutral-200 dark:border-neutral-800 flex-shrink-0"
+                    className="flex items-center justify-end gap-2 px-2 py-1 flex-shrink-0"
                     data-testid="sql-editor-results-toolbar"
                 >
                     <Button

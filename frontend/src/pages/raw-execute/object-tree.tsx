@@ -107,7 +107,7 @@ export const ObjectTree: FC<IObjectTreeProps> = ({ onSelectObject, onOpenStructu
                         {!collapsed[kind] && objs.map(obj => (
                             <button
                                 key={obj.Ref.Locator + obj.Name}
-                                className="block w-full text-left pl-5 pr-2 py-0.5 text-xs hover:bg-neutral-100 dark:hover:bg-neutral-900 rounded"
+                                className="flex w-full items-center pl-5 pr-3 py-2 text-sm cursor-default rounded-none hover:bg-muted hover:text-foreground"
                                 onClick={() => { onSelectObject(obj); }}
                                 onDoubleClick={() => { onOpenStructure(obj); }}
                                 data-testid={`sql-editor-tree-object-${obj.Name}`}

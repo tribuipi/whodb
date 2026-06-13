@@ -21,9 +21,8 @@ import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/search-input";
 import { SheetTitle } from "@/components/ui/sheet";
 import { StackList, StackListItem } from "@/components/ui/stack-list";
-import {
-    TableCell, TableHead, TableHeadRow, TableRow, VirtualizedTableBody,
-} from "@/components/ui/table";
+import { TableCell, TableHead, TableRow } from "@/components/ui/table";
+import { TableHeadRow, VirtualizedTableBody } from "@clidey/ux";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
     GetColumnsBatchQuery,
