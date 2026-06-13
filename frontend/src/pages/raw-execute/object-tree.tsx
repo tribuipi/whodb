@@ -68,13 +68,12 @@ export const ObjectTree: FC<IObjectTreeProps> = ({ onSelectObject, onOpenStructu
         <div className="flex flex-col h-full overflow-hidden" data-testid="sql-editor-object-tree">
             {supportsSchema
                 ? (
-                    <div className="px-2 py-1" data-testid="sql-editor-schema-select">
+                    <div className="flex flex-col p-2" data-testid="sql-editor-schema-select">
                         <SearchSelect
                             label={t("schemaHeader")}
                             options={schemaOptions}
                             value={schema}
                             onChange={handleSchemaChange}
-                            buttonClassName="w-full"
                         />
                     </div>
                 )
