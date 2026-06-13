@@ -2,7 +2,7 @@ import type React from 'react';
 import {
     ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator,
     ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger, ContextMenuTrigger,
-} from '@clidey/ux';
+} from '@/components/ui/context-menu';
 import {
     ArrowDownTrayIcon,
     CheckCircleIcon,

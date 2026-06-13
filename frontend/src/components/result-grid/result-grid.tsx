@@ -1,11 +1,14 @@
 import { AgGridReact } from 'ag-grid-react';
 import type { GridApi, GridReadyEvent, CellClickedEvent, CellDoubleClickedEvent, CellContextMenuEvent, SelectionChangedEvent, CellEditingStoppedEvent } from 'ag-grid-community';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import {
     AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
     AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-    Button, DataPagination, Spinner, toast,
-} from '@clidey/ux';
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { DataPagination } from '@/components/ui/data-pagination';
+import { Spinner } from '@/components/ui/spinner';
 import { useMutation } from '@apollo/client/react';
 import { useTranslation } from '@/hooks/use-translation';
 import { copyToClipboard } from '@/services/clipboard';

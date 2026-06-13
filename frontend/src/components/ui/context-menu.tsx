@@ -3,6 +3,7 @@
 import * as React from "react"
 import * as ContextMenuPrimitive from "@radix-ui/react-context-menu"
 import { Check, ChevronRight, Circle } from "lucide-react"
+import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
@@ -71,16 +72,31 @@ const ContextMenuContent = React.forwardRef<
 ))
 ContextMenuContent.displayName = ContextMenuPrimitive.Content.displayName
 
+const contextMenuItemVariants = cva(
+  "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "",
+        destructive: "text-destructive focus:bg-destructive focus:text-destructive-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
 const ContextMenuItem = React.forwardRef<
   React.ElementRef<typeof ContextMenuPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Item> & {
+  React.ComponentPropsWithoutRef<typeof ContextMenuPrimitive.Item> & VariantProps<typeof contextMenuItemVariants> & {
     inset?: boolean
   }
->(({ className, inset, ...props }, ref) => (
+>(({ className, inset, variant, ...props }, ref) => (
   <ContextMenuPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      contextMenuItemVariants({ variant }),
       inset && "pl-8",
       className
     )}

@@ -6,13 +6,14 @@ import {
     MockDataMaxRowCountDocument,
     type SourceObjectRefInput,
 } from '@graphql';
-import {
-    Alert, AlertDescription, AlertTitle,
-    Button, Input, Label,
-    Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-    Sheet, SheetContent, SheetFooter, SheetTitle,
-    Spinner, toast,
-} from '@clidey/ux';
+import { toast } from 'sonner';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Sheet, SheetContent, SheetFooter, SheetTitle } from '@/components/ui/sheet';
+import { Spinner } from '@/components/ui/spinner';
 import { CalculatorIcon, XMarkIcon } from '../heroicons';
 import { useSourceContract } from '@/hooks/useSourceContract';
 import { useTranslation } from '@/hooks/use-translation';
@@ -164,34 +165,8 @@ export function MockDataSheet(props: MockDataSheetProps) {
                 setShowMockDataConfirmation(false);
             }
         }}>
-            <SheetContent side="right" className="p-8" data-testid="mock-data-sheet" footer={
-                <SheetFooter className="flex gap-sm px-0">
-                    <Alert variant={supportsMockDataRelations ? "info" : "default"} className="mb-4">
-                        <AlertTitle>{t('mockDataNote')}</AlertTitle>
-                        <AlertDescription>
-                            {supportsMockDataRelations ? t('mockDataWarning') : t('mockDataWarningClickHouse')}
-                        </AlertDescription>
-                    </Alert>
-                    <Button
-                        className="flex-1"
-                        variant="secondary"
-                        onClick={() => { props.onOpenChange(false); }}
-                        data-testid="cancel-mock-data"
-                    >
-                        {t('cancel')}
-                    </Button>
-                    {!showMockDataConfirmation ? (
-                        <Button className="flex-1" onClick={() => { void handleMockDataGenerate(); }} disabled={generatingMockData || !mockDataRowCount || parseInt(mockDataRowCount) < 1} data-testid="mock-data-generate-button">
-                            {t('generate')}
-                        </Button>
-                    ) : (
-                        <Button className="flex-1" onClick={() => { void handleMockDataGenerate(); }} disabled={generatingMockData || !mockDataRowCount || parseInt(mockDataRowCount) < 1} variant="destructive" data-testid="mock-data-overwrite-button">
-                            {t('yesOverwrite')}
-                        </Button>
-                    )}
-                </SheetFooter>
-            }>
-                <div className="flex flex-col gap-lg">
+            <SheetContent side="right" className="flex flex-col p-8" data-testid="mock-data-sheet">
+                <div className="flex flex-col gap-lg flex-1 overflow-y-auto">
                     <SheetTitle className="flex items-center gap-2"><CalculatorIcon className="w-4 h-4" /> {t('mockData')}</SheetTitle>
                     {!showMockDataConfirmation ? (
                         <div className="space-y-4">
@@ -297,6 +272,33 @@ export function MockDataSheet(props: MockDataSheetProps) {
                                 {t('overwriteConfirmation', { storageUnit: props.storageUnit })}
                             </p>
                         </div>
+                    )}
+                </div>
+                <SheetFooter className="flex gap-sm px-0 mt-4 border-t pt-4">
+                    <Alert variant="default" className="mb-4 flex-1">
+                        <AlertTitle>{t('mockDataNote')}</AlertTitle>
+                        <AlertDescription>
+                            {supportsMockDataRelations ? t('mockDataWarning') : t('mockDataWarningClickHouse')}
+                        </AlertDescription>
+                    </Alert>
+                </SheetFooter>
+                <div className="flex gap-sm mt-4">
+                    <Button
+                        className="flex-1"
+                        variant="secondary"
+                        onClick={() => { props.onOpenChange(false); }}
+                        data-testid="cancel-mock-data"
+                    >
+                        {t('cancel')}
+                    </Button>
+                    {!showMockDataConfirmation ? (
+                        <Button className="flex-1" onClick={() => { void handleMockDataGenerate(); }} disabled={generatingMockData || !mockDataRowCount || parseInt(mockDataRowCount) < 1} data-testid="mock-data-generate-button">
+                            {t('generate')}
+                        </Button>
+                    ) : (
+                        <Button className="flex-1" onClick={() => { void handleMockDataGenerate(); }} disabled={generatingMockData || !mockDataRowCount || parseInt(mockDataRowCount) < 1} variant="destructive" data-testid="mock-data-overwrite-button">
+                            {t('yesOverwrite')}
+                        </Button>
                     )}
                 </div>
             </SheetContent>
