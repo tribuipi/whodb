@@ -5,6 +5,7 @@ import {
 } from '@clidey/ux';
 import {
     ArrowDownTrayIcon,
+    CheckCircleIcon,
     DocumentDuplicateIcon,
     DocumentIcon,
     DocumentTextIcon,
@@ -27,6 +28,10 @@ export interface GridContextMenuProps {
     onEditCell?: () => void;
     onDeleteRow?: () => void;
     onDeleteSelected?: () => void;
+    /** Toggle selection of the right-clicked row. */
+    onToggleSelect?: () => void;
+    /** Whether the right-clicked row is currently selected (controls the menu label). */
+    isTargetSelected?: boolean;
     selectedCount: number;
     onExport?: (format: 'csv' | 'excel', scope: 'selected' | 'all') => void;
     onForeignKey?: () => void;
@@ -45,6 +50,8 @@ export function GridContextMenu(props: GridContextMenuProps) {
         onEditCell,
         onDeleteRow,
         onDeleteSelected,
+        onToggleSelect,
+        isTargetSelected,
         selectedCount,
         onExport,
         onForeignKey,
@@ -70,6 +77,12 @@ export function GridContextMenu(props: GridContextMenuProps) {
                     <ContextMenuItem onSelect={onForeignKey}>
                         <MagnifyingGlassIcon className="w-4 h-4" />
                         {t('searchForEntity')}
+                    </ContextMenuItem>
+                )}
+                {!limited && onToggleSelect && (
+                    <ContextMenuItem onSelect={onToggleSelect}>
+                        <CheckCircleIcon className="w-4 h-4 text-primary" />
+                        {isTargetSelected ? t('deselectRow') : t('selectRow')}
                     </ContextMenuItem>
                 )}
                 {!limited && onEditCell && (

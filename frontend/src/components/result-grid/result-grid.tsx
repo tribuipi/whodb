@@ -233,6 +233,18 @@ export function ResultGrid(props: ResultGridProps) {
         if (idx.length > 0) setPendingDeleteIndexes(idx);
     }, [selectedRows]);
 
+    // Toggle selection of the right-clicked row via the grid API.
+    const onToggleSelect = useCallback(() => {
+        if (menuTarget == null) return;
+        const node = apiRef.current?.getRowNode(String(menuTarget.rowIndex));
+        if (node) node.setSelected(!node.isSelected());
+    }, [menuTarget]);
+
+    const isTargetSelected = menuTarget != null
+        && selectedRows.some((r) => Number(r.__rowIndex) === menuTarget.rowIndex);
+
+    const selectionEnabled = props.editing != null || props.actions?.rawQuery != null;
+
     // Foreign-key navigation handler
     const onForeignKey = useMemo(() => {
         if (menuTarget == null || !props.foreignKeys?.onEntitySearch) return undefined;
@@ -271,9 +283,9 @@ export function ResultGrid(props: ResultGridProps) {
         <div className="flex flex-col w-full h-full" data-testid="result-grid">
             {!actions?.hideFooterControls && (
                 <div className="flex items-center justify-end gap-2 px-2 py-1 border-b border-neutral-200 dark:border-neutral-800 flex-shrink-0">
-                    <Button variant="secondary" onClick={triggerExport} className="flex gap-sm" data-testid="result-grid-export">
+                    <Button variant="secondary" onClick={triggerExport} className="flex gap-sm" data-testid="export-all-button">
                         <ArrowDownCircleIcon className="w-4 h-4" />
-                        {t('export')}
+                        {selectedRows.length > 0 ? t('exportSelected', { count: selectedRows.length }) : t('export')}
                     </Button>
                 </div>
             )}
@@ -287,6 +299,8 @@ export function ResultGrid(props: ResultGridProps) {
                 onEditCell={canEditRows ? onEditCell : undefined}
                 onDeleteRow={canDeleteRows ? onDeleteRow : undefined}
                 onDeleteSelected={canDeleteRows ? onDeleteSelected : undefined}
+                onToggleSelect={selectionEnabled ? onToggleSelect : undefined}
+                isTargetSelected={isTargetSelected}
                 onForeignKey={onForeignKey}
                 onMockData={(!props.limitContextMenu && isMockDataSupported && objectRef) ? () =>{  setShowMockDataSheet(true); } : undefined}
                 t={t}
@@ -304,7 +318,7 @@ export function ResultGrid(props: ResultGridProps) {
                         onCellEditingStopped={onCellEditingStopped}
                         onSelectionChanged={onSelectionChanged}
                         preventDefaultOnContextMenu={false}
-                        rowSelection={(props.editing || props.actions?.rawQuery) ? { mode: 'multiRow', checkboxes: true, headerCheckbox: true } : undefined}
+                        rowSelection={selectionEnabled ? { mode: 'multiRow', checkboxes: true, headerCheckbox: true } : undefined}
                         suppressCellFocus={false}
                         getRowId={(p) => String((p.data as Record<string, string>).__rowIndex)}
                     />
