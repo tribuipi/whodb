@@ -31,6 +31,9 @@ interface UseProfileSwitchOptions {
     onSuccess?: () => void;
     onError?: (error: string) => void;
     errorMessage?: string;
+    /** When true, skip the default navigation to the Storage Unit page after a successful switch.
+     *  Used by surfaces (e.g. the SQL editor) that should stay on the current page. */
+    skipNavigation?: boolean;
 }
 
 /**
@@ -99,9 +102,11 @@ export const useProfileSwitch = (options?: UseProfileSwitchOptions) => {
             }
             dispatch(DatabaseActions.setSchema(""));
             dispatch(AuthActions.switch({ id: profile.Id }));
-            void navigate(InternalRoutes.Dashboard.StorageUnit.path, {
-                state: {},
-            });
+            if (!options?.skipNavigation) {
+                void navigate(InternalRoutes.Dashboard.StorageUnit.path, {
+                    state: {},
+                });
+            }
             options?.onSuccess?.();
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);

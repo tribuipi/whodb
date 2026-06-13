@@ -94,7 +94,7 @@ import {isGcpConnection} from "../gcp";
 import {useProfileSwitch} from "@/hooks/use-profile-switch";
 import {buildSourceSchemaQuery} from "@/utils/source-refs";
 
-function getProfileLabel(profile: LocalLoginProfile, item: SourceTypeItem | undefined) {
+export function getProfileLabel(profile: LocalLoginProfile, item: SourceTypeItem | undefined) {
     if (profile.Saved) return profile.Id;
     if (item?.traits?.presentation.profileLabelStrategy === SourceProfileLabelStrategy.Hostname && profile.Hostname) {
         return profile.Hostname;
