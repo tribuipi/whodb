@@ -21,10 +21,11 @@ the chat panel.
    the old `table.tsx` once migrated.
 5. **Editing:** per-cell native editing. Committing a cell fires
    `onRowUpdate(updatedRow, originalRow)` with that single change applied.
-6. **Click-to-copy:** preserved everywhere (single-click = copy cell, double-click =
-   copy row). To avoid colliding with ag-grid's default double-click-to-edit, set
-   `suppressClickEdit: true`; editing starts via **Enter/F2** or a context-menu
-   **"Edit cell"** action.
+6. **Click-to-copy / edit trigger:** single-click = copy cell (preserved everywhere,
+   with the existing ~200ms debounce so a double-click doesn't also fire a copy).
+   **Double-click = edit the cell** (ag-grid's native default), not copy-row. Editing
+   also starts via **Enter/F2** or a context-menu **"Edit cell"** action. Copy-row
+   moves to the context menu ("Copy row").
 7. **Search:** keep the existing highlight-and-cycle behavior (imperative
    `searchRef`), reimplemented on ag-grid's API. Not the native quick filter (which
    hides rows).
@@ -117,8 +118,8 @@ Read-only call sites (SQL editor, chat) pass only `data`, `layout`, `actions.raw
 
 ## Feature Mapping Details
 
-- **Editing:** `colDef.editable = canEditRows`. `suppressClickEdit: true` so clicks
-  never start an edit. Edit starts on Enter/F2 or context-menu "Edit cell".
+- **Editing:** `colDef.editable = canEditRows`. Edit starts on double-click (ag-grid
+  native), Enter/F2, or context-menu "Edit cell".
   `onCellEditingStopped` builds `updatedRow`/`originalRow` from the row's current and
   prior values and calls `onRowUpdate`, then `onRefresh`. Type-aware editors:
   ag-grid number editor for int/float types (reusing the int/float type Sets and the
@@ -136,8 +137,9 @@ Read-only call sites (SQL editor, chat) pass only `data`, `layout`, `actions.raw
   delete row (+ delete selected), export submenu (CSV/Excel selected/all), FK
   navigate (when `isValidForeignKey`), generate mock data. Items gated by
   source-action support and `limitContextMenu`.
-- **Click-to-copy:** `onCellClicked` → `copyToClipboard(cell)`;
-  `onCellDoubleClicked` → copy whole row (tab-joined). Preserved in every mode.
+- **Click-to-copy:** `onCellClicked` → `copyToClipboard(cell)`, fired after a ~200ms
+  debounce that is cancelled by a double-click (which enters edit instead). Copy-row
+  (tab-joined) is available from the context menu, not from double-click.
 - **Search:** `searchRef.current = (term) => ...` scans `rows`, finds matches, and on
   each call advances to the next match: `api.ensureIndexVisible(row)`,
   `api.ensureColumnVisible(col)`, then flash/highlight the cell (cellClassRules or
@@ -182,8 +184,8 @@ strings (e.g. context-menu "Edit cell" if not already present).
 
 ## Risks / Notes
 
-- **UX shifts** (accepted): per-cell editing replaces whole-row editing; editing now
-  starts via Enter/F2 or the context menu rather than a click.
+- **UX shifts** (accepted): per-cell editing replaces whole-row editing; double-click
+  now edits a cell instead of copying the row (copy-row moves to the context menu).
 - **Bundle size:** ag-grid-community adds weight; import `AllCommunityModule` once and
   rely on tree-shaking. Acceptable for this app.
 - **Theme parity** is the main visual risk; tune `themeQuartz` params against the
