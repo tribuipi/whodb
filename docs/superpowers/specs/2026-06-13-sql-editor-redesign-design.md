@@ -121,11 +121,11 @@ Behavior:
 - Errors render inline in the results area (red banner), as today.
 - Editor/results split is vertically resizable.
 
-### 7. Chat (right panel) — **extract shared component**
+### 7. Chat (right panel) — **embedded only**
 
-Extract the existing Chat page (`pages/chat/chat.tsx`, `ChatPage`) core into a
-**reusable component** rendered both at the standalone `/chat` route and embedded in the
-editor's right panel — single source of truth.
+Chat exists **only** as the editor's right panel; the standalone `/chat` route is removed.
+Repurpose the existing Chat page (`pages/chat/chat.tsx`, `ChatPage`) into an embeddable
+panel component used solely here.
 
 - Reuses existing chat infrastructure: the `useAI()` hook (`components/ai.tsx`) for the
   model picker, schema from Redux (`state.database.schema`), source context via
@@ -169,8 +169,11 @@ Per-tab **results** are component-local state (not persisted), keyed by tab.
   Editor. The new page component renders **outside** `InternalPage` (full viewport),
   unlike the current scratchpad which is wrapped by it.
 - `SourceSurfaceRoute` feature-support wrapping is retained.
-- The standalone `/chat` route keeps working, now rendering the extracted shared chat
-  component.
+- The standalone `/chat` route (`InternalRoutes.Chat`, `ChatRouteComponent`) is **removed**,
+  along with its WhoDB nav/sidebar entry. Chat is reachable only as the editor's embedded
+  panel.
+- The editor's **back/home control** navigates to the rest of the nav-bearing app
+  (Tables, Graph, …), which still render inside `InternalPage`.
 
 ## Files
 
@@ -191,8 +194,10 @@ Per-tab **results** are component-local state (not persisted), keyed by tab.
 - Three-panel layout shell for the editor page.
 
 **Modified**
-- `pages/chat/chat.tsx` — extract `ChatPage` core into a shared, embeddable component.
-- `config/routes.tsx` — point the editor route at the new full-screen page.
+- `pages/chat/chat.tsx` — repurpose `ChatPage` into the embeddable right-panel component.
+- `config/routes.tsx` — point the editor route at the new full-screen page; remove the
+  `/chat` route (`InternalRoutes.Chat` / `ChatRouteComponent`).
+- Sidebar/nav — remove the Chat entry.
 - `store/index.ts` — register the new tabs slice.
 
 **New dependency**
