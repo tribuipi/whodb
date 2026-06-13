@@ -23,7 +23,7 @@ import type { LogoutMutation, LogoutMutationVariables } from '@graphql';
 import { LogoutDocument } from '@graphql';
 import { AuthActions } from "../../store/auth";
 import { Loading } from "../../components/loading";
-import { toast } from "@clidey/ux";
+import { toast } from "sonner";
 import { useTranslation } from '@/hooks/use-translation';
 import { clearGraphqlStore } from "@/config/graphql-client";
 

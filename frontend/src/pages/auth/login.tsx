@@ -15,7 +15,15 @@
  */
 
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
-import {Badge, Button, Card, cn, Label, ModeToggle, Separator, toast, useTheme} from '@clidey/ux';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { useTheme } from '@/components/theme/provider';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { ModeToggle } from '@/components/ui/mode-toggle';
+import { Separator } from '@/components/ui/separator';
 import {SearchSelect} from '../../components/ux';
 import {
     SettingsConfigDocument,
