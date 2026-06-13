@@ -24,7 +24,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@clidey/ux";
+} from "@/components/ui/breadcrumb";
 import {ChevronRightIcon, HomeIcon} from "./heroicons";
 
 export type IBreadcrumbRoute = Omit<IInternalRoute, "component">;

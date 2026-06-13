@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-import {
-  Badge,
-  Card as UxCard,
-  CardContent,
-  CardHeader,
-  cn,
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  Spinner,
-} from "@clidey/ux";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Card as UxCard, CardContent, CardHeader } from "@/components/ui/card";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Spinner } from "@/components/ui/spinner";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import type { FC, ReactElement, ReactNode} from "react";
 import {cloneElement, useEffect, useState,} from "react";

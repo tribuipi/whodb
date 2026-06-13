@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-    Dialog,
-    DialogContent,
-} from "@clidey/ux";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import type {FC} from "react";
 import { useCallback, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
