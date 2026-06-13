@@ -15,7 +15,8 @@
  */
 
 import type { FC, ReactElement} from "react";
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from "@clidey/ux";
+import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { CloudIcon, ShieldCheckIcon } from "../heroicons";
 import { useTranslation } from "@/hooks/use-translation";
 

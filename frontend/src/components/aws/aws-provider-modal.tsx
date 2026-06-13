@@ -17,21 +17,15 @@
 import { skipToken, useMutation, useQuery } from "@apollo/client/react";
 import type { FC} from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-    Badge,
-    Button,
-    cn,
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    Input,
-    Label,
-    Separator,
-    Switch,
-    toast,
-} from "@clidey/ux";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { SearchSelect } from "../ux";
 import type {
     AwsProvider,

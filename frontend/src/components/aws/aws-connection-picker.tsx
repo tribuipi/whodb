@@ -16,16 +16,12 @@
 
 import { useMutation, useQuery } from "@apollo/client/react";
 import { type FC, type ReactElement, useCallback, useEffect, useMemo } from "react";
-import {
-    Badge,
-    Button,
-    cn,
-    Label,
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-    toast,
-} from "@clidey/ux";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
     CloudProviderType,
     GetCloudProvidersDocument,

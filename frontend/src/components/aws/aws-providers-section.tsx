@@ -17,7 +17,10 @@
 import { useMutation, useQuery } from "@apollo/client/react";
 import type { FC} from "react";
 import { useCallback, useEffect, useMemo } from "react";
-import { Badge, Button, cn, toast } from "@clidey/ux";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type {
     AwsProvider} from "@graphql";
 import {
