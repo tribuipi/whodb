@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import { useState } from "react";
 import { useTranslation } from "../../hooks/use-translation";
-import { XMarkIcon, PlusIcon } from "../../components/heroicons";
+import { XMarkIcon, PlusIcon, SparklesIcon } from "../../components/heroicons";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { SqlEditorActions } from "../../store/sql-editor";
 
@@ -53,8 +53,8 @@ export const EditorTabs: FC<IEditorTabsProps> = ({ rightCollapsed, onToggleRight
         <PlusIcon className="w-4 h-4" />
       </button>
       <div className="flex-1" />
-      <button onClick={onToggleRight} aria-label={t("toggleChat")} className="px-2 text-neutral-500" data-testid="sql-editor-toggle-chat">
-        {rightCollapsed ? t("showChat") : t("hideChat")}
+      <button onClick={onToggleRight} aria-label={t("toggleChat")} className={`px-2 ${rightCollapsed ? "text-neutral-500" : "text-blue-500"}`} data-testid="sql-editor-toggle-chat">
+        <SparklesIcon className="w-4 h-4" />
       </button>
     </div>
   );

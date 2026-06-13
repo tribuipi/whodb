@@ -1,8 +1,11 @@
 en_US:
   mainNavigation: Main navigation
   profile: Profile
+  selectProfile: Select Profile
   searchProfile: Search Profile...
   addAnotherProfile: Add Another Profile
+  database: Database
+  selectDatabase: Select Database
   searchDatabase: Search Database...
   schema: Schema
   selectSchema: Select Schema

@@ -171,7 +171,7 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
         />
       </div>
       <div
-        className="px-2 py-1 text-[10px] text-neutral-500 border-t border-neutral-200 dark:border-neutral-800 flex-shrink-0"
+        className="px-2 py-1 text-[10px] text-neutral-500 flex-shrink-0"
         data-testid="sql-editor-status-bar"
       >
         {totalCount != null && t("totalCount", { count: totalCount })}

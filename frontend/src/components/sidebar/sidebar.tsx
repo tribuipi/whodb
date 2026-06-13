@@ -93,7 +93,7 @@ export function getProfileLabel(profile: LocalLoginProfile, item: SourceTypeItem
     return profile.Type;
 }
 
-function getProfileIcon(profile: LocalLoginProfile) {
+export function getProfileIcon(profile: LocalLoginProfile) {
     return (Icons.Logos as Record<string, ReactElement>)[profile.Type];
 }
 
