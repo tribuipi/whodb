@@ -32,7 +32,12 @@ export type IPluginProps = {
     token?: string;
     schema: string;
     containerWidth?: number;
+    height?: number;
 }
+
+// Vertical space the table reserves for its header row and footer chrome,
+// subtracted from the available pane height so the grid fits without clipping.
+const TABLE_CHROME = 100;
 
 function isSQLQueryAction(code?: string): boolean {
     if (code == null) {
@@ -52,7 +57,7 @@ function isSQLQueryAction(code?: string): boolean {
     return /^(select|with|values|show|explain|describe)\b/.test(cleaned);
 }
 
-export const QueryView: FC<IPluginProps> = ({ code, handleExecuteRef, containerWidth }) => {
+export const QueryView: FC<IPluginProps> = ({ code, handleExecuteRef, containerWidth, height }) => {
     const [rawExecute, { data }] = useLazyQuery(RawExecuteDocument, {
         fetchPolicy: 'network-only',
     });
@@ -91,7 +96,8 @@ export const QueryView: FC<IPluginProps> = ({ code, handleExecuteRef, containerW
                             rows={data.RawExecute.Rows}
                             disableEdit={true}
                             limitContextMenu={true}
-                            height={250}
+                            height={Math.max(200, (height ?? 360) - TABLE_CHROME)}
+                            enforceMinHeight={true}
                             databaseType={currentType}
                             rawQuery={code}
                             totalCount={data.RawExecute.TotalCount}

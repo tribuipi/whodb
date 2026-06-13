@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,6 +42,36 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
   const containerWidth = useContainerWidth(resultsContainerRef);
   const [pendingCode, setPendingCode] = useState<string | null>(null);
   const [error, setError] = useState<Error | null>(null);
+  const [editorHeight, setEditorHeight] = useState(260);
+  const [resultsHeight, setResultsHeight] = useState(0);
+
+  // Track the results pane's available height so the table can fill it.
+  useEffect(() => {
+    const el = resultsContainerRef.current;
+    if (el == null) {
+      return;
+    }
+    const update = () => { setResultsHeight(el.clientHeight); };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => { observer.disconnect(); };
+  }, []);
+
+  const startResize = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const startY = e.clientY;
+    const startHeight = editorHeight;
+    const onMove = (ev: MouseEvent) => {
+      setEditorHeight(Math.max(120, startHeight + (ev.clientY - startY)));
+    };
+    const onUp = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, [editorHeight]);
 
   const setCode = useCallback((value: string) => {
     dispatch(SqlEditorActions.updateTabCode({ tabId, code: value }));
@@ -84,14 +114,18 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
   return (
     <div className="flex flex-col h-full overflow-hidden" data-testid="sql-editor-sql-tab">
       <EditorToolbar onRun={() => { onRun(); }} onFormat={onFormat} />
-      <div className="flex-1 min-h-0 overflow-auto">
+      <div style={{ height: editorHeight }} className="flex-shrink-0 overflow-auto">
         <CodeEditor language="sql" value={code} setValue={setCode} onRun={(lineText) => { onRun(lineText); }} />
       </div>
       <div className="px-2 py-0.5 text-[10px] text-neutral-500 border-t border-neutral-200 dark:border-neutral-800">
         {t("searchPath", { schema: currentDatabase ?? "" })}
       </div>
-      <div className="h-1 bg-neutral-200 dark:bg-neutral-800 cursor-row-resize flex-shrink-0" data-testid="sql-editor-results-divider" />
-      <div ref={resultsContainerRef} className="h-[40%] overflow-auto border-t border-neutral-200 dark:border-neutral-800">
+      <div
+        onMouseDown={startResize}
+        className="h-1 bg-neutral-200 dark:bg-neutral-800 cursor-row-resize flex-shrink-0 hover:bg-blue-400/40"
+        data-testid="sql-editor-results-divider"
+      />
+      <div ref={resultsContainerRef} className="flex-1 min-h-0 overflow-auto border-t border-neutral-200 dark:border-neutral-800">
         {error != null && (
           <div className="p-2" data-testid="cell-error">
             <ErrorState error={error} />
@@ -105,6 +139,7 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
           token={modelType?.token}
           providerId={currentId}
           containerWidth={containerWidth}
+          height={resultsHeight}
         />
       </div>
       <AlertDialog open={pendingCode != null} onOpenChange={(open) => { if (!open) { handleCancel(); } }}>
