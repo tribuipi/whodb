@@ -10,11 +10,13 @@ pgconsole-style **SQL Editor**. The new page is a three-panel layout:
 
 ```
 ┌──────────────┬────────────────────────────────┬──────────────┐
-│  DB object   │  Tabs                          │   Chat       │
-│  tree        │  Toolbar (Run · Format)        │   (embedded) │
-│  (new comp)  │  Editor                        │              │
-│  (220px,     │  ── status bar ──              │   (360px,    │
-│   resizable) │  Results (resizable split)     │   collapsible)│
+│  Source ▾    │  Tabs                          │   Chat       │
+│  Database ▾  │  Toolbar (Run · Format)        │   (embedded) │
+│  ──────────  │  Editor                        │              │
+│  DB object   │  ── status bar ──              │   (360px,    │
+│  tree        │  Results (resizable split)     │   collapsible)│
+│  (220px,     │                                │              │
+│   resizable) │                                │              │
 └──────────────┴────────────────────────────────┴──────────────┘
 ```
 
@@ -48,7 +50,20 @@ toolbar/header area lets users navigate back to the rest of WhoDB.
 
 ## Components
 
-### 1. DB Object Tree (left panel) — **new component**
+### 1. Source selectors (left panel, top) — **new**
+
+Because the WhoDB nav (which hosted the profile/database/schema dropdowns) is gone, the
+left panel gets its own data-source selectors at the very top, above the object tree:
+
+- **Profile/source dropdown** — the connected login profile/source (the `authProfile`
+  used by `buildSourceScopeRef`).
+- **Database dropdown** — the database within the selected profile.
+- Schema selection is **not** here — it stays in the tree header (see below).
+- Changing the profile or database refreshes the object tree and the chat's source
+  context. Reuses the same source/database state the old WhoDB sidebar drove
+  (profile + `state.database`).
+
+### 2. DB Object Tree (left panel) — **new component**
 
 A new tree component styled pixel-for-pixel to pgconsole (we are **not** reusing
 `SchemaViewer`).
@@ -64,7 +79,7 @@ A new tree component styled pixel-for-pixel to pgconsole (we are **not** reusing
   schema objects. (Grouping/counts logic is reimplemented in the new component rather
   than imported from `SchemaViewer`.)
 
-### 2. Tabs (center, top)
+### 3. Tabs (center, top)
 
 - Each tab = one independent SQL editor with its own code + results state.
 - **+** adds a new empty tab named `SQL N`.
@@ -72,7 +87,7 @@ A new tree component styled pixel-for-pixel to pgconsole (we are **not** reusing
 - **✕** closes a tab (confirm if it has content). At least one tab always remains.
 - Tabs and their code **persist to `localStorage`** via the Redux slice (survive reload).
 
-### 3. Toolbar (center) — Run & Format only
+### 4. Toolbar (center) — Run & Format only
 
 - **Run** — executes the current tab's SQL, or the selected text if there is a selection.
   Keyboard: `⌘↵` / `Ctrl+↵`. Reuses the existing GraphQL mutation
@@ -83,12 +98,12 @@ A new tree component styled pixel-for-pixel to pgconsole (we are **not** reusing
 - **Destructive-query confirmation** (INSERT/UPDATE/DELETE/DDL) is preserved via the
   existing `isDestructiveQuery()` check in `utils/query-utils.ts`.
 
-### 4. Editor (center)
+### 5. Editor (center)
 
 - CodeMirror SQL editor (reuse the existing `components/editor.tsx`).
 - A **status bar** between editor and results shows `search_path` and cursor line/column.
 
-### 5. Results panel (center, below editor)
+### 6. Results panel (center, below editor)
 
 - **Reuses the existing `QueryView` component** from `pages/raw-execute/query-view.tsx`
   for the results table (search, copy, export, add-row already implemented).
@@ -96,7 +111,7 @@ A new tree component styled pixel-for-pixel to pgconsole (we are **not** reusing
 - Errors render inline in the results area (red banner), as today.
 - Editor/results split is vertically resizable.
 
-### 6. Chat (right panel) — **extract shared component**
+### 7. Chat (right panel) — **extract shared component**
 
 Extract the existing Chat page (`pages/chat/chat.tsx`, `ChatPage`) core into a
 **reusable component** rendered both at the standalone `/chat` route and embedded in the
@@ -147,6 +162,7 @@ Per-tab **results** are component-local state (not persisted), keyed by tab.
 - `utils/query-utils.ts` (`isDestructiveQuery`).
 
 **New**
+- Source selectors (profile + database dropdowns) for the left panel top.
 - DB object tree component.
 - Three-panel layout shell for the editor page.
 
