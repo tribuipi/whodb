@@ -21,6 +21,7 @@ export const RawExecutePage: FC = () => {
   const navigate = useNavigate();
   const tabs = useAppSelector(state => state.sqlEditor.tabs);
   const activeTabId = useAppSelector(state => state.sqlEditor.activeTabId);
+  const schema = useAppSelector(state => state.database.schema);
   const [rightCollapsed, setRightCollapsed] = useState(true);
 
   useEffect(() => {
@@ -44,9 +45,10 @@ export const RawExecutePage: FC = () => {
       <div className="flex-1 min-h-0">
         <ObjectTree
           onSelectObject={obj => {
+            const qualified = schema ? `${schema}.${obj.Name}` : obj.Name;
             dispatch(SqlEditorActions.addSqlTab({
               name: obj.Name,
-              code: `SELECT * FROM ${obj.Name} LIMIT 100;`,
+              code: `SELECT * FROM ${qualified} LIMIT 100;`,
             }));
           }}
           onOpenStructure={obj => {
@@ -76,7 +78,6 @@ export const RawExecutePage: FC = () => {
       center={center}
       right={<ChatPanel />}
       rightCollapsed={rightCollapsed}
-      onToggleRight={() => { setRightCollapsed(c => !c); }}
     />
   );
 };

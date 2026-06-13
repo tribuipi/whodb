@@ -13,11 +13,10 @@ type ISqlEditorLayoutProps = {
   center: ReactNode;
   right: ReactNode;
   rightCollapsed: boolean;
-  onToggleRight: () => void;
 };
 
 /** Full-viewport three-column shell with draggable dividers between panels. */
-export const SqlEditorLayout: FC<ISqlEditorLayoutProps> = ({ left, center, right, rightCollapsed, onToggleRight: _onToggleRight }) => {
+export const SqlEditorLayout: FC<ISqlEditorLayoutProps> = ({ left, center, right, rightCollapsed }) => {
   const [leftWidth, setLeftWidth] = useState(LEFT_DEFAULT);
   const [rightWidth, setRightWidth] = useState(RIGHT_DEFAULT);
 
