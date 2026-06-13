@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-import {
-  Button,
-  Checkbox,
-  Input,
-  Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Sheet,
-  SheetContent,
-  SheetFooter,
-  SheetTitle,
-  toast,
-} from "@clidey/ux";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetFooter, SheetTitle } from "@/components/ui/sheet";
 import type {FC} from "react";
 import { useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useTranslation} from "@/hooks/use-translation";
