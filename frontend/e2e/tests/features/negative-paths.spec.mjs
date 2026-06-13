@@ -68,14 +68,16 @@ test.describe('Negative Path Contracts', () => {
             await whodb.goto('scratchpad');
             await whodb.waitForSqlEditor();
 
-            // Run an invalid query. The redesigned editor has no visible inline error
-            // surface, so just trigger it and confirm no results render.
+            // Run an invalid query. The editor surfaces the failure inline (cell-error)
+            // and renders no results table.
             await whodb.writeCode(getSqlQuery(db, 'invalidQuery'));
             await page.locator('[data-testid="sql-editor-run"]').click();
-            await page.waitForTimeout(1000);
+            const error = await whodb.getCellError();
+            expect(error).not.toBeNull();
             await expect(page.locator('[data-testid="cell-query-output"]')).not.toBeAttached();
 
-            // A subsequent valid query must still run, proving the editor recovered.
+            // A subsequent valid query must still run, proving the editor recovered
+            // (and clears the prior error).
             await whodb.writeCode(getSqlQuery(db, 'countUsers'));
             await whodb.runCode();
             const { rows } = await whodb.getCellQueryOutput();

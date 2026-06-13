@@ -14,6 +14,7 @@ import {
 import { useTranslation } from "../../hooks/use-translation";
 import { useContainerWidth } from "../../hooks/use-container-width";
 import { CodeEditor } from "../../components/editor";
+import { ErrorState } from "../../components/error-state";
 import { QueryView } from "./query-view";
 import { EditorToolbar } from "./editor-toolbar";
 import { formatSql } from "../../utils/format-sql";
@@ -40,13 +41,17 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
   const resultsContainerRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(resultsContainerRef);
   const [pendingCode, setPendingCode] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const setCode = useCallback((value: string) => {
     dispatch(SqlEditorActions.updateTabCode({ tabId, code: value }));
   }, [dispatch, tabId]);
 
   const doExecute = useCallback((sql: string) => {
-    void handleExecuteRef.current?.(sql);
+    setError(null);
+    void handleExecuteRef.current?.(sql)?.catch((err: unknown) => {
+      setError(err instanceof Error ? err : new Error(String(err)));
+    });
   }, []);
 
   const onRun = useCallback((sql?: string) => {
@@ -87,6 +92,11 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
       </div>
       <div className="h-1 bg-neutral-200 dark:bg-neutral-800 cursor-row-resize flex-shrink-0" data-testid="sql-editor-results-divider" />
       <div ref={resultsContainerRef} className="h-[40%] overflow-auto border-t border-neutral-200 dark:border-neutral-800">
+        {error != null && (
+          <div className="p-2" data-testid="cell-error">
+            <ErrorState error={error} />
+          </div>
+        )}
         <QueryView
           code={code}
           handleExecuteRef={handleExecuteRef}

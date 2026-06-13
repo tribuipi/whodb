@@ -116,6 +116,18 @@ export const scratchpadMethods = {
     },
 
     /**
+     * Get the active tab's inline error text, or null if no error is shown.
+     * @returns {Promise<string|null>}
+     */
+    async getCellError() {
+        const errorLocator = this.page.locator('[data-testid="cell-error"]');
+        if (!(await errorLocator.isVisible({ timeout: TIMEOUT.ACTION }).catch(() => false))) {
+            return null;
+        }
+        return (await errorLocator.innerText()).trim();
+    },
+
+    /**
      * Get the active tab's action output text (e.g. "Action Executed").
      * @returns {Promise<string>}
      */
