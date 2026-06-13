@@ -190,18 +190,13 @@ test.describe('Sidebar Navigation', () => {
                     await page.locator('[href="/scratchpad"]').click();
                     await expect(page).toHaveURL(/\/scratchpad/);
 
-                    // Navigate to chat
-                    await page.locator('[href="/chat"]').click();
-                    await expect(page).toHaveURL(/\/chat/);
-
                     // Navigate back to storage-unit
                     await page.locator('[href="/storage-unit"]').click();
                     await expect(page).toHaveURL(/\/storage-unit/);
                 });
 
-                test('shows chat option for SQL databases', async ({ whodb, page }) => {
-                    await expect(page.locator('[href="/chat"]')).toBeAttached();
-                });
+                // The standalone /chat sidebar entry was removed; AI chat now lives
+                // inside the SQL editor panel, so there is no /chat nav link to assert.
 
                 test('shows graph option', async ({ whodb, page }) => {
                     await expect(page.locator('[href="/graph"]')).toBeAttached();
@@ -218,11 +213,6 @@ test.describe('Sidebar Navigation', () => {
         // Test NoSQL databases that may not show all options
         forEachDatabase('keyvalue', (db) => {
             test.describe(`${db.type}`, () => {
-                test('hides chat option for key-value databases', async ({ whodb, page }) => {
-                    // Redis and similar don't support SQL chat
-                    await expect(page.locator('[href="/chat"]')).not.toBeAttached();
-                });
-
                 test('hides scratchpad option for key-value databases', async ({ whodb, page }) => {
                     // Key-value stores don't support SQL scratchpad
                     await expect(page.locator('[href="/scratchpad"]')).not.toBeAttached();

@@ -364,25 +364,14 @@ test.describe('Schema Management', () => {
                     }
 
                     // Clean up: Delete the created table if it exists
-                    // Use scratchpad to drop the table
+                    // Use the SQL editor to drop the table
                     await page.goto(whodb.url('/scratchpad'));
-
-                    // Wait for scratchpad page to load
-                    await expect(page.locator('[data-testid="raw-execute-page"]')).toBeVisible({ timeout: 10000 });
-
-                    // Wait for the editor cell to be ready
-                    await page.locator('[data-testid="cell-0"]').waitFor({ timeout: 10000 });
-
-                    const editorLocator = page.locator('[data-testid="cell-0"]')
-                        .locator('textarea, [contenteditable="true"], .cm-content')
-                        .first();
+                    await whodb.waitForSqlEditor();
 
                     for (const tableName of createdTableNames) {
                         const dropQuery = `DROP TABLE IF EXISTS ${schemaQualifiedTableName(db, tableName)};`;
-                        await editorLocator.click();
-                        await editorLocator.fill('');
-                        await editorLocator.fill(dropQuery);
-                        await whodb.runCode(0);
+                        await whodb.writeCode(dropQuery);
+                        await whodb.runCode();
                     }
 
                     createdTableNames.clear();

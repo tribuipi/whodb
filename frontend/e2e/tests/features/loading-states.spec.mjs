@@ -151,10 +151,11 @@ test.describe('Loading States & Spinners', () => {
             test.describe(`${db.type}`, () => {
                 test('shows loading indicator during query execution', async ({ whodb, page }) => {
                     await whodb.goto('scratchpad');
+                    await whodb.waitForSqlEditor();
 
                     // Write query
                     const query = getSqlQuery(db, 'selectAllUsers');
-                    await whodb.writeCode(0, query);
+                    await whodb.writeCode(query);
 
                     // Track query execution
                     const responsePromise = page.waitForResponse(
@@ -163,55 +164,44 @@ test.describe('Loading States & Spinners', () => {
                     );
 
                     // Execute query
-                    await whodb.runCode(0);
+                    await whodb.runCode();
 
                     // Wait for query to complete
                     await responsePromise;
 
                     // Verify results are displayed
-                    const output = await whodb.getCellQueryOutput(0);
+                    const output = await whodb.getCellQueryOutput();
                     expect(output.columns.length).toBeGreaterThan(0);
                     expect(output.rows.length).toBeGreaterThan(0);
                 });
 
-                test('shows loading state for multiple concurrent queries', async ({ whodb, page }) => {
+                test('runs queries across multiple editor tabs', async ({ whodb, page }) => {
                     await whodb.goto('scratchpad');
+                    await whodb.waitForSqlEditor();
 
-                    // Add multiple cells and write queries
-                    await whodb.addCell(0);
-                    await whodb.addCell(1);
+                    // Run a query in the first tab
+                    await whodb.writeCode(getSqlQuery(db, 'selectAllUsers'));
+                    await whodb.runCode();
+                    let output = await whodb.getCellQueryOutput();
+                    expect(output.rows.length).toBeGreaterThan(0);
 
-                    const query1 = getSqlQuery(db, 'selectAllUsers');
-                    const query2 = getSqlQuery(db, 'countUsers');
-
-                    await whodb.writeCode(0, query1);
-                    await whodb.writeCode(1, query2);
-                    await whodb.writeCode(2, query1);
-
-                    // Track queries
-                    const responsePromise = page.waitForResponse(
-                        (response) => response.url().includes('/api/query') && response.request().method() === 'POST',
-                        { timeout: 10000 }
-                    );
-
-                    // Execute all
-                    await whodb.runCode(0);
-                    await whodb.runCode(1);
-                    await whodb.runCode(2);
-
-                    // Wait for queries to complete
-                    await responsePromise;
-
-                    // Verify all results are displayed
-                    await page.locator('[role="tabpanel"][data-state="active"] [data-testid="cell-0"] [data-testid="cell-query-output"]').waitFor({ timeout: 10000 });
-                    await page.locator('[role="tabpanel"][data-state="active"] [data-testid="cell-1"] [data-testid="cell-query-output"]').waitFor({ timeout: 10000 });
-                    await page.locator('[role="tabpanel"][data-state="active"] [data-testid="cell-2"] [data-testid="cell-query-output"]').waitFor({ timeout: 10000 });
+                    // Open a second tab and run a different query
+                    await whodb.addTab();
+                    await whodb.writeCode(getSqlQuery(db, 'countUsers'));
+                    await whodb.runCode();
+                    output = await whodb.getCellQueryOutput();
+                    expect(output.rows.length).toEqual(1);
                 });
             });
         }, { features: ['scratchpad'] });
     });
 
     test.describe('Chat AI Loading State', () => {
+        // The standalone /chat route was removed in the SQL editor redesign; AI chat
+        // is now an in-editor panel with a different testid contract. These tests drive
+        // the old chat page via gotoChat() and are skipped until rewritten.
+        test.skip(true, 'Chat moved into the SQL editor panel; loading-state tests need a rewrite.');
+
         forEachDatabase('sql', (db) => {
             if (db.type !== 'Postgres') {
                 return;

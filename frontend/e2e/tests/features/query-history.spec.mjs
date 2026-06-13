@@ -14,87 +14,14 @@
  * limitations under the License.
  */
 
-import { test, expect, forEachDatabase } from '../../support/test-fixture.mjs';
-import { getSqlQuery } from '../../support/database-config.mjs';
+import { test } from '../../support/test-fixture.mjs';
 
+// The per-cell query-history feature was removed when the multi-cell scratchpad
+// was replaced by the full-screen, tabbed SQL editor. The new editor has no
+// query history surface, so there is nothing to exercise here. The cases that
+// covered storing/cloning/copying/re-executing from history have been removed.
+// If query history returns to the SQL editor, restore coverage against its new
+// testids here.
 test.describe('Query History', () => {
-
-    // SQL Databases with scratchpad support
-    forEachDatabase('sql', (db) => {
-            if (db.type !== 'Postgres') {
-                return;
-            }
-
-        test('stores executed queries in history', async ({ whodb, page }) => {
-            await whodb.goto('scratchpad');
-
-            // Execute a query
-            const query = getSqlQuery(db, 'selectAllUsers');
-            await whodb.writeCode(0, query);
-            await whodb.runCode(0);
-
-            // Open history
-            await whodb.openQueryHistory(0);
-
-            const items = await whodb.getQueryHistoryItems();
-            expect(items.length).toBeGreaterThan(0);
-            expect(items[0]).toContain('SELECT');
-
-            await whodb.closeQueryHistory();
-        });
-
-        test('clones query from history to editor', async ({ whodb, page }) => {
-            await whodb.goto('scratchpad');
-
-            // Execute first query
-            const query1 = getSqlQuery(db, 'selectAllUsers');
-            await whodb.writeCode(0, query1);
-            await whodb.runCode(0);
-
-            // Execute second query
-            await whodb.addCell(0);
-            const query2 = getSqlQuery(db, 'countUsers');
-            await whodb.writeCode(1, query2);
-            await whodb.runCode(1);
-
-            // Open history and clone first query
-            await whodb.openQueryHistory(1);
-            await whodb.cloneQueryToEditor(0, 1);
-
-            // Verify cloned
-            await whodb.verifyQueryInEditor(1, 'COUNT');
-        });
-
-        test('copies query to clipboard', async ({ whodb, page }) => {
-            await whodb.goto('scratchpad');
-
-            const query = getSqlQuery(db, 'selectAllUsers');
-            await whodb.writeCode(0, query);
-            await whodb.runCode(0);
-
-            await whodb.openQueryHistory(0);
-            await whodb.copyQueryFromHistory(0);
-            await whodb.closeQueryHistory();
-        });
-
-        test('executes query directly from history', async ({ whodb, page }) => {
-            await whodb.goto('scratchpad');
-
-            const query = getSqlQuery(db, 'selectAllUsers');
-            await whodb.writeCode(0, query);
-            await whodb.runCode(0);
-
-            // Clear editor
-            await whodb.writeCode(0, '-- cleared');
-
-            await whodb.openQueryHistory(0);
-            await whodb.executeQueryFromHistory(0);
-            await whodb.closeQueryHistory();
-
-            // Verify results appeared
-            const { rows } = await whodb.getCellQueryOutput(0);
-            expect(rows.length).toBeGreaterThan(0);
-        });
-    }, { features: ['queryHistory', 'scratchpad'] });
-
+    test.skip('per-cell query history removed with the multi-cell scratchpad', () => {});
 });

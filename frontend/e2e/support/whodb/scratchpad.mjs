@@ -32,37 +32,29 @@ async function extractText(locator) {
         .trim();
 }
 
-/** Methods for scratchpad cells and pages */
+/**
+ * Methods for the tabbed SQL editor (full-screen scratchpad).
+ *
+ * The legacy multi-cell scratchpad was replaced by a three-panel SQL editor:
+ * a DB object tree on the left, a tab strip in the center, and a per-tab editor
+ * with results below it. The result-reading testids (`cell-query-output`,
+ * `cell-action-output`) are preserved from the old `QueryView`/`StorageUnitTable`.
+ */
 export const scratchpadMethods = {
     /**
-     * Add a cell after the specified index
-     * @param {number} afterIndex
+     * Wait for the SQL editor layout to be ready (call after goto('scratchpad')).
      */
-    async addCell(afterIndex) {
-        await this.page
-            .locator(`[role="tabpanel"][data-state="active"] [data-testid="cell-${afterIndex}"] [data-testid="add-cell-button"]`)
-            .click();
+    async waitForSqlEditor() {
+        await this.page.locator('[data-testid="sql-editor-layout"]').waitFor({ timeout: TIMEOUT.SLOW });
+        await this.page.locator('[data-testid="sql-editor-sql-tab"] .cm-content').first().waitFor({ timeout: TIMEOUT.ACTION });
     },
 
     /**
-     * Remove a cell at the specified index
-     * @param {number} index
-     */
-    async removeCell(index) {
-        await this.page
-            .locator(`[role="tabpanel"][data-state="active"] [data-testid="cell-${index}"] [data-testid="delete-cell-button"]`)
-            .click();
-        await this.page.locator('[data-testid="delete-cell-confirm"]').click();
-    },
-
-    /**
-     * Write code into a cell's CodeMirror editor
-     * @param {number} index
+     * Write SQL into the active SQL tab's CodeMirror editor.
      * @param {string} text
      */
-    async writeCode(index, text) {
-        const selector = `[role="tabpanel"][data-state="active"] [data-testid="cell-${index}"] .cm-content`;
-        const editor = this.page.locator(selector);
+    async writeCode(text) {
+        const editor = this.page.locator('[data-testid="sql-editor-sql-tab"] .cm-content').first();
         await editor.scrollIntoViewIfNeeded();
         await editor.waitFor({ state: "visible" });
         await editor.click();
@@ -73,35 +65,45 @@ export const scratchpadMethods = {
     },
 
     /**
-     * Run code in a specific cell
-     * @param {number} index
+     * Read the current text of the active SQL tab's CodeMirror editor.
+     * @returns {Promise<string>}
      */
-    async runCode(index) {
-        const buttonSelector = `[role="tabpanel"][data-state="active"] [data-testid="cell-${index}"] [data-testid="query-cell-button"]`;
-        await this.page.locator(buttonSelector).first().click({ force: true });
+    async getEditorText() {
+        const editor = this.page.locator('[data-testid="sql-editor-sql-tab"] .cm-content').first();
+        return (await editor.innerText()).trim();
+    },
 
-        // If a confirmation dialog appears (destructive queries), click through it
+    /**
+     * Run the SQL in the active tab via the Run button, clicking through any
+     * destructive-query confirmation dialog.
+     */
+    async runCode() {
+        await this.page.locator('[data-testid="sql-editor-run"]').click();
+
         const confirmBtn = this.page.locator('[data-testid="execute-query-confirm"]');
         if (await confirmBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
             await confirmBtn.click();
         }
 
-        const cellLocator = this.page.locator(`[role="tabpanel"][data-state="active"] [data-testid="cell-${index}"]`);
-        await cellLocator
-            .locator('[data-testid="cell-query-output"], [data-testid="cell-action-output"], [data-testid="cell-error"]')
+        await this.page
+            .locator('[data-testid="cell-query-output"], [data-testid="cell-action-output"], [data-testid="error-state"]')
             .first()
             .waitFor({ timeout: TIMEOUT.SLOW });
     },
 
     /**
-     * Get cell query output as {columns, rows}
-     * @param {number} index
+     * Format the SQL in the active tab.
+     */
+    async formatCode() {
+        await this.page.locator('[data-testid="sql-editor-format"]').click();
+    },
+
+    /**
+     * Get the active tab's query output as {columns, rows}.
      * @returns {Promise<{columns: string[], rows: string[][]}>}
      */
-    async getCellQueryOutput(index) {
-        const tableLocator = this.page.locator(
-            `[role="tabpanel"][data-state="active"] [data-testid="cell-${index}"] [data-testid="cell-query-output"] table`
-        );
+    async getCellQueryOutput() {
+        const tableLocator = this.page.locator('[data-testid="cell-query-output"] table');
         await tableLocator.waitFor({ timeout: TIMEOUT.ACTION });
 
         return await tableLocator.evaluate((table) => {
@@ -114,46 +116,53 @@ export const scratchpadMethods = {
     },
 
     /**
-     * Get cell action output text
-     * @param {number} index
+     * Get the active tab's action output text (e.g. "Action Executed").
      * @returns {Promise<string>}
      */
-    async getCellActionOutput(index) {
-        const el = this.page.locator(
-            `[role="tabpanel"][data-state="active"] [data-testid="cell-${index}"] [data-testid="cell-action-output"]`
-        );
+    async getCellActionOutput() {
+        const el = this.page.locator('[data-testid="cell-action-output"]');
         await el.waitFor({ timeout: TIMEOUT.ACTION });
         return await extractText(el);
     },
 
     /**
-     * Get cell error text
-     * @param {number} index
-     * @returns {Promise<string>}
+     * Single-click a DB object in the tree, opening a new SELECT tab for it.
+     * @param {string} name
      */
-    async getCellError(index) {
-        const el = this.page.locator(
-            `[role="tabpanel"][data-state="active"] [data-testid="cell-${index}"] [data-testid="cell-error"]`
-        );
-        await el.waitFor({ timeout: TIMEOUT.ACTION });
-        await el.waitFor({ state: "visible" });
-        const text = await el.innerText();
-        return text.replace(/^Error\s*/i, "").trim();
+    async clickTreeObject(name) {
+        await this.page.locator(`[data-testid="sql-editor-tree-object-${name}"]`).click();
     },
 
     /**
-     * Add a new scratchpad page
+     * Double-click a DB object in the tree, opening its structure tab.
+     * @param {string} name
      */
-    async addScratchpadPage() {
-        await this.page.locator('[data-testid="add-page-button"]').click();
+    async openStructure(name) {
+        await this.page.locator(`[data-testid="sql-editor-tree-object-${name}"]`).dblclick();
+        await this.page.locator('[data-testid="sql-editor-structure-tab"]').waitFor({ timeout: TIMEOUT.ACTION });
     },
 
     /**
-     * Get scratchpad page names
+     * Search the object tree.
+     * @param {string} term
+     */
+    async searchTree(term) {
+        await this.page.locator('[data-testid="sql-editor-tree-search"]').fill(term);
+    },
+
+    /**
+     * Add a new SQL tab via the add-tab button.
+     */
+    async addTab() {
+        await this.page.locator('[data-testid="sql-editor-add-tab"]').click();
+    },
+
+    /**
+     * Get the visible tab names.
      * @returns {Promise<string[]>}
      */
-    async getScratchpadPages() {
-        const els = this.page.locator('[data-testid="page-tabs"] [data-testid*="page-tab"]');
+    async getTabNames() {
+        const els = this.page.locator('[data-testid="sql-editor-tabs"] [data-testid^="sql-editor-tab-"]');
         const count = await els.count();
         const result = [];
         for (let i = 0; i < count; i++) {
@@ -163,20 +172,5 @@ export const scratchpadMethods = {
             }
         }
         return result;
-    },
-
-    /**
-     * Delete a scratchpad page
-     * @param {number} index
-     * @param {boolean} cancel
-     */
-    async deleteScratchpadPage(index, cancel = true) {
-        await this.page.locator(`[data-testid="delete-page-tab-${index}"]`).click();
-
-        if (cancel) {
-            await this.page.locator('[data-testid="delete-page-button-cancel"]').click();
-        } else {
-            await this.page.locator('[data-testid="delete-page-button-confirm"]').click();
-        }
     },
 };

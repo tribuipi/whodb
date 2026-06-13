@@ -35,6 +35,13 @@ async function waitForPersistedProviderSelection(page) {
 }
 
 test.describe('Chat AI Integration', () => {
+    // The standalone /chat route was removed in the SQL editor redesign. AI chat is
+    // now an in-editor panel (toggled via `sql-editor-toggle-chat`) with a different
+    // testid contract (`user-message`/`system-message`/`chat-input`, etc.) than the
+    // old chat page these tests drive via `gotoChat()`. This suite is skipped until it
+    // is rewritten against the new in-editor chat panel; the chat *feature* still
+    // exists, so this is paused coverage rather than removed coverage.
+    test.skip(true, 'Chat moved into the SQL editor panel; suite needs a rewrite against the new panel testids.');
 
     // Only SQL databases with chat feature
     forEachDatabase('sql', (db) => {

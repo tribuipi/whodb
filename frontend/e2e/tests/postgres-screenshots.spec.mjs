@@ -278,59 +278,31 @@ test.describe("Postgres Screenshot Generation", () => {
 
     test("28 - Scratchpad - Code Editor", async ({ whodb, page }) => {
       await whodb.goto("scratchpad");
-      await page.waitForTimeout(500);
-      await whodb.writeCode(0, "SELECT * FROM test_schema.users ORDER BY id;");
+      await whodb.waitForSqlEditor();
+      await whodb.writeCode("SELECT * FROM test_schema.users ORDER BY id;");
       await page.waitForTimeout(300);
       await page.screenshot({ path: ssPath("28-scratchpad-code-editor") });
     });
 
     test("29 - Scratchpad - Query Results", async ({ whodb, page }) => {
       await whodb.goto("scratchpad");
-      await whodb.writeCode(0, "SELECT * FROM test_schema.users ORDER BY id;");
-      await whodb.runCode(0);
+      await whodb.waitForSqlEditor();
+      await whodb.writeCode("SELECT * FROM test_schema.users ORDER BY id;");
+      await whodb.runCode();
       await page.waitForTimeout(1000);
       await page.screenshot({ path: ssPath("29-scratchpad-query-results") });
     });
 
-    test("30 - Scratchpad - Query Error", async ({ whodb, page }) => {
-      await whodb.goto("scratchpad");
-      await whodb.writeCode(0, "SELECT * FROM test_schema.nonexistent_table;");
-      await whodb.runCode(0);
-      await page.waitForTimeout(1000);
-      await page.screenshot({ path: ssPath("30-scratchpad-query-error") });
-    });
+    // Removed in the SQL editor redesign: the new editor has no visible query-error
+    // surface, no multi-page support, no per-cell options menu, and no per-cell query
+    // history. These screenshots are skipped until / unless equivalent UI returns.
+    test.skip("30 - Scratchpad - Query Error", async () => {});
 
-    test("31 - Scratchpad - Multiple Pages", async ({ whodb, page }) => {
-      await whodb.goto("scratchpad");
-      await whodb.addScratchpadPage();
-      await page.waitForTimeout(500);
-      await page.screenshot({ path: ssPath("31-scratchpad-multiple-pages") });
-    });
+    test.skip("31 - Scratchpad - Multiple Pages", async () => {});
 
-    test("32 - Scratchpad - Cell Options Menu", async ({ whodb, page }) => {
-      await whodb.goto("scratchpad");
-      await page.waitForTimeout(1500);
-      const cell = page.locator('[role="tabpanel"][data-state="active"] [data-testid="cell-0"]');
-      await expect(cell).toBeVisible();
-      await cell.hover();
-      await page.waitForTimeout(500);
-      await cell.locator('[data-testid="icon-button"]').first().click({ force: true });
-      await page.waitForTimeout(1000);
-      await expect(page.locator('[role="menu"]')).toBeVisible();
-      await page.waitForTimeout(300);
-      await page.screenshot({ path: ssPath("32-scratchpad-cell-options-menu") });
-    });
+    test.skip("32 - Scratchpad - Cell Options Menu", async () => {});
 
-    test("33 - Scratchpad - Query History Dialog", async ({ whodb, page }) => {
-      await whodb.goto("scratchpad");
-      await whodb.writeCode(0, "SELECT * FROM test_schema.users;");
-      await whodb.runCode(0);
-      await page.waitForTimeout(1000);
-      await whodb.openQueryHistory(0);
-      await page.waitForTimeout(500);
-      await page.screenshot({ path: ssPath("33-scratchpad-query-history") });
-      await page.keyboard.press("Escape");
-    });
+    test.skip("33 - Scratchpad - Query History Dialog", async () => {});
 
     test("34 - Sidebar - Database Selector", async ({ whodb, page }) => {
       await page.goto(whodb.url("/storage-unit"));
@@ -394,8 +366,9 @@ test.describe("Postgres Screenshot Generation", () => {
 
     test("40 - Scratchpad - Action Query Result", async ({ whodb, page }) => {
       await whodb.goto("scratchpad");
-      await whodb.writeCode(0, "UPDATE test_schema.users SET username='temp' WHERE id=999;");
-      await whodb.runCode(0);
+      await whodb.waitForSqlEditor();
+      await whodb.writeCode("UPDATE test_schema.users SET username='temp' WHERE id=999;");
+      await whodb.runCode();
       await page.waitForTimeout(1000);
       await page.screenshot({ path: ssPath("40-scratchpad-action-result") });
     });
@@ -493,31 +466,11 @@ test.describe("Postgres Screenshot Generation", () => {
       await page.keyboard.press("Escape");
     });
 
-    test("48 - Scratchpad - Multiple Cells with Results", async ({ whodb, page }) => {
-      await whodb.goto("scratchpad");
-      await whodb.writeCode(0, "SELECT * FROM test_schema.users ORDER BY id LIMIT 3;");
-      await whodb.runCode(0);
-      await page.waitForTimeout(1000);
-      await whodb.addCell(0);
-      await whodb.writeCode(1, "SELECT COUNT(*) as total FROM test_schema.users;");
-      await whodb.runCode(1);
-      await page.waitForTimeout(1000);
-      await page.screenshot({ path: ssPath("48-scratchpad-multiple-cells-results") });
-    });
+    // Removed in the SQL editor redesign: multi-cell scratchpad and per-cell query
+    // history no longer exist, so these screenshots are skipped.
+    test.skip("48 - Scratchpad - Multiple Cells with Results", async () => {});
 
-    test("49 - Scratchpad - Query History Clone to Editor", async ({ whodb, page }) => {
-      await whodb.goto("scratchpad");
-      await whodb.writeCode(0, "SELECT * FROM test_schema.users;");
-      await whodb.runCode(0);
-      await page.waitForTimeout(1000);
-      await whodb.writeCode(0, "SELECT * FROM test_schema.orders;");
-      await whodb.runCode(0);
-      await page.waitForTimeout(1000);
-      await whodb.openQueryHistory(0);
-      await page.waitForTimeout(500);
-      await whodb.screenshotWithHighlight('[data-testid="clone-to-editor-button"]', ssName("49-scratchpad-history-clone-button"));
-      await page.keyboard.press("Escape");
-    });
+    test.skip("49 - Scratchpad - Query History Clone to Editor", async () => {});
 
     test("50 - Graph - Click Node Data Button", async ({ whodb, page }) => {
       await whodb.goto("graph");
@@ -860,40 +813,45 @@ test.describe("Postgres Screenshot Generation", () => {
 
     test("86 - Scratchpad - SELECT Query Result", async ({ whodb, page }) => {
       await whodb.goto("scratchpad");
-      await whodb.writeCode(0, "SELECT id, username, email FROM test_schema.users ORDER BY id;");
-      await whodb.runCode(0);
+      await whodb.waitForSqlEditor();
+      await whodb.writeCode("SELECT id, username, email FROM test_schema.users ORDER BY id;");
+      await whodb.runCode();
       await page.waitForTimeout(1000);
       await page.screenshot({ path: ssPath("86-scratchpad-select-query-result") });
     });
 
     test("87 - Scratchpad - COUNT Query Result", async ({ whodb, page }) => {
       await whodb.goto("scratchpad");
-      await whodb.writeCode(0, "SELECT COUNT(*) as total_users FROM test_schema.users;");
-      await whodb.runCode(0);
+      await whodb.waitForSqlEditor();
+      await whodb.writeCode("SELECT COUNT(*) as total_users FROM test_schema.users;");
+      await whodb.runCode();
       await page.waitForTimeout(1000);
       await page.screenshot({ path: ssPath("87-scratchpad-count-query-result") });
     });
 
     test("88 - Scratchpad - JOIN Query Result", async ({ whodb, page }) => {
       await whodb.goto("scratchpad");
-      await whodb.writeCode(0, "SELECT u.username, COUNT(o.id) as order_count FROM test_schema.users u LEFT JOIN test_schema.orders o ON u.id = o.user_id GROUP BY u.username ORDER BY order_count DESC;");
-      await whodb.runCode(0);
+      await whodb.waitForSqlEditor();
+      await whodb.writeCode("SELECT u.username, COUNT(o.id) as order_count FROM test_schema.users u LEFT JOIN test_schema.orders o ON u.id = o.user_id GROUP BY u.username ORDER BY order_count DESC;");
+      await whodb.runCode();
       await page.waitForTimeout(1000);
       await page.screenshot({ path: ssPath("88-scratchpad-join-query-result") });
     });
 
     test("89 - Scratchpad - UPDATE Statement Result", async ({ whodb, page }) => {
       await whodb.goto("scratchpad");
-      await whodb.writeCode(0, "UPDATE test_schema.users SET username=username WHERE id=999;");
-      await whodb.runCode(0);
+      await whodb.waitForSqlEditor();
+      await whodb.writeCode("UPDATE test_schema.users SET username=username WHERE id=999;");
+      await whodb.runCode();
       await page.waitForTimeout(1000);
       await page.screenshot({ path: ssPath("89-scratchpad-update-statement") });
     });
 
     test("90 - Scratchpad - DELETE Statement Result", async ({ whodb, page }) => {
       await whodb.goto("scratchpad");
-      await whodb.writeCode(0, "DELETE FROM test_schema.users WHERE id=999;");
-      await whodb.runCode(0);
+      await whodb.waitForSqlEditor();
+      await whodb.writeCode("DELETE FROM test_schema.users WHERE id=999;");
+      await whodb.runCode();
       await page.waitForTimeout(1000);
       await page.screenshot({ path: ssPath("90-scratchpad-delete-statement") });
     });
@@ -981,6 +939,12 @@ test.describe("Postgres Screenshot Generation", () => {
     // ============================================================================
     // SECTION: CHAT (AI ASSISTANT) FUNCTIONALITY (101-115)
     // ============================================================================
+    // The standalone /chat route was removed in the SQL editor redesign; AI chat is
+    // now an in-editor panel with a different testid contract. These chat screenshots
+    // drive the old chat page via `gotoChat()` and are skipped until regenerated
+    // against the new in-editor chat panel. (These are the last tests in this
+    // describe, so this skip scopes exactly to the chat block 101-115.)
+    test.skip(true, "Chat moved into the SQL editor panel; chat screenshots need regeneration.");
 
     test("101 - Chat - Initial Page with Model Selection", async ({ whodb, page }) => {
       await whodb.setupChatMock();

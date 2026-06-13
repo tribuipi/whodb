@@ -568,38 +568,28 @@ test.describe('Keyboard Shortcuts', () => {
             test('navigates to first view with number shortcut', async ({ whodb, page }) => {
                 await whodb.data(tableName);
 
-                // Press Ctrl+1 (Mac) or Alt+1 (Win/Linux) to go to first view (Chat for SQL databases)
+                // Press Ctrl+1 (Mac) or Alt+1 (Win/Linux) to go to first view (Storage Units/Tables)
                 await whodb.typeNavShortcut(1);
-
-                // Should navigate to chat page
-                await expect(page).toHaveURL(/\/chat/);
-            });
-
-            test('navigates to second view with number shortcut', async ({ whodb, page }) => {
-                await whodb.data(tableName);
-
-                // Press Ctrl+2 (Mac) or Alt+2 (Win/Linux) to go to second view (Storage Units/Tables)
-                await whodb.typeNavShortcut(2);
 
                 // Should navigate to storage-unit page
                 await expect(page).toHaveURL(/\/storage-unit/);
             });
 
-            test('navigates to third view with number shortcut', async ({ whodb, page }) => {
+            test('navigates to second view (Graph) with number shortcut', async ({ whodb, page }) => {
                 await whodb.data(tableName);
 
-                // Press Ctrl+3 (Mac) or Alt+3 (Win/Linux) to go to third view (Graph)
-                await whodb.typeNavShortcut(3);
+                // Press Ctrl+2 (Mac) or Alt+2 (Win/Linux) to go to second view (Graph)
+                await whodb.typeNavShortcut(2);
 
                 // Should navigate to graph page
                 await expect(page).toHaveURL(/\/graph/);
             });
 
-            test('navigates to fourth view (Scratchpad) with number shortcut', async ({ whodb, page }) => {
+            test('navigates to third view (Scratchpad) with number shortcut', async ({ whodb, page }) => {
                 await whodb.data(tableName);
 
-                // Press Ctrl+4 (Mac) or Alt+4 (Win/Linux) to go to fourth view (Scratchpad)
-                await whodb.typeNavShortcut(4);
+                // Press Ctrl+3 (Mac) or Alt+3 (Win/Linux) to go to third view (Scratchpad)
+                await whodb.typeNavShortcut(3);
 
                 // Should navigate to scratchpad page
                 await expect(page).toHaveURL(/\/scratchpad/);
@@ -646,7 +636,6 @@ test.describe('Keyboard Shortcuts', () => {
                 await whodb.typeCmdShortcut('k');
 
                 // Should show navigation commands
-                await expect(page.locator('[data-testid="command-nav-chat"]')).toBeVisible();
                 await expect(page.locator('[data-testid="command-nav-storage-units"]')).toBeVisible();
                 await expect(page.locator('[data-testid="command-nav-graph"]')).toBeVisible();
                 await expect(page.locator('[data-testid="command-nav-scratchpad"]')).toBeVisible();
@@ -671,17 +660,17 @@ test.describe('Keyboard Shortcuts', () => {
                 await page.keyboard.press('Escape');
             });
 
-            test('Command palette navigates to Chat when selected', async ({ whodb, page }) => {
+            test('Command palette navigates to Storage Units when selected', async ({ whodb, page }) => {
                 await whodb.data(tableName);
 
                 // Open command palette
                 await whodb.typeCmdShortcut('k');
 
-                // Click on Chat navigation
-                await page.locator('[data-testid="command-nav-chat"]').click();
+                // Click on Storage Units navigation
+                await page.locator('[data-testid="command-nav-storage-units"]').click();
 
-                // Should navigate to chat
-                await expect(page).toHaveURL(/\/chat/);
+                // Should navigate to storage units
+                await expect(page).toHaveURL(/\/storage-unit/);
             });
 
             test('Command palette navigates to Scratchpad when selected', async ({ whodb, page }) => {
@@ -730,7 +719,7 @@ test.describe('Keyboard Shortcuts', () => {
 
                 // Should filter to show only graph
                 await expect(page.locator('[data-testid="command-nav-graph"]')).toBeAttached();
-                await expect(page.locator('[data-testid="command-nav-chat"]')).not.toBeAttached();
+                await expect(page.locator('[data-testid="command-nav-scratchpad"]')).not.toBeAttached();
 
                 // Close
                 await page.keyboard.press('Escape');
@@ -770,21 +759,21 @@ test.describe('Keyboard Shortcuts', () => {
         });
 
         test.describe('Query Editor Shortcuts', () => {
-            test('Ctrl+Enter executes query in scratchpad', async ({ whodb, page }) => {
+            test('Ctrl+Enter executes query in SQL editor', async ({ whodb, page }) => {
                 await whodb.goto('scratchpad');
+                await whodb.waitForSqlEditor();
 
                 // Write a simple query
-                await whodb.writeCode(0, 'SELECT 1 as test');
+                await whodb.writeCode('SELECT 1 as test');
 
                 // Focus the editor and press Mod+Enter (Cmd on Mac, Ctrl on Windows/Linux)
-                const editorSelector = '[role="tabpanel"][data-state="active"] [data-testid="cell-0"] .cm-content';
-                await page.locator(editorSelector).click();
+                const editorSelector = '[data-testid="sql-editor-sql-tab"] .cm-content';
+                await page.locator(editorSelector).first().click();
                 await whodb.typeCmdShortcut('Enter');
 
                 // Query should execute and show results
                 await expect(
-                    page.locator('[role="tabpanel"][data-state="active"] [data-testid="cell-0"]')
-                        .locator('[data-testid="cell-query-output"], [data-testid="cell-action-output"], [data-testid="cell-error"]')
+                    page.locator('[data-testid="cell-query-output"], [data-testid="cell-action-output"]')
                 ).toBeAttached({ timeout: 5000 });
             });
         });

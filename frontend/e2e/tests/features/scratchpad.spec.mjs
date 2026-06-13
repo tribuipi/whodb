@@ -15,9 +15,9 @@
  */
 
 import { test, expect, forEachDatabase, conditionalTest } from '../../support/test-fixture.mjs';
-import { hasFeature, getSqlQuery, getErrorPattern } from '../../support/database-config.mjs';
+import { hasFeature, getSqlQuery } from '../../support/database-config.mjs';
 
-test.describe('Scratchpad', () => {
+test.describe('SQL Editor', () => {
 
     // SQL Databases only
     forEachDatabase('sql', (db) => {
@@ -27,71 +27,59 @@ test.describe('Scratchpad', () => {
             const expectedCountCol = db.sql.countColumn;
             const expectedUpdatedValue = db.testTable.testValues.modified;
 
-            test('executes SELECT query and shows results', async ({ whodb, page }) => {
+            test('executes SELECT query and shows results', async ({ whodb }) => {
                 await whodb.goto('scratchpad');
+                await whodb.waitForSqlEditor();
 
                 const query = getSqlQuery(db, 'selectAllUsers');
-                await whodb.writeCode(0, query);
-                await whodb.runCode(0);
+                await whodb.writeCode(query);
+                await whodb.runCode();
 
-                const { columns, rows } = await whodb.getCellQueryOutput(0);
+                const { columns, rows } = await whodb.getCellQueryOutput();
                 expect(columns.map(c => c.toUpperCase())).toContain(expectedIdentifierCol.toUpperCase());
                 expect(rows.length).toBeGreaterThan(0);
             });
 
-            test('executes filtered query', async ({ whodb, page }) => {
+            test('executes filtered query', async ({ whodb }) => {
                 await whodb.goto('scratchpad');
+                await whodb.waitForSqlEditor();
 
                 const query = getSqlQuery(db, 'selectUserById');
-                await whodb.writeCode(0, query);
-                await whodb.runCode(0);
+                await whodb.writeCode(query);
+                await whodb.runCode();
 
-                const { rows } = await whodb.getCellQueryOutput(0);
+                const { rows } = await whodb.getCellQueryOutput();
                 expect(rows.length).toEqual(1);
             });
 
-            test('executes aggregate query', async ({ whodb, page }) => {
+            test('executes aggregate query', async ({ whodb }) => {
                 await whodb.goto('scratchpad');
+                await whodb.waitForSqlEditor();
 
                 const query = getSqlQuery(db, 'countUsers');
-                await whodb.writeCode(0, query);
-                await whodb.runCode(0);
+                await whodb.writeCode(query);
+                await whodb.runCode();
 
-                const { columns, rows } = await whodb.getCellQueryOutput(0);
+                const { columns, rows } = await whodb.getCellQueryOutput();
                 expect(columns.map(c => c.toUpperCase())).toContain(expectedCountCol.toUpperCase());
                 expect(rows.length).toEqual(1);
-            });
-
-            test('shows error for invalid query', async ({ whodb, page }) => {
-                await whodb.goto('scratchpad');
-
-                const query = getSqlQuery(db, 'invalidQuery');
-                await whodb.writeCode(0, query);
-                await whodb.runCode(0);
-
-                const errorPattern = getErrorPattern(db, 'tableNotFound');
-                if (errorPattern) {
-                    const errorText = await whodb.getCellError(0);
-                    expect(errorText).toContain(errorPattern.split(' ')[0]);
-                } else {
-                    await expect(page.locator('[data-testid="cell-error"]')).toBeVisible();
-                }
             });
 
             // Skip UPDATE test for databases with async mutations (e.g., ClickHouse)
             const updateSupported = hasFeature(db, 'scratchpadUpdate') !== false;
 
-            conditionalTest(updateSupported, 'executes UPDATE query', async ({ whodb, page }) => {
+            conditionalTest(updateSupported, 'executes UPDATE then verifies and reverts', async ({ whodb, page }) => {
                 await whodb.goto('scratchpad');
+                await whodb.waitForSqlEditor();
 
                 const mutationDelay = db.mutationDelay || 0;
 
                 await test.step('execute update', async () => {
                     const updateQuery = getSqlQuery(db, 'updateUser');
-                    await whodb.writeCode(0, updateQuery);
-                    await whodb.runCode(0);
+                    await whodb.writeCode(updateQuery);
+                    await whodb.runCode();
 
-                    const actionOutput = await whodb.getCellActionOutput(0);
+                    const actionOutput = await whodb.getCellActionOutput();
                     expect(actionOutput).toContain('Action Executed');
 
                     // Wait for async mutations (e.g., ClickHouse)
@@ -101,74 +89,99 @@ test.describe('Scratchpad', () => {
                 });
 
                 await test.step('verify update', async () => {
-                    await whodb.addCell(0);
                     const selectQuery = getSqlQuery(db, 'selectUserById');
-                    await whodb.writeCode(1, selectQuery);
-                    await whodb.runCode(1);
+                    await whodb.writeCode(selectQuery);
+                    await whodb.runCode();
 
-                    const { rows } = await whodb.getCellQueryOutput(1);
+                    const { rows } = await whodb.getCellQueryOutput();
                     expect(rows[0]).toContain(expectedUpdatedValue);
                 });
 
                 await test.step('revert update', async () => {
-                    await whodb.addCell(1);
                     const revertQuery = getSqlQuery(db, 'revertUser');
-                    await whodb.writeCode(2, revertQuery);
-                    await whodb.runCode(2);
+                    await whodb.writeCode(revertQuery);
+                    await whodb.runCode();
 
-                    const revertOutput = await whodb.getCellActionOutput(2);
+                    const revertOutput = await whodb.getCellActionOutput();
                     expect(revertOutput).toContain('Action Executed');
                 });
             });
         });
 
-        test.describe('Cell Management', () => {
-            test('adds and removes cells', async ({ whodb, page }) => {
+        test.describe('Editor Tools', () => {
+            test('formats SQL in the editor', async ({ whodb }) => {
                 await whodb.goto('scratchpad');
+                await whodb.waitForSqlEditor();
 
-                // Add cells
-                await whodb.addCell(0);
-                await whodb.addCell(1);
+                // Messy, single-line SQL that the formatter should reflow.
+                await whodb.writeCode('select   1   as   a');
+                await whodb.formatCode();
 
-                // Verify cells exist
-                await expect(page.locator('[data-testid="cell-0"]')).toBeAttached();
-                await expect(page.locator('[data-testid="cell-1"]')).toBeAttached();
-                await expect(page.locator('[data-testid="cell-2"]')).toBeAttached();
-
-                // Remove middle cell
-                await whodb.removeCell(1);
-
-                await expect(page.locator('[data-testid="cell-2"]')).not.toBeAttached();
+                const formatted = await whodb.getEditorText();
+                // The formatter normalizes keyword casing and whitespace.
+                expect(formatted.toUpperCase()).toContain('SELECT');
+                // Collapsed runs of spaces should be gone.
+                expect(formatted).not.toContain('   ');
             });
         });
 
-        test.describe('Page Management', () => {
-            test('creates and manages multiple pages', async ({ whodb, page }) => {
+        test.describe('Object Tree', () => {
+            const tableName = db.testTable.name;
+            const expectedIdentifierCol = db.testTable.identifierField;
+
+            test('single-click opens a SELECT tab for the object', async ({ whodb, page }) => {
                 await whodb.goto('scratchpad');
+                await whodb.waitForSqlEditor();
 
-                // Add new page
-                await whodb.addScratchpadPage();
+                await whodb.clickTreeObject(tableName);
 
-                let pages = await whodb.getScratchpadPages();
-                expect(pages.length).toEqual(2);
+                // A new tab named after the object opens.
+                await expect(page.locator(`[data-testid="sql-editor-tab-${tableName}"]`)).toBeVisible();
 
-                // Delete page with cancel
-                await whodb.deleteScratchpadPage(1, true);
+                // Its editor is pre-filled with a SELECT for that object.
+                const editorText = await whodb.getEditorText();
+                expect(editorText.toUpperCase()).toContain('SELECT');
+                expect(editorText).toContain(tableName);
 
-                pages = await whodb.getScratchpadPages();
-                expect(pages.length).toEqual(2);
+                // And it runs successfully.
+                await whodb.runCode();
+                const { rows } = await whodb.getCellQueryOutput();
+                expect(rows.length).toBeGreaterThan(0);
+            });
 
-                // Delete page for real
-                await whodb.deleteScratchpadPage(1, false);
+            test('double-click opens a structure tab listing columns', async ({ whodb, page }) => {
+                await whodb.goto('scratchpad');
+                await whodb.waitForSqlEditor();
 
-                pages = await whodb.getScratchpadPages();
-                expect(pages.length).toEqual(1);
+                await whodb.openStructure(tableName);
+
+                const structure = page.locator('[data-testid="sql-editor-structure-tab"]');
+                await expect(structure).toBeVisible();
+                await expect(structure.locator('tbody tr')).not.toHaveCount(0);
+                await expect(structure).toContainText(expectedIdentifierCol);
+            });
+        });
+
+        test.describe('Tab Management', () => {
+            test('adds a new SQL tab', async ({ whodb, page }) => {
+                await whodb.goto('scratchpad');
+                await whodb.waitForSqlEditor();
+
+                const before = await whodb.getTabNames();
+                expect(before).toContain('SQL 1');
+
+                await whodb.addTab();
+
+                await expect(page.locator('[data-testid="sql-editor-tab-SQL 2"]')).toBeVisible();
+                const after = await whodb.getTabNames();
+                expect(after.length).toEqual(before.length + 1);
             });
         });
 
         test.describe('Query Export', () => {
             test('exports query results as CSV', async ({ whodb, page }) => {
                 await whodb.goto('scratchpad');
+                await whodb.waitForSqlEditor();
 
                 let exportPromise;
                 await test.step('execute query', async () => {
@@ -177,10 +190,10 @@ test.describe('Scratchpad', () => {
                     );
 
                     const query = getSqlQuery(db, 'selectAllUsers');
-                    await whodb.writeCode(0, query);
-                    await whodb.runCode(0);
+                    await whodb.writeCode(query);
+                    await whodb.runCode();
 
-                    const { rows } = await whodb.getCellQueryOutput(0);
+                    const { rows } = await whodb.getCellQueryOutput();
                     expect(rows.length).toBeGreaterThan(0);
                 });
 
@@ -211,6 +224,7 @@ test.describe('Scratchpad', () => {
 
             test('exports query results as Excel', async ({ whodb, page }) => {
                 await whodb.goto('scratchpad');
+                await whodb.waitForSqlEditor();
 
                 let exportPromise;
                 await test.step('execute query', async () => {
@@ -219,10 +233,10 @@ test.describe('Scratchpad', () => {
                     );
 
                     const query = getSqlQuery(db, 'selectAllUsers');
-                    await whodb.writeCode(0, query);
-                    await whodb.runCode(0);
+                    await whodb.writeCode(query);
+                    await whodb.runCode();
 
-                    const { rows } = await whodb.getCellQueryOutput(0);
+                    const { rows } = await whodb.getCellQueryOutput();
                     expect(rows.length).toBeGreaterThan(0);
                 });
 
@@ -241,65 +255,6 @@ test.describe('Scratchpad', () => {
                     expect(postData.selectedRows).toBeDefined();
                     expect(postData.format).toEqual('excel');
                     expect(postData.fileBaseName).toEqual('query_export');
-                });
-            });
-
-            test('preselects Excel when "Export All as Excel" is chosen from context menu', async ({ whodb, page }) => {
-                await whodb.goto('scratchpad');
-
-                await test.step('execute query', async () => {
-                    const query = getSqlQuery(db, 'selectAllUsers');
-                    await whodb.writeCode(0, query);
-                    await whodb.runCode(0);
-
-                    const { rows } = await whodb.getCellQueryOutput(0);
-                    expect(rows.length).toBeGreaterThan(0);
-                });
-
-                await test.step('open context menu export', async () => {
-                    await page.locator('[data-testid="cell-query-output"] table tbody tr').first().locator('td').nth(1).click({ button: 'right' });
-                    await page.waitForTimeout(300);
-
-                    await page.locator('[role="menu"]').locator('text=Export').click();
-                    await expect(page.locator('text=Export All as Excel')).toBeVisible();
-                    await page.locator('text=Export All as Excel').click();
-                });
-
-                await test.step('verify dialog', async () => {
-                    await expect(page.locator('h2').filter({ hasText: 'Export Data' }).first()).toBeVisible();
-                    await expect(page.locator('[data-testid="export-format-select"]')).toContainText('Excel');
-
-                    await page.keyboard.press('Escape');
-                });
-            });
-
-            test('does not show "Export Selected" options in context menu', async ({ whodb, page }) => {
-                await whodb.goto('scratchpad');
-
-                await test.step('execute query', async () => {
-                    const query = getSqlQuery(db, 'selectAllUsers');
-                    await whodb.writeCode(0, query);
-                    await whodb.runCode(0);
-
-                    const { rows } = await whodb.getCellQueryOutput(0);
-                    expect(rows.length).toBeGreaterThan(0);
-                });
-
-                await test.step('open context menu', async () => {
-                    await page.locator('[data-testid="cell-query-output"] table tbody tr').first().locator('td').nth(1).click({ button: 'right' });
-                    await page.waitForTimeout(300);
-
-                    await page.locator('[role="menu"]').locator('text=Export').click();
-                });
-
-                await test.step('verify options', async () => {
-                    await expect(page.locator('text=Export All as CSV')).toBeVisible();
-                    await expect(page.locator('text=Export All as Excel')).toBeVisible();
-
-                    await expect(page.locator('text=Export Selected as CSV')).not.toBeAttached();
-                    await expect(page.locator('text=Export Selected as Excel')).not.toBeAttached();
-
-                    await page.keyboard.press('Escape');
                 });
             });
         });

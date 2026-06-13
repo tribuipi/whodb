@@ -224,43 +224,25 @@ test.describe("Accessibility (axe-core)", () => {
 
     conditionalTest(hasFeature(db, "scratchpad"), "scratchpad page has no critical violations", async ({ whodb, page }, testInfo) => {
       await whodb.goto("scratchpad");
-      await page.locator('[data-testid="cell-0"]').waitFor({ timeout: 15_000 });
+      await whodb.waitForSqlEditor();
       await runAxeScan(page, testInfo, "scratchpad");
     });
 
     conditionalTest(
       hasFeature(db, "scratchpad") && db.category === "sql",
-      "scratchpad error state has no critical violations",
+      "scratchpad results state has no critical violations",
       async ({ whodb, page }, testInfo) => {
         await whodb.goto("scratchpad");
-        await page.locator('[data-testid="cell-0"]').waitFor({ timeout: 15_000 });
+        await whodb.waitForSqlEditor();
 
-        const query = getSqlQuery(db, "invalidQuery");
-        await whodb.writeCode(0, query);
-        await whodb.runCode(0);
+        const query = getSqlQuery(db, "countUsers");
+        await whodb.writeCode(query);
+        await whodb.runCode();
 
-        await page.locator('[data-testid="cell-error"]').waitFor({ timeout: 15_000 });
-        await runAxeScan(page, testInfo, "scratchpad-error");
+        await page.locator('[data-testid="cell-query-output"]').waitFor({ timeout: 15_000 });
+        await runAxeScan(page, testInfo, "scratchpad-results");
       }
     );
-
-    conditionalTest(hasFeature(db, "queryHistory"), "query history dialog has no critical violations", async ({ whodb, page }, testInfo) => {
-      await whodb.goto("scratchpad");
-      await page.locator('[data-testid="cell-0"]').waitFor({ timeout: 15_000 });
-
-      const query = getSqlQuery(db, "countUsers");
-      await whodb.writeCode(0, query);
-      await whodb.runCode(0);
-
-      await whodb.openQueryHistory(0);
-      await page.locator('[role="dialog"]').filter({ visible: true }).first().waitFor({
-        timeout: 15_000,
-      });
-
-      await runAxeScan(page, testInfo, "query-history");
-      await page.keyboard.press("Escape");
-      await expect(page.locator('[role="dialog"]')).not.toBeAttached();
-    });
 
     conditionalTest(hasFeature(db, "graph"), "graph page has no critical violations", async ({ whodb, page }, testInfo) => {
       await whodb.goto("graph");

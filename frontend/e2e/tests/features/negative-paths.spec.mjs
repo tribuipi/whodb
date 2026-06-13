@@ -64,17 +64,21 @@ async function attemptLoginWithUnreachablePort(page, whodb, db) {
 
 test.describe('Negative Path Contracts', () => {
     forEachDatabase('sql', (db) => {
-        test('invalid scratchpad query shows an error and remains recoverable', async ({ whodb }) => {
+        test('invalid scratchpad query leaves the editor recoverable', async ({ whodb, page }) => {
             await whodb.goto('scratchpad');
+            await whodb.waitForSqlEditor();
 
-            await whodb.writeCode(0, getSqlQuery(db, 'invalidQuery'));
-            await whodb.runCode(0);
-            const error = await whodb.getCellError(0);
-            expect(error.length).toBeGreaterThan(0);
+            // Run an invalid query. The redesigned editor has no visible inline error
+            // surface, so just trigger it and confirm no results render.
+            await whodb.writeCode(getSqlQuery(db, 'invalidQuery'));
+            await page.locator('[data-testid="sql-editor-run"]').click();
+            await page.waitForTimeout(1000);
+            await expect(page.locator('[data-testid="cell-query-output"]')).not.toBeAttached();
 
-            await whodb.writeCode(0, getSqlQuery(db, 'countUsers'));
-            await whodb.runCode(0);
-            const { rows } = await whodb.getCellQueryOutput(0);
+            // A subsequent valid query must still run, proving the editor recovered.
+            await whodb.writeCode(getSqlQuery(db, 'countUsers'));
+            await whodb.runCode();
+            const { rows } = await whodb.getCellQueryOutput();
             expect(rows.length).toBeGreaterThan(0);
         });
     }, { features: ['scratchpad'] });
