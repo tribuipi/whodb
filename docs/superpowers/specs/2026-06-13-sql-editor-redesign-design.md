@@ -140,11 +140,11 @@ panel component used solely here.
 
 A read-only view rendering a table's structure, opened by double-clicking a tree object.
 
-- Shows **columns** (name, type, nullable, default), **keys** (primary/foreign), and
-  **indexes**.
-- Fetches column/structure metadata from the existing source-object metadata query the
-  Storage Units page already uses to render a table's columns (reuse that query rather
-  than adding a new one).
+- Shows **columns** (name, type, nullable, default) and **keys** (primary / foreign /
+  unique). Indexes are **out of scope** — the existing metadata queries don't expose
+  them, and backend changes are a non-goal.
+- Fetches column/structure metadata via the existing `SourceFieldConstraints` query the
+  Storage Units feature already provides (reuse it rather than adding a new query).
 - No toolbar, no editor — purely a display panel. Occupies the editor/results area of its
   tab.
 
