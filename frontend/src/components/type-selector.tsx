@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import type { ButtonProps } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -39,7 +40,7 @@ export interface TypeSelectorProps {
     /** Search placeholder for the type dropdown */
     searchPlaceholder?: string;
     /** Additional button props for the dropdown */
-    buttonProps?: Record<string, unknown>;
+    buttonProps?: ButtonProps;
 }
 
 /**
