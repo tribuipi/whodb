@@ -593,7 +593,6 @@ export const StorageUnitPage: FC = () => {
         })}>
             <VirtualizedTableBody
                     rowCount={filterStorageUnits.length}
-                    rowHeight={40}
                     header={
                         <TableHeadRow>
                             <TableHead>{t('nameLabel')}</TableHead>

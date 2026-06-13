@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils"
 
 interface VirtualizedTableBodyProps {
   rowCount: number
-  rowHeight?: number
   header?: React.ReactNode
   children: (rowIndex: number) => React.ReactNode
   className?: string
@@ -115,7 +114,7 @@ function TableCaption({
 // Alias used by storage-unit page
 const TableHeadRow = TableRow
 
-function VirtualizedTableBody({ rowCount, rowHeight: _rowHeight, header, children, className }: VirtualizedTableBodyProps) {
+function VirtualizedTableBody({ rowCount, header, children, className }: VirtualizedTableBodyProps) {
   return (
     <div className={cn("w-full overflow-auto", className)}>
       <table data-slot="table" className="w-full caption-bottom text-sm">
