@@ -23,17 +23,11 @@ import {useAppDispatch, useAppSelector} from "../../store/hooks";
 import {SettingsActions} from "../../store/settings";
 import {getAppName} from "@/config/features";
 import {useTranslation} from "@/hooks/use-translation";
-import {
-    Input,
-    Label,
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-    Separator,
-    Switch,
-} from "@clidey/ux";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import {optInUser, optOutUser, trackFrontendEvent} from "@/config/posthog";
 import {type SupportedLanguage, SUPPORTED_LANGUAGES} from "@/utils/languages";
 import {ExternalLink} from "../../utils/external-links";

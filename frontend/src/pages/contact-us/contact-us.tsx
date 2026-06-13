@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import {Badge, Button, Label, Separator} from "@clidey/ux";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import {ChatBubbleLeftRightIcon, EnvelopeIcon, GlobeAltIcon} from "../../components/heroicons";
 import type {FC} from "react";
 import {InternalPage} from "../../components/page";
