@@ -15,7 +15,7 @@
  */
 
 import {useCallback, useState} from "react";
-import {toast} from "@clidey/ux";
+import {toast} from "sonner";
 import {useTranslation} from "./use-translation";
 
 export const PRESET_PAGE_SIZES = ["10", "25", "50", "100", "250", "500", "1000"];

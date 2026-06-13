@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useTheme } from '@clidey/ux';
+import { useTheme } from '@/components/theme/provider';
 import { themeQuartz } from 'ag-grid-community';
 
 /**

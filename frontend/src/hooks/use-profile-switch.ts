@@ -17,7 +17,7 @@
 import { useMutation } from '@apollo/client/react';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@clidey/ux';
+import { toast } from 'sonner';
 import { LoginSourceDocument, LoginWithSourceProfileDocument } from '@graphql';
 import { useAppDispatch } from '@/store/hooks';
 import type { LocalLoginProfile } from '@/store/auth';
