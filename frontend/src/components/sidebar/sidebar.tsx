@@ -140,25 +140,30 @@ export const NavItem: FC<{
 
     return (
         <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={tooltip}>
-                <Link
-                    to={path}
-                    className={cn(
-                        "flex items-center gap-2 transition-all duration-150",
-                        isActive
-                            ? "text-blue-300 font-medium"
-                            : "text-neutral-500 hover:text-neutral-200"
-                    )}
-                >
-                    <span className={cn(
-                        "flex-shrink-0",
-                        isActive ? "text-blue-400" : "text-neutral-600"
-                    )}>{icon}</span>
-                    {open && <span className="text-sm">{label}</span>}
-                    {open && isActive && (
-                        <span className="ml-auto w-1 h-1 rounded-full bg-blue-400" />
-                    )}
-                </Link>
+            <SidebarMenuButton
+                tooltip={tooltip}
+                render={(props) => (
+                    <Link
+                        {...props}
+                        to={path}
+                        className={cn(
+                            props.className,
+                            "flex items-center gap-2 transition-all duration-150",
+                            isActive
+                                ? "text-blue-300 font-medium"
+                                : "text-neutral-500 hover:text-neutral-200"
+                        )}
+                    />
+                )}
+            >
+                <span className={cn(
+                    "flex-shrink-0",
+                    isActive ? "text-blue-400" : "text-neutral-600"
+                )}>{icon}</span>
+                {open && <span className="text-sm">{label}</span>}
+                {open && isActive && (
+                    <span className="ml-auto w-1 h-1 rounded-full bg-blue-400" />
+                )}
             </SidebarMenuButton>
         </SidebarMenuItem>
     );
@@ -637,31 +642,30 @@ export const Sidebar: FC = () => {
 
                             {!EESidebarNav && !isEmbedded && (
                                 <SidebarMenuItem className="flex justify-between items-center w-full">
-                                    <SidebarMenuButton asChild tooltip={t('logOutProfile')}>
-                                        <div className="flex items-center gap-sm text-nowrap w-fit cursor-pointer" onClick={handleLogoutProfile}>
-                                            <ArrowLeftStartOnRectangleIcon className="w-4 h-4" />
-                                            {open && <span>{t('logOutProfile')}</span>}
-                                        </div>
+                                    <SidebarMenuButton tooltip={t('logOutProfile')} onClick={handleLogoutProfile} className="flex items-center gap-sm text-nowrap w-fit cursor-pointer">
+                                        <ArrowLeftStartOnRectangleIcon className="w-4 h-4" />
+                                        {open && <span>{t('logOutProfile')}</span>}
                                     </SidebarMenuButton>
-                                    <SidebarMenuButton asChild>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger className={cn({ "hidden": !open })}>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger
+                                            render={(props) => (
                                                 <Button
-                                                    className="flex items-center justify-center p-1 rounded hover:bg-gray-100 dark:hover:bg-neutral-800 ml-2"
+                                                    {...props}
+                                                    className={cn("flex items-center justify-center p-1 rounded hover:bg-gray-100 dark:hover:bg-neutral-800 ml-2", { "hidden": !open })}
                                                     aria-label={t('moreLogoutOptions')}
                                                     variant="ghost"
-                                                >
-                                                    <ChevronDownIcon className="w-4 h-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent side="right" align="start">
-                                                <DropdownMenuItem onClick={handleLogoutAll}>
-                                                    <ArrowLeftStartOnRectangleIcon className="w-4 h-4" />
-                                                    <span className="ml-2">{t('logoutAllProfiles')}</span>
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </SidebarMenuButton>
+                                                />
+                                            )}
+                                        >
+                                            <ChevronDownIcon className="w-4 h-4" />
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent side="right" align="start">
+                                            <DropdownMenuItem onClick={handleLogoutAll}>
+                                                <ArrowLeftStartOnRectangleIcon className="w-4 h-4" />
+                                                <span className="ml-2">{t('logoutAllProfiles')}</span>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </SidebarMenuItem>
                             )}
                         </SidebarMenu>
@@ -751,16 +755,20 @@ export const Sidebar: FC = () => {
                             <SidebarMenu className="grow mt-8 gap-4">
                                 {sidebarRoutes.map(route => (
                                     <SidebarMenuItem key={route.title}>
-                                        <SidebarMenuButton asChild tooltip={route.title}>
-                                            <Link
-                                                to={route.path}
-                                                className={cn("flex items-center gap-2", {
-                                                    "font-bold": pathname === route.path,
-                                                })}
-                                            >
-                                                {route.icon}
-                                                {open && <span>{route.title}</span>}
-                                            </Link>
+                                        <SidebarMenuButton
+                                            tooltip={route.title}
+                                            render={(props) => (
+                                                <Link
+                                                    {...props}
+                                                    to={route.path}
+                                                    className={cn(props.className, "flex items-center gap-2", {
+                                                        "font-bold": pathname === route.path,
+                                                    })}
+                                                />
+                                            )}
+                                        >
+                                            {route.icon}
+                                            {open && <span>{route.title}</span>}
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 ))}
@@ -771,64 +779,69 @@ export const Sidebar: FC = () => {
 
                                 {featureFlags.contactUsPage && InternalRoutes.ContactUs && (
                                     <SidebarMenuItem>
-                                        <SidebarMenuButton asChild tooltip={t('contactUs')}>
-                                            <Link
-                                                to={InternalRoutes.ContactUs.path}
-                                                className={cn("flex items-center gap-2", {
-                                                    "font-bold": pathname === InternalRoutes.ContactUs.path,
-                                                })}
-                                            >
-                                                <QuestionMarkCircleIcon className="w-4 h-4" />
-                                                {open && <span>{t('contactUs')}</span>}
-                                            </Link>
+                                        <SidebarMenuButton
+                                            tooltip={t('contactUs')}
+                                            render={(props) => (
+                                                <Link
+                                                    {...props}
+                                                    to={InternalRoutes.ContactUs.path}
+                                                    className={cn(props.className, "flex items-center gap-2", {
+                                                        "font-bold": pathname === InternalRoutes.ContactUs.path,
+                                                    })}
+                                                />
+                                            )}
+                                        >
+                                            <QuestionMarkCircleIcon className="w-4 h-4" />
+                                            {open && <span>{t('contactUs')}</span>}
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 )}
                                 {featureFlags.settingsPage && InternalRoutes.Settings && (
                                     <SidebarMenuItem>
-                                        <SidebarMenuButton asChild tooltip={t('settings')}>
-                                            <Link
-                                                to={InternalRoutes.Settings.path}
-                                                className={cn("flex items-center gap-2", {
-                                                    "font-bold": pathname === InternalRoutes.Settings.path,
-                                                })}
-                                            >
-                                                <CogIcon className="w-4 h-4" />
-                                                {open && <span>{t('settings')}</span>}
-                                            </Link>
+                                        <SidebarMenuButton
+                                            tooltip={t('settings')}
+                                            render={(props) => (
+                                                <Link
+                                                    {...props}
+                                                    to={InternalRoutes.Settings.path}
+                                                    className={cn(props.className, "flex items-center gap-2", {
+                                                        "font-bold": pathname === InternalRoutes.Settings.path,
+                                                    })}
+                                                />
+                                            )}
+                                        >
+                                            <CogIcon className="w-4 h-4" />
+                                            {open && <span>{t('settings')}</span>}
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 )}
                                 <div className="grow" />
                                 {!isEmbedded && (
                                     <SidebarMenuItem className="flex justify-between items-center w-full">
-                                        <SidebarMenuButton asChild tooltip={t('logOutProfile')}>
-                                            <div className="flex items-center gap-sm text-nowrap w-fit cursor-pointer" onClick={handleLogoutProfile}>
-                                                <ArrowLeftStartOnRectangleIcon className="w-4 h-4" />
-                                                {open && <span>{t('logOutProfile')}</span>}
-                                            </div>
+                                        <SidebarMenuButton tooltip={t('logOutProfile')} onClick={handleLogoutProfile} className="flex items-center gap-sm text-nowrap w-fit cursor-pointer">
+                                            <ArrowLeftStartOnRectangleIcon className="w-4 h-4" />
+                                            {open && <span>{t('logOutProfile')}</span>}
                                         </SidebarMenuButton>
-                                        <SidebarMenuButton asChild>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger className={cn({
-                                                    "hidden": !open,
-                                                })}>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger
+                                                render={(props) => (
                                                     <Button
-                                                        className="flex items-center justify-center p-1 rounded hover:bg-gray-100 dark:hover:bg-neutral-800 ml-2"
+                                                        {...props}
+                                                        className={cn("flex items-center justify-center p-1 rounded hover:bg-gray-100 dark:hover:bg-neutral-800 ml-2", { "hidden": !open })}
                                                         aria-label={t('moreLogoutOptions')}
                                                         variant="ghost"
-                                                    >
-                                                        <ChevronDownIcon className="w-4 h-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent side="right" align="start">
-                                                    <DropdownMenuItem onClick={handleLogoutAll}>
-                                                        <ArrowLeftStartOnRectangleIcon className="w-4 h-4" />
-                                                        <span className="ml-2">{t('logoutAllProfiles')}</span>
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </SidebarMenuButton>
+                                                    />
+                                                )}
+                                            >
+                                                <ChevronDownIcon className="w-4 h-4" />
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent side="right" align="start">
+                                                <DropdownMenuItem onClick={handleLogoutAll}>
+                                                    <ArrowLeftStartOnRectangleIcon className="w-4 h-4" />
+                                                    <span className="ml-2">{t('logoutAllProfiles')}</span>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </SidebarMenuItem>
                                 )}
                             </SidebarMenu>
@@ -839,13 +852,20 @@ export const Sidebar: FC = () => {
                     <div className="absolute right-3 bottom-3">
                         <TooltipProvider delayDuration={200}>
                             <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button className={cn(
-                                        "rounded-full p-1 text-muted-foreground/60 hover:text-muted-foreground transition-colors",
-                                        updateInfo?.UpdateInfo?.updateAvailable && "text-blue-500/70 hover:text-blue-400"
-                                    )} data-testid="sidebar-version-info">
-                                        <InformationCircleIcon className="w-4 h-4" />
-                                    </button>
+                                <TooltipTrigger
+                                    render={(props) => (
+                                        <button
+                                            {...props}
+                                            className={cn(
+                                                props.className,
+                                                "rounded-full p-1 text-muted-foreground/60 hover:text-muted-foreground transition-colors",
+                                                updateInfo?.UpdateInfo?.updateAvailable && "text-blue-500/70 hover:text-blue-400"
+                                            )}
+                                            data-testid="sidebar-version-info"
+                                        />
+                                    )}
+                                >
+                                    <InformationCircleIcon className="w-4 h-4" />
                                 </TooltipTrigger>
                                 <TooltipContent side="top" align="end">
                                     <p className="text-xs">{t('version')} {__APP_VERSION__}</p>
