@@ -54,7 +54,7 @@ export function getRegisteredPublicRoutes(): RegisteredRoute[] {
     return publicRegistrations;
 }
 
-let surfaceFallbackPath = "/storage-unit";
+let surfaceFallbackPath = "/scratchpad";
 
 export function setSurfaceFallbackPath(path: string): void {
     surfaceFallbackPath = path;

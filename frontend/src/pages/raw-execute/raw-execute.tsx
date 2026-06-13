@@ -1,9 +1,5 @@
 import type { FC } from "react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { HomeIcon } from "../../components/heroicons";
-import { InternalRoutes } from "../../config/routes";
-import { useTranslation } from "../../hooks/use-translation";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { SqlEditorActions } from "../../store/sql-editor";
 import { formatSql } from "../../utils/format-sql";
@@ -17,9 +13,7 @@ import { StructureTab } from "./structure-tab";
 
 /** Full-screen three-panel SQL editor page rendered at the scratchpad route. */
 export const RawExecutePage: FC = () => {
-  const { t } = useTranslation("pages/raw-execute");
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const tabs = useAppSelector(state => state.sqlEditor.tabs);
   const activeTabId = useAppSelector(state => state.sqlEditor.activeTabId);
   const schema = useAppSelector(state => state.database.schema);
@@ -34,15 +28,6 @@ export const RawExecutePage: FC = () => {
 
   const left = (
     <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 p-2 border-b border-neutral-200 dark:border-neutral-800">
-        <button
-          onClick={() => { void navigate(InternalRoutes.Dashboard.StorageUnit.path); }}
-          aria-label={t("back")}
-          data-testid="sql-editor-back"
-        >
-          <HomeIcon className="w-4 h-4" />
-        </button>
-      </div>
       <SourceSelectors />
       <div className="flex-1 min-h-0">
         <ObjectTree

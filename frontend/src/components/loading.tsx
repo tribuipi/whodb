@@ -17,6 +17,7 @@
 import type {FC} from "react";
 
 import {Spinner} from "@/components/ui/spinner";
+import {cn} from "@/lib/utils";
 import {useTranslation} from "@/hooks/use-translation";
 
 type ILoadingProps = {
@@ -29,12 +30,16 @@ type ILoadingProps = {
 export const Loading: FC<ILoadingProps> = ({className, size = "md", hideText = true, loadingText}) => {
   const { t } = useTranslation('components/loading');
   let textSize = "text-base";
+  let spinnerSize = "size-4";
   if (size === "sm") {
       textSize = "text-xs";
+      spinnerSize = "size-3";
   } else if (size === "md") {
       textSize = "text-sm";
+      spinnerSize = "size-4";
   } else if (size === "lg") {
       textSize = "text-base";
+      spinnerSize = "size-6";
   }
 
     return (
@@ -45,7 +50,7 @@ export const Loading: FC<ILoadingProps> = ({className, size = "md", hideText = t
             aria-busy="true"
             aria-label={loadingText ?? t('loading')}
         >
-            <Spinner className={className} size={size} aria-hidden="true" />
+            <Spinner className={cn(spinnerSize, className)} aria-hidden="true" />
             {!hideText && <p className={textSize}>{loadingText ?? t('loading')}</p>}
         </div>
     );

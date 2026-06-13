@@ -22,6 +22,7 @@ export function useGridTheme() {
             rowHoverColor: darkModeEnabled ? '#262626' : '#f5f5f5',
             fontFamily: 'inherit',
             fontSize: '13px',
+            wrapperBorderRadius: 0,
         });
     }, [darkModeEnabled]);
 }
