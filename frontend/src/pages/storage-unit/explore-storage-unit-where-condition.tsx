@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-import {
-    Badge,
-    Button,
-    cn,
-    Input,
-    Label,
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-    Sheet,
-    SheetContent,
-    SheetFooter,
-    SheetTitle
-} from "@clidey/ux";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Sheet, SheetContent, SheetFooter, SheetTitle } from "@/components/ui/sheet";
 import { SearchSelect } from "../../components/ux";
 import type { AtomicWhereCondition, WhereCondition} from '@graphql';
 import { WhereConditionType } from '@graphql';
@@ -473,21 +466,7 @@ export const ExploreStorageUnitWhereCondition: FC<IExploreStorageUnitWhereCondit
 
             {/* Sheet for managing all conditions */}
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-                <SheetContent side="right" className="w-[500px] max-w-full p-8" footer={
-                    <SheetFooter className="flex gap-sm px-0">
-                        <Button
-                            className="flex-1"
-                            variant="secondary"
-                            onClick={() =>{  setSheetOpen(false); }}
-                            data-testid="cancel-manage-conditions"
-                        >
-                            {t('cancel')}
-                        </Button>
-                        <Button className="flex-1" onClick={handleSheetSave}>
-                            {t('saveChanges')}
-                        </Button>
-                    </SheetFooter>
-                }>
+                <SheetContent side="right" className="w-[500px] max-w-full p-8">
                     <SheetTitle><AdjustmentsVerticalIcon className="w-5 h-5" /> {t('manageWhereConditions')}</SheetTitle>
                     <div className="flex flex-col gap-lg mt-6 overflow-y-auto max-h-[calc(100vh-200px)]">
                         {sheetFilters.map((filter, index) => {
@@ -543,6 +522,19 @@ export const ExploreStorageUnitWhereCondition: FC<IExploreStorageUnitWhereCondit
                             <PlusCircleIcon className="w-4 h-4"/> {t('addCondition')}
                         </Button>
                     </div>
+                    <SheetFooter className="flex gap-sm px-0">
+                        <Button
+                            className="flex-1"
+                            variant="secondary"
+                            onClick={() =>{  setSheetOpen(false); }}
+                            data-testid="cancel-manage-conditions"
+                        >
+                            {t('cancel')}
+                        </Button>
+                        <Button className="flex-1" onClick={handleSheetSave}>
+                            {t('saveChanges')}
+                        </Button>
+                    </SheetFooter>
                 </SheetContent>
             </Sheet>
         </div>

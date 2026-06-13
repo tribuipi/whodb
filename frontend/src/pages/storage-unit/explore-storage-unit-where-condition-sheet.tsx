@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-import {
-    Button,
-    Input,
-    Label,
-    Sheet,
-    SheetContent,
-    SheetFooter,
-    SheetTitle
-} from "@clidey/ux";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Sheet, SheetContent, SheetFooter, SheetTitle } from "@/components/ui/sheet";
 import { SearchSelect } from "../../components/ux";
 import type { AtomicWhereCondition, WhereCondition} from '@graphql';
 import { WhereConditionType } from '@graphql';
@@ -192,25 +187,7 @@ export const ExploreStorageUnitWhereConditionSheet: FC<IExploreStorageUnitWhereC
             </div>
             {/* Sheet for managing all conditions */}
             <Sheet open={sheetOpen} onOpenChange={handleCloseSheet}>
-                <SheetContent side="right" className="w-[500px] max-w-full p-8" footer={
-                    <SheetFooter className="flex flex-row w-full gap-sm px-0">
-                        <Button
-                            className="flex-1"
-                            variant="secondary"
-                            onClick={handleCloseSheet}
-                            data-testid="cancel-add-conditions"
-                        >
-                            {t('cancel')}
-                        </Button>
-                        <Button
-                            className="flex-1"
-                            onClick={handleSheetSave}
-                            data-testid="add-conditions-button"
-                        >
-                            {t('addCondition')}
-                        </Button>
-                    </SheetFooter>
-                }>
+                <SheetContent side="right" className="w-[500px] max-w-full p-8">
                     <SheetTitle className="flex items-center gap-2"><AdjustmentsHorizontalIcon className="w-5 h-5" /> {t('conditionsTitle')}</SheetTitle>
                     {/* Display existing conditions as editable cards */}
                     {existingFilters.length > 0 && (
@@ -441,6 +418,23 @@ export const ExploreStorageUnitWhereConditionSheet: FC<IExploreStorageUnitWhereC
                             </Button>
                         </div>
                     </div>
+                    <SheetFooter className="flex flex-row w-full gap-sm px-0">
+                        <Button
+                            className="flex-1"
+                            variant="secondary"
+                            onClick={handleCloseSheet}
+                            data-testid="cancel-add-conditions"
+                        >
+                            {t('cancel')}
+                        </Button>
+                        <Button
+                            className="flex-1"
+                            onClick={handleSheetSave}
+                            data-testid="add-conditions-button"
+                        >
+                            {t('addCondition')}
+                        </Button>
+                    </SheetFooter>
                 </SheetContent>
             </Sheet>
         </div>
