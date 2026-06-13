@@ -32,6 +32,7 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
   const { t } = useTranslation("pages/raw-execute");
   const dispatch = useAppDispatch();
   const code = useAppSelector(state => state.sqlEditor.tabs.find(tab => tab.id === tabId)?.code ?? "");
+  const autoRun = useAppSelector(state => state.sqlEditor.tabs.find(tab => tab.id === tabId)?.autoRun ?? false);
   const currentType = useAppSelector(state => state.auth.current?.Type);
   const currentDatabase = useAppSelector(state => state.auth.current?.Database);
   const currentId = useAppSelector(state => state.auth.current?.Id);
@@ -101,6 +102,16 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
       doExecute(target);
     }
   }, [code, doExecute]);
+
+  // Run once when the tab is opened from the object tree, then clear the flag.
+  const autoRunDone = useRef(false);
+  useEffect(() => {
+    if (autoRun && !autoRunDone.current) {
+      autoRunDone.current = true;
+      onRun();
+      dispatch(SqlEditorActions.clearAutoRun({ tabId }));
+    }
+  }, [autoRun, onRun, dispatch, tabId]);
 
   const onFormat = useCallback(() => {
     setCode(formatSql(code, currentType));

@@ -49,6 +49,7 @@ export const RawExecutePage: FC = () => {
             dispatch(SqlEditorActions.addSqlTab({
               name: obj.Name,
               code: `SELECT * FROM ${qualified} LIMIT 100;`,
+              autoRun: true,
             }));
           }}
           onOpenStructure={obj => {

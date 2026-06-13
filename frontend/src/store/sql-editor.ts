@@ -13,6 +13,8 @@ export type SqlEditorTab = {
   code?: string;
   /** Target object ref — present for kind === 'structure'. */
   target?: SourceObjectRefInput;
+  /** When true, the tab runs its code once on mount (e.g. opened from the object tree). */
+  autoRun?: boolean;
 };
 
 export type ISqlEditorState = {
@@ -45,13 +47,14 @@ export const sqlEditorSlice = createSlice({
         state.activeTabId = state.tabs[0].id;
       }
     },
-    addSqlTab: (state, action: PayloadAction<{ name?: string; code?: string } | undefined>) => {
+    addSqlTab: (state, action: PayloadAction<{ name?: string; code?: string; autoRun?: boolean } | undefined>) => {
       const id = uuidv4();
       state.tabs.push({
         id,
         name: action.payload?.name ?? nextSqlTabName(state),
         kind: 'sql',
         code: action.payload?.code ?? '',
+        autoRun: action.payload?.autoRun ?? false,
       });
       state.activeTabId = id;
     },
@@ -85,6 +88,10 @@ export const sqlEditorSlice = createSlice({
     updateTabCode: (state, action: PayloadAction<{ tabId: string; code: string }>) => {
       const tab = state.tabs.find(t => t.id === action.payload.tabId);
       if (tab?.kind === 'sql') tab.code = action.payload.code;
+    },
+    clearAutoRun: (state, action: PayloadAction<{ tabId: string }>) => {
+      const tab = state.tabs.find(t => t.id === action.payload.tabId);
+      if (tab) tab.autoRun = false;
     },
     setActiveTab: (state, action: PayloadAction<{ tabId: string }>) => {
       if (state.tabs.some(t => t.id === action.payload.tabId)) {
