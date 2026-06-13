@@ -117,15 +117,12 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
       <div style={{ height: editorHeight }} className="flex-shrink-0 overflow-auto">
         <CodeEditor language="sql" value={code} setValue={setCode} onRun={(lineText) => { onRun(lineText); }} />
       </div>
-      <div className="px-2 py-0.5 text-[10px] text-neutral-500 border-t border-neutral-200 dark:border-neutral-800">
-        {t("searchPath", { schema: currentDatabase ?? "" })}
-      </div>
       <div
         onMouseDown={startResize}
         className="h-1 bg-neutral-200 dark:bg-neutral-800 cursor-row-resize flex-shrink-0 hover:bg-blue-400/40"
         data-testid="sql-editor-results-divider"
       />
-      <div ref={resultsContainerRef} className="flex-1 min-h-0 overflow-auto border-t border-neutral-200 dark:border-neutral-800">
+      <div ref={resultsContainerRef} className="flex-1 min-h-0 overflow-hidden border-t border-neutral-200 dark:border-neutral-800">
         {error != null && (
           <div className="p-2" data-testid="cell-error">
             <ErrorState error={error} />
@@ -141,6 +138,9 @@ export const SqlTab: FC<ISqlTabProps> = ({ tabId }) => {
           containerWidth={containerWidth}
           height={resultsHeight}
         />
+      </div>
+      <div className="px-2 py-1 text-[10px] text-neutral-500 border-t border-neutral-200 dark:border-neutral-800 flex-shrink-0">
+        {t("searchPath", { schema: currentDatabase ?? "" })}
       </div>
       <AlertDialog open={pendingCode != null} onOpenChange={(open) => { if (!open) { handleCancel(); } }}>
         <AlertDialogContent>
