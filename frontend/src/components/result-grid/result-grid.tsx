@@ -1,6 +1,6 @@
 import { AgGridReact } from 'ag-grid-react';
-import type { GridApi, GridReadyEvent, CellClickedEvent, CellDoubleClickedEvent } from 'ag-grid-community';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import type { GridApi, GridReadyEvent, CellClickedEvent, CellDoubleClickedEvent, CellContextMenuEvent } from 'ag-grid-community';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, toast } from '@clidey/ux';
 import { useTranslation } from '@/hooks/use-translation';
 import { copyToClipboard } from '@/services/clipboard';
@@ -8,6 +8,8 @@ import { ArrowDownCircleIcon } from '../heroicons';
 import { useGridTheme } from './use-grid-theme';
 import { buildColumnDefs, buildRowData } from './grid-column-defs';
 import type { ResultGridProps } from './types';
+import { GridContextMenu } from './grid-context-menu';
+import type { GridContextTarget } from './grid-context-menu';
 
 const DEFAULT_ROW_HEIGHT = 48;
 
@@ -17,6 +19,7 @@ export function ResultGrid(props: ResultGridProps) {
     const { t } = useTranslation('components/table');
     const theme = useGridTheme();
     const apiRef = useRef<GridApi | null>(null);
+    const [menuTarget, setMenuTarget] = useState<GridContextTarget | null>(null);
 
     const editable = false; // Phase 3 wires real editability
     const columnDefs = useMemo(
@@ -60,6 +63,29 @@ export function ResultGrid(props: ResultGridProps) {
         // double-click enters native edit (when editable); copy-row lives in the context menu
     }, []);
 
+    const onCellContextMenu = useCallback((e: CellContextMenuEvent) => {
+        const colId = e.column?.getColId() ?? 'c0';
+        const colIndex = Number(colId.replace('c', ''));
+        const rowIndex = Number((e.data as Record<string, string>).__rowIndex);
+        setMenuTarget({ rowIndex, colIndex });
+    }, []);
+
+    const onCopyCell = useCallback(() => {
+        if (menuTarget == null) return;
+        const value = data.rows[menuTarget.rowIndex]?.[menuTarget.colIndex];
+        if (value != null) {
+            void copyToClipboard(String(value)).then(ok => { if (ok) toast.success(t('copiedCellToClipboard')); });
+        }
+    }, [menuTarget, data.rows, t]);
+
+    const onCopyRow = useCallback(() => {
+        if (menuTarget == null) return;
+        const row = data.rows[menuTarget.rowIndex];
+        if (row != null) {
+            void copyToClipboard(row.join('\t')).then(ok => { if (ok) toast.success(t('rowCopiedToClipboard')); });
+        }
+    }, [menuTarget, data.rows, t]);
+
     const triggerExport = () => window.dispatchEvent(new CustomEvent('menu:trigger-export'));
 
     const rowHeight = layout?.rowHeight ?? DEFAULT_ROW_HEIGHT;
@@ -77,19 +103,31 @@ export function ResultGrid(props: ResultGridProps) {
                     </Button>
                 </div>
             )}
-            <div style={{ height, width: '100%' }}>
-                <AgGridReact
-                    theme={theme}
-                    columnDefs={columnDefs}
-                    rowData={rowData}
-                    rowHeight={rowHeight}
-                    onGridReady={onGridReady}
-                    onCellClicked={onCellClicked}
-                    onCellDoubleClicked={onCellDoubleClicked}
-                    suppressCellFocus={false}
-                    getRowId={(p) => String((p.data as Record<string, string>).__rowIndex)}
-                />
-            </div>
+            <GridContextMenu
+                target={menuTarget}
+                onCopyCell={onCopyCell}
+                onCopyRow={onCopyRow}
+                selectedCount={0}
+                limited={props.limitContextMenu}
+                t={t}
+            >
+                <div style={{ height, width: '100%' }}>
+                    <AgGridReact
+                        theme={theme}
+                        columnDefs={columnDefs}
+                        rowData={rowData}
+                        rowHeight={rowHeight}
+                        onGridReady={onGridReady}
+                        onCellClicked={onCellClicked}
+                        onCellDoubleClicked={onCellDoubleClicked}
+                        onCellContextMenu={onCellContextMenu}
+                        preventDefaultOnContextMenu={false}
+                        rowSelection={(props.editing || props.actions?.rawQuery) ? { mode: 'multiRow', checkboxes: true, headerCheckbox: true } : undefined}
+                        suppressCellFocus={false}
+                        getRowId={(p) => String((p.data as Record<string, string>).__rowIndex)}
+                    />
+                </div>
+            </GridContextMenu>
             {props.children}
         </div>
     );
