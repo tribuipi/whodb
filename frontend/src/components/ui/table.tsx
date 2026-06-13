@@ -4,6 +4,14 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+interface VirtualizedTableBodyProps {
+  rowCount: number
+  rowHeight?: number
+  header?: React.ReactNode
+  children: (rowIndex: number) => React.ReactNode
+  className?: string
+}
+
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
@@ -104,6 +112,26 @@ function TableCaption({
   )
 }
 
+// Alias used by storage-unit page
+const TableHeadRow = TableRow
+
+function VirtualizedTableBody({ rowCount, rowHeight: _rowHeight, header, children, className }: VirtualizedTableBodyProps) {
+  return (
+    <div className={cn("w-full overflow-auto", className)}>
+      <table data-slot="table" className="w-full caption-bottom text-sm">
+        {header && (
+          <thead data-slot="table-header" className="[&_tr]:border-b">
+            {header}
+          </thead>
+        )}
+        <tbody data-slot="table-body" className="[&_tr:last-child]:border-0">
+          {Array.from({ length: rowCount }, (_, i) => children(i))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 export {
   Table,
   TableHeader,
@@ -113,4 +141,6 @@ export {
   TableRow,
   TableCell,
   TableCaption,
+  TableHeadRow,
+  VirtualizedTableBody,
 }

@@ -36,7 +36,7 @@ import {
     SourceFieldOptionsDocument,
 } from '@graphql';
 import {useTranslation} from '@/hooks/use-translation';
-import type {FC, LazyExoticComponent, ReactElement, ReactNode} from "react";
+import type {FC, KeyboardEvent, LazyExoticComponent, ReactElement, ReactNode} from "react";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {useDispatch} from "react-redux";
 import {Link, useLocation, useNavigate} from "react-router-dom";
@@ -527,7 +527,7 @@ export const Sidebar: FC = () => {
                                                 ) : undefined}
                                                 side="left" align="start"
                                                 buttonClassName={ph.mask}
-                                                buttonProps={{ "data-testid": "sidebar-profile", "data-collapsed": !open }}
+                                                buttonProps={{ "data-testid": "sidebar-profile", "data-collapsed": String(!open) }}
                                             />
                                             {supportsDatabaseSwitching && (
                                                 <SearchSelect
@@ -582,7 +582,7 @@ export const Sidebar: FC = () => {
                                                 ) : undefined}
                                                 side="left" align="start"
                                                 buttonClassName={ph.mask}
-                                                buttonProps={{ "data-testid": "sidebar-profile", "data-collapsed": !open }}
+                                                buttonProps={{ "data-testid": "sidebar-profile", "data-collapsed": String(!open) }}
                                             />
                                             {supportsDatabaseSwitching && (
                                                 <SearchSelect
@@ -702,7 +702,7 @@ export const Sidebar: FC = () => {
                                         buttonClassName={ph.mask}
                                         buttonProps={{
                                             "data-testid": "sidebar-profile",
-                                            "data-collapsed": !open,
+                                            "data-collapsed": String(!open),
                                         }}
                                     />
                                 </div>
@@ -783,9 +783,9 @@ export const Sidebar: FC = () => {
                                             render={(props) => (
                                                 <Link
                                                     {...props}
-                                                    to={InternalRoutes.ContactUs.path}
+                                                    to={InternalRoutes.ContactUs!.path}
                                                     className={cn(props.className, "flex items-center gap-2", {
-                                                        "font-bold": pathname === InternalRoutes.ContactUs.path,
+                                                        "font-bold": pathname === InternalRoutes.ContactUs!.path,
                                                     })}
                                                 />
                                             )}
@@ -802,9 +802,9 @@ export const Sidebar: FC = () => {
                                             render={(props) => (
                                                 <Link
                                                     {...props}
-                                                    to={InternalRoutes.Settings.path}
+                                                    to={InternalRoutes.Settings!.path}
                                                     className={cn(props.className, "flex items-center gap-2", {
-                                                        "font-bold": pathname === InternalRoutes.Settings.path,
+                                                        "font-bold": pathname === InternalRoutes.Settings!.path,
                                                     })}
                                                 />
                                             )}
@@ -849,7 +849,7 @@ export const Sidebar: FC = () => {
                 </SidebarContent>
                 {newUIEnabled ? (
                     <div className="absolute right-3 bottom-3">
-                        <TooltipProvider delayDuration={200}>
+                        <TooltipProvider delay={200}>
                             <Tooltip>
                                 <TooltipTrigger
                                     render={(props) => (
@@ -909,8 +909,8 @@ export const Sidebar: FC = () => {
                     <LoginForm advancedDirection="vertical" onLoginSuccess={handleLoginSuccess}/>
                 </SheetContent>
             </Sheet>
-            <Dialog open={showProfileSwitchDialog} onOpenChange={handleProfileSwitchDialogChange}>
-                <DialogContent className="max-w-sm" onInteractOutside={(e) => { e.preventDefault(); }} onEscapeKeyDown={(e) => { e.preventDefault(); }}>
+            <Dialog open={showProfileSwitchDialog} onOpenChange={handleProfileSwitchDialogChange} disablePointerDismissal>
+                <DialogContent className="max-w-sm" onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); } }}>
                     <DialogHeader>
                         <DialogTitle>{t('switchProfile')}</DialogTitle>
                         <DialogDescription>{t('switchProfileDescription')}</DialogDescription>

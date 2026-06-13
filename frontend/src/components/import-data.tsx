@@ -546,7 +546,7 @@ export const ImportData: FC<ImportDataProps> = ({
                   {dataFormat === "csv" && (
                     <div className="space-y-2">
                       <Label>{t("delimiter")}</Label>
-                      <Select value={delimiter} onValueChange={(value) => { setDelimiter(value); }}>
+                      <Select value={delimiter} onValueChange={(value) => { if (value != null) setDelimiter(value); }}>
                         <SelectTrigger data-testid="import-delimiter-select">
                           <SelectValue />
                         </SelectTrigger>

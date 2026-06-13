@@ -31,7 +31,8 @@ export function usePageSize(initialSize: number, options?: UsePageSizeOptions) {
     const [isCustom, setIsCustom] = useState(!PRESET_PAGE_SIZES.includes(String(initialSize)));
     const [customInput, setCustomInput] = useState(String(initialSize));
 
-    const handleSelectChange = useCallback((value: string) => {
+    const handleSelectChange = useCallback((value: string | null) => {
+        if (value == null) return;
         if (value === "custom") {
             setIsCustom(true);
             setCustomInput(pageSize);

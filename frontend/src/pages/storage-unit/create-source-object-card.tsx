@@ -15,24 +15,15 @@
  */
 
 import { useMutation, useQuery } from "@apollo/client/react";
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-    Button,
-    Checkbox,
-    Input,
-    Label,
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-    Separator,
-    SheetTitle,
-    toast,
-} from "@clidey/ux";
+import { toast } from "sonner";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { SheetTitle } from "@/components/ui/sheet";
 import {
     CreateSourceObjectFromDefinitionDocument,
     SourceObjectCreationMetadataDocument,
@@ -280,7 +271,7 @@ export const CreateSourceObjectCard: FC<CreateSourceObjectCardProps> = ({
             {metadata?.TableOptions.map(option => (
                 <div className="flex flex-col gap-2" key={option.Key}>
                     <Label>{option.Label}</Label>
-                    <Select value={tableOptions[option.Key] ?? ""} onValueChange={value =>{  setTableOptions(current => ({ ...current, [option.Key]: value })); }}>
+                    <Select value={tableOptions[option.Key] ?? ""} onValueChange={value =>{ if (value != null) setTableOptions(current => ({ ...current, [option.Key]: value })); }}>
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder={option.Label} />
                         </SelectTrigger>
@@ -319,7 +310,7 @@ export const CreateSourceObjectCard: FC<CreateSourceObjectCardProps> = ({
                                 />
                             </>}
                             {typeDef?.tableModel ? <p className="text-xs text-muted-foreground">{t("aggregateKeyHint")}</p> : null}
-                            {showAdvancedOptions && <Accordion type="single" collapsible className="w-full">
+                            {showAdvancedOptions && <Accordion className="w-full">
                                 <AccordionItem value={`field-options-${index}`}>
                                     <AccordionTrigger className="py-2" data-testid={`field-options-trigger-${index}`}>
                                         {t("modifiersLabel")}
@@ -356,6 +347,7 @@ export const CreateSourceObjectCard: FC<CreateSourceObjectCardProps> = ({
                                                     <Select
                                                         value={column.ForeignKeyTable}
                                                         onValueChange={value => {
+                                                            if (value == null) return;
                                                             handleColumnChange(index, "ForeignKeyTable", value);
                                                             handleColumnChange(index, "ForeignKeyColumn", "");
                                                         }}
@@ -375,7 +367,7 @@ export const CreateSourceObjectCard: FC<CreateSourceObjectCardProps> = ({
                                                     <Label>{t("foreignColumnLabel")}</Label>
                                                     <Select
                                                         value={column.ForeignKeyColumn}
-                                                        onValueChange={value =>{  handleColumnChange(index, "ForeignKeyColumn", value); }}
+                                                        onValueChange={value =>{ if (value != null) handleColumnChange(index, "ForeignKeyColumn", value); }}
                                                         disabled={column.ForeignKeyTable === "" || foreignKeyColumnOptions.length === 0}
                                                     >
                                                         <SelectTrigger className="w-full" data-testid={`foreign-column-${index}`}>

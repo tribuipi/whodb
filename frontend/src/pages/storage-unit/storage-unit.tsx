@@ -22,7 +22,7 @@ import { SearchInput } from "@/components/ui/search-input";
 import { SheetTitle } from "@/components/ui/sheet";
 import { StackList, StackListItem } from "@/components/ui/stack-list";
 import {
-    Table, TableCell, TableHead, TableHeader, TableHeadRow, TableRow, VirtualizedTableBody,
+    TableCell, TableHead, TableHeadRow, TableRow, VirtualizedTableBody,
 } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
@@ -591,20 +591,19 @@ export const StorageUnitPage: FC = () => {
         <div className={cn("flex flex-wrap gap-lg w-full h-[80vh]", {
             "hidden": view !== "list",
         })}>
-            <Table>
-                <TableHeader>
-                    <TableHeadRow>
-                        <TableHead>{t('nameLabel')}</TableHead>
-                        {/** Dynamically render shared attribute keys as columns */}
-                        {sharedAttributeKeys.map(key => (
-                            <TableHead key={key}>{key}</TableHead>
-                        ))}
-                        <TableHead>{t('actions')}</TableHead>
-                    </TableHeadRow>
-                </TableHeader>
-                <VirtualizedTableBody
+            <VirtualizedTableBody
                     rowCount={filterStorageUnits.length}
-                    rowHeight={40}>
+                    rowHeight={40}
+                    header={
+                        <TableHeadRow>
+                            <TableHead>{t('nameLabel')}</TableHead>
+                            {/** Dynamically render shared attribute keys as columns */}
+                            {sharedAttributeKeys.map(key => (
+                                <TableHead key={key}>{key}</TableHead>
+                            ))}
+                            <TableHead>{t('actions')}</TableHead>
+                        </TableHeadRow>
+                    }>
                     {(rowIndex: number) => {
                         const unit = filterStorageUnits[rowIndex];
                         if (!unit) {
@@ -634,7 +633,6 @@ export const StorageUnitPage: FC = () => {
                         );
                     }}
                 </VirtualizedTableBody>
-            </Table>
             {expandedUnit && (
                 <div className="w-full mt-4">
                     {(() => {

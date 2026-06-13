@@ -182,7 +182,7 @@ export function MockDataSheet(props: MockDataSheetProps) {
                                 data-testid="mock-data-rows-input"
                             />
                             <Label>{t('method')}</Label>
-                            <Select value={mockDataMethod} onValueChange={setMockDataMethod}>
+                            <Select value={mockDataMethod} onValueChange={(v) => { if (v != null) setMockDataMethod(v); }}>
                                 <SelectTrigger className="w-full" data-testid="mock-data-method-select">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -191,7 +191,7 @@ export function MockDataSheet(props: MockDataSheetProps) {
                                 </SelectContent>
                             </Select>
                             <Label>{t('dataHandling')}</Label>
-                            <Select value={mockDataOverwriteExisting} onValueChange={setMockDataOverwriteExisting}>
+                            <Select value={mockDataOverwriteExisting} onValueChange={(v) => { if (v != null) setMockDataOverwriteExisting(v); }}>
                                 <SelectTrigger className="w-full" data-testid="mock-data-handling-select">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -206,7 +206,7 @@ export function MockDataSheet(props: MockDataSheetProps) {
                                         <Label>{t('fkVariety')}</Label>
                                         <p className="text-sm text-muted-foreground mb-2">{t('fkVarietyDescription')}</p>
                                     </div>
-                                    <Select value={mockDataFkDensityRatio} onValueChange={setMockDataFkDensityRatio}>
+                                    <Select value={mockDataFkDensityRatio} onValueChange={(v) => { if (v != null) setMockDataFkDensityRatio(v); }}>
                                         <SelectTrigger className="w-full" data-testid="mock-data-fk-variety-select">
                                             <SelectValue />
                                         </SelectTrigger>

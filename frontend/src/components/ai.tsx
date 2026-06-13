@@ -399,8 +399,8 @@ export const AIProvider: FC<ReturnType<typeof useAI> & {
         onAddExternalModel?.();
     }, [onAddExternalModel]);
 
-    const handleExternalModelChange = useCallback((item: string) => {
-        setExternalModel(item);
+    const handleExternalModelChange = useCallback((item: string | null) => {
+        if (item != null) setExternalModel(item);
     }, []);
 
     const handleExternalModelSubmit = useCallback(() => {

@@ -194,7 +194,7 @@ export const DatabaseDownOverlay = () => {
                         <div className="flex flex-col gap-3 mt-4">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium">{t('selectProfile')}</label>
-                                <Select value={selectedProfileId} onValueChange={setSelectedProfileId}>
+                                <Select value={selectedProfileId} onValueChange={(v) => { if (v != null) setSelectedProfileId(v); }}>
                                     <SelectTrigger className="w-full">
                                         <SelectValue>
                                             {selectedProfileId

@@ -90,32 +90,32 @@ export const SettingsPage: FC = () => {
         dispatch(SettingsActions.setMetricsEnabled(enabled));
     }, [dispatch]);
 
-    const handleStorageUnitViewToggle = useCallback((view: 'list' | 'card') => {
-        dispatch(SettingsActions.setStorageUnitView(view));
+    const handleStorageUnitViewToggle = useCallback((view: 'list' | 'card' | null) => {
+        if (view != null) dispatch(SettingsActions.setStorageUnitView(view));
     }, [dispatch]);
 
-    const handleFontSizeChange = useCallback((size: 'small' | 'medium' | 'large') => {
-        dispatch(SettingsActions.setFontSize(size));
+    const handleFontSizeChange = useCallback((size: 'small' | 'medium' | 'large' | null) => {
+        if (size != null) dispatch(SettingsActions.setFontSize(size));
     }, [dispatch]);
 
-    const handleBorderRadiusChange = useCallback((radius: 'none' | 'small' | 'medium' | 'large') => {
-        dispatch(SettingsActions.setBorderRadius(radius));
+    const handleBorderRadiusChange = useCallback((radius: 'none' | 'small' | 'medium' | 'large' | null) => {
+        if (radius != null) dispatch(SettingsActions.setBorderRadius(radius));
     }, [dispatch]);
 
-    const handleSpacingChange = useCallback((space: 'compact' | 'comfortable' | 'spacious') => {
-        dispatch(SettingsActions.setSpacing(space));
+    const handleSpacingChange = useCallback((space: 'compact' | 'comfortable' | 'spacious' | null) => {
+        if (space != null) dispatch(SettingsActions.setSpacing(space));
     }, [dispatch]);
 
-    const handleWhereConditionModeChange = useCallback((mode: 'popover' | 'sheet') => {
-        dispatch(SettingsActions.setWhereConditionMode(mode));
+    const handleWhereConditionModeChange = useCallback((mode: 'popover' | 'sheet' | null) => {
+        if (mode != null) dispatch(SettingsActions.setWhereConditionMode(mode));
     }, [dispatch]);
 
-    const handleLanguageChange = useCallback((lang: SupportedLanguage) => {
-        dispatch(SettingsActions.setLanguage(lang));
+    const handleLanguageChange = useCallback((lang: SupportedLanguage | null) => {
+        if (lang != null) dispatch(SettingsActions.setLanguage(lang));
     }, [dispatch]);
 
-    const handleDatabaseSchemaTerminologyChange = useCallback((terminology: 'database' | 'schema') => {
-        dispatch(SettingsActions.setDatabaseSchemaTerminology(terminology));
+    const handleDatabaseSchemaTerminologyChange = useCallback((terminology: 'database' | 'schema' | null) => {
+        if (terminology != null) dispatch(SettingsActions.setDatabaseSchemaTerminology(terminology));
     }, [dispatch]);
 
     const handleDisableAnimationsToggle = useCallback((disabled: boolean) => {

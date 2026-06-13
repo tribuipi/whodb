@@ -159,7 +159,7 @@ export const Export: FC<IExportProps> = ({
                                         </Label>
                                         <Select
                                             value={exportDelimiter}
-                                            onValueChange={(value) =>{  setExportDelimiter(value); }}
+                                            onValueChange={(value) =>{ if (value != null) setExportDelimiter(value); }}
                                         >
                                             <SelectTrigger className="w-full" data-testid="export-delimiter-select">
                                                 <SelectValue>

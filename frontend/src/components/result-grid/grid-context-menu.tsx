@@ -64,7 +64,7 @@ export function GridContextMenu(props: GridContextMenuProps) {
             <ContextMenuTrigger className="contents">
                 {children}
             </ContextMenuTrigger>
-            <ContextMenuContent className="w-52 max-h-[calc(100vh-2rem)] overflow-y-auto" collisionPadding={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+            <ContextMenuContent className="w-52 max-h-[calc(100vh-2rem)] overflow-y-auto">
                 <ContextMenuItem onSelect={onCopyCell}>
                     <DocumentDuplicateIcon className="w-4 h-4" />
                     {t('copyCell')}
@@ -97,7 +97,7 @@ export function GridContextMenu(props: GridContextMenuProps) {
                             <ArrowDownTrayIcon className="w-4 h-4 mr-2" />
                             {t('export')}
                         </ContextMenuSubTrigger>
-                        <ContextMenuSubContent collisionPadding={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                        <ContextMenuSubContent>
                             <ContextMenuItem onSelect={() =>{  onExport('csv', 'all'); }}>
                                 <DocumentIcon className="w-4 h-4" />
                                 {t('exportAllAsCsv')}

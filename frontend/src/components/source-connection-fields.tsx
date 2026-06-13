@@ -266,7 +266,6 @@ export function SourceConnectionFields({
                             aria-required={passwordField.Required ? 'true' : undefined}
                             aria-invalid={hasError ? 'true' : undefined}
                             aria-describedby={hasError ? errorId : undefined}
-                            showPasswordToggle={showPasswordToggle}
                         />
                     </div>
                 )}
@@ -392,7 +391,6 @@ function PrimaryAdvancedValueField({
                 data-testid={`${field.Key}-input`}
                 type={field.Kind === SourceConnectionFieldKind.Password ? 'password' : 'text'}
                 placeholder={fieldPlaceholder(field, translate)}
-                showPasswordToggle={field.Kind === SourceConnectionFieldKind.Password && showPasswordToggle}
             />
         </div>
     );

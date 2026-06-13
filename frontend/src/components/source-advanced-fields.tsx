@@ -94,7 +94,6 @@ export const SourceAdvancedFields: FC<SourceAdvancedFieldsProps> = ({
                             data-testid={`${field.Key}-input`}
                             type={field.Kind === SourceConnectionFieldKind.Password ? 'password' : 'text'}
                             placeholder={field.PlaceholderKey ? translate(field.PlaceholderKey) : undefined}
-                            showPasswordToggle={field.Kind === SourceConnectionFieldKind.Password && showPasswordToggle}
                         />
                     </div>
                 );
