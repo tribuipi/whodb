@@ -1,6 +1,6 @@
 import { skipToken, useQuery } from "@apollo/client/react";
 import type { FC, ReactElement } from "react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SearchSelect } from "../../components/ux";
 import { SourceFieldOptionsDocument } from "@graphql";
 import { useProfileSwitch } from "@/hooks/use-profile-switch";
@@ -41,10 +41,22 @@ export const SourceSelectors: FC = () => {
     const databaseQueryOptions = current != null && supportsDatabaseSwitching && current.Type
         ? { variables: { sourceType: current.Type } }
         : skipToken;
-    const { data: availableDatabases, loading: databasesLoading } = useQuery(
+    const { data: availableDatabases, loading: databasesLoading, refetch: refetchDatabases } = useQuery(
         SourceFieldOptionsDocument,
         databaseQueryOptions,
     );
+
+    // clearStore() doesn't refetch active watchQueries. When two profiles share the same
+    // sourceType, the ObservableQuery returns its stale lastResult after a profile switch.
+    // Re-fetch explicitly whenever the active profile changes.
+    const currentId = current?.Id;
+    const prevCurrentId = useRef(currentId);
+    useEffect(() => {
+        if (prevCurrentId.current !== currentId) {
+            prevCurrentId.current = currentId;
+            if (databaseQueryOptions !== skipToken) void refetchDatabases();
+        }
+    }, [currentId, databaseQueryOptions, refetchDatabases]);
 
     const profileOptions = useMemo(
         () => profiles
