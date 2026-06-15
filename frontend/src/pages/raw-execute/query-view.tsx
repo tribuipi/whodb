@@ -62,15 +62,18 @@ function isSQLQueryAction(code?: string): boolean {
 
 export const QueryView: FC<IPluginProps> = ({ code, handleExecuteRef, containerWidth, height, onResult }) => {
     const { t } = useTranslation("pages/raw-execute");
-    const [rawExecute, { data }] = useLazyQuery(RawExecuteDocument, {
+    const [rawExecute, { data, loading }] = useLazyQuery(RawExecuteDocument, {
         fetchPolicy: 'network-only',
     });
     const currentType = useAppSelector(state => state.auth.current?.Type);
 
     // Surface the result's total count to the host (shown in the editor's status bar).
+    // Only fires when loading is complete to prevent onResult(null) mid-flight.
     useEffect(() => {
-        onResult?.(data?.RawExecute?.TotalCount ?? null);
-    }, [data, onResult]);
+        if (!loading) {
+            onResult?.(data?.RawExecute?.TotalCount ?? null);
+        }
+    }, [data, loading, onResult]);
 
     const triggerExport = () => {
         window.dispatchEvent(new CustomEvent("menu:trigger-export"));
@@ -93,13 +96,33 @@ export const QueryView: FC<IPluginProps> = ({ code, handleExecuteRef, containerW
         };
     }, [rawExecute, handleExecuteRef, code]);
 
+    const loadingOverlay = loading && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 dark:bg-[#0a0a0a]/70 backdrop-blur-[1px]">
+            <div className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                {t("executingQuery")}
+            </div>
+        </div>
+    );
+
     if (data == null) {
-        return null;
+        if (!loading) {
+            return null;
+        }
+        return (
+            <div className="relative w-full h-full">
+                {loadingOverlay}
+            </div>
+        );
     }
 
     if (isSQLQueryAction(code) || data.RawExecute.Rows.length > 0) {
         return (
-            <div className="flex flex-col w-full h-full" data-testid="cell-query-output">
+            <div className="relative flex flex-col w-full h-full" data-testid="cell-query-output">
+                {loadingOverlay}
                 <div
                     className="flex items-center justify-end gap-2 px-2 py-1 flex-shrink-0"
                     data-testid="sql-editor-results-toolbar"
@@ -134,9 +157,12 @@ export const QueryView: FC<IPluginProps> = ({ code, handleExecuteRef, containerW
     }
 
     return (
-        <div className="bg-white/10 text-neutral-800 dark:text-neutral-300 rounded-lg p-2 flex gap-sm self-start items-center my-4" data-testid="cell-action-output">
-            Action Executed
-            <CheckCircleIcon className="w-4 h-4" />
+        <div className="relative" data-testid="cell-action-output">
+            {loadingOverlay}
+            <div className="bg-white/10 text-neutral-800 dark:text-neutral-300 rounded-lg p-2 flex gap-sm self-start items-center my-4">
+                Action Executed
+                <CheckCircleIcon className="w-4 h-4" />
+            </div>
         </div>
     );
 };
