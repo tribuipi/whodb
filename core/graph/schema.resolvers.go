@@ -17,12 +17,10 @@ import (
 
 	"github.com/clidey/whodb/core/graph/model"
 	"github.com/clidey/whodb/core/src"
-	"github.com/clidey/whodb/core/src/analytics"
 	"github.com/clidey/whodb/core/src/audit"
 	"github.com/clidey/whodb/core/src/auth"
 	"github.com/clidey/whodb/core/src/aws"
 	"github.com/clidey/whodb/core/src/azure"
-	"github.com/clidey/whodb/core/src/common"
 	"github.com/clidey/whodb/core/src/engine"
 	"github.com/clidey/whodb/core/src/env"
 	"github.com/clidey/whodb/core/src/envconfig"
@@ -60,8 +58,6 @@ func (r *mutationResolver) LoginWithSourceProfile(ctx context.Context, profile m
 func (r *mutationResolver) Logout(ctx context.Context) (*model.StatusResponse, error) {
 	start := time.Now()
 	creds := auth.GetSourceCredentials(ctx)
-	identity := strings.TrimSpace(analytics.MetadataFromContext(ctx).DistinctID)
-	hasIdentity := identity != "" && identity != "disabled"
 	hasProfile := false
 	sourceType := ""
 	var profileID *string
@@ -71,21 +67,8 @@ func (r *mutationResolver) Logout(ctx context.Context) (*model.StatusResponse, e
 		profileID = creds.ID
 	}
 
-	if hasIdentity {
-		analytics.CaptureWithDistinctID(ctx, identity, "logout.attempt", map[string]any{
-			"database_type":      sourceType,
-			"profile_id_present": hasProfile,
-		})
-	}
-
 	resp, err := auth.Logout(ctx)
 	if err != nil {
-		if hasIdentity {
-			analytics.CaptureError(ctx, "logout.execute", err, map[string]any{
-				"database_type":      sourceType,
-				"profile_id_present": hasProfile,
-			})
-		}
 		if creds != nil {
 			audit.RecordWithContext(ctx, audit.AuditEvent{
 				Timestamp: start,
@@ -102,13 +85,6 @@ func (r *mutationResolver) Logout(ctx context.Context) (*model.StatusResponse, e
 			})
 		}
 		return nil, err
-	}
-
-	if hasIdentity {
-		analytics.CaptureWithDistinctID(ctx, identity, "logout.success", map[string]any{
-			"database_type":      sourceType,
-			"profile_id_present": hasProfile,
-		})
 	}
 
 	if creds != nil {
@@ -136,42 +112,7 @@ func (r *mutationResolver) TestSourceConnection(ctx context.Context, credentials
 
 // UpdateSettings is the resolver for the UpdateSettings field.
 func (r *mutationResolver) UpdateSettings(ctx context.Context, newSettings model.SettingsConfigInput) (*model.StatusResponse, error) {
-	start := time.Now()
-	before := settings.Get()
-	var fields []settings.ISettingsField
-	changedFields := make([]string, 0, 1)
-	details := map[string]any{}
-
-	if newSettings.MetricsEnabled != nil {
-		metricsEnabled := common.StrPtrToBool(newSettings.MetricsEnabled)
-		fields = append(fields, settings.MetricsEnabledField(metricsEnabled))
-		changedFields = append(changedFields, "metrics_enabled")
-		details["metrics_enabled_before"] = before.MetricsEnabled
-		details["metrics_enabled_after"] = metricsEnabled
-
-		analytics.TrackMutation(ctx, "UpdateSettings.metrics", map[string]any{
-			"metrics_enabled": metricsEnabled,
-		})
-	}
-
-	updated := settings.UpdateSettings(fields...)
-	if len(changedFields) > 0 {
-		details["changed_fields"] = changedFields
-		details["updated"] = updated
-		audit.RecordWithContext(ctx, audit.AuditEvent{
-			Timestamp: start,
-			Action:    "settings.update",
-			Outcome:   audit.OutcomeSuccess,
-			Severity:  audit.SeverityInfo,
-			Resource: audit.Resource{
-				ID:   "global-settings",
-				Type: "settings_config",
-				Name: "settings",
-			},
-			Details:  details,
-			Duration: time.Since(start),
-		})
-	}
+	updated := settings.UpdateSettings()
 	return &model.StatusResponse{
 		Status: updated,
 	}, nil
@@ -1543,9 +1484,8 @@ func (r *queryResolver) AIChat(ctx context.Context, providerID *string, modelTyp
 
 // SettingsConfig is the resolver for the SettingsConfig field.
 func (r *queryResolver) SettingsConfig(ctx context.Context) (*model.SettingsConfig, error) {
-	currentSettings := settings.Get()
 	return &model.SettingsConfig{
-		MetricsEnabled:        &currentSettings.MetricsEnabled,
+		MetricsEnabled:        nil,
 		CloudProvidersEnabled: env.IsAWSProviderEnabled || env.IsAzureProviderEnabled || env.IsGCPProviderEnabled,
 		AWSProviderEnabled:    env.IsAWSProviderEnabled,
 		AzureProviderEnabled:  env.IsAzureProviderEnabled,

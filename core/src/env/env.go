@@ -101,9 +101,6 @@ var ApplicationEnvironment = os.Getenv("WHODB_APPLICATION_ENVIRONMENT")
 
 var ApplicationVersion string
 
-var PosthogAPIKey = "phc_hbXcCoPTdxm5ADL8PmLSYTIUvS6oRWFM2JAK8SMbfnH"
-var PosthogHost = "https://us.i.posthog.com"
-
 // IsAWSProviderEnabled controls whether AWS provider functionality is available.
 // disabled by default for now until official release
 var IsAWSProviderEnabled = os.Getenv("WHODB_ENABLE_AWS_PROVIDER") == "true"

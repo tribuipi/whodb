@@ -19,10 +19,7 @@ import {createSlice} from '@reduxjs/toolkit';
 import {settingsDefaults} from '../config/features';
 import {type SupportedLanguage, DEFAULT_LANGUAGE} from '../utils/languages';
 
-const ANALYTICS_CONSENT_KEY = 'whodb.analytics.consent';
-
 type ISettingsState = {
-    metricsEnabled: boolean;
     cloudProvidersEnabled: boolean;
     awsProviderEnabled: boolean;
     azureProviderEnabled: boolean;
@@ -45,21 +42,8 @@ type ISettingsState = {
     sidebarOpen: boolean;
 }
 
-const getInitialMetricsEnabled = (): boolean => {
-    if (typeof window === 'undefined') {
-        return true;
-    }
-
-    const consent = window.localStorage.getItem(ANALYTICS_CONSENT_KEY);
-    if (consent === 'denied') {
-        return false;
-    }
-    return true;
-};
-
 const getInitialState = (): ISettingsState => {
     return {
-        metricsEnabled: getInitialMetricsEnabled(),
         cloudProvidersEnabled: false,
         awsProviderEnabled: false,
         azureProviderEnabled: false,
@@ -89,9 +73,6 @@ export const settingsSlice = createSlice({
     name: 'settings',
     initialState,
     reducers: {
-        setMetricsEnabled: (state, action: PayloadAction<ISettingsState["metricsEnabled"]>) => {
-            state.metricsEnabled = action.payload;
-        },
         setCloudProvidersEnabled: (state, action: PayloadAction<ISettingsState["cloudProvidersEnabled"]>) => {
             state.cloudProvidersEnabled = action.payload;
         },

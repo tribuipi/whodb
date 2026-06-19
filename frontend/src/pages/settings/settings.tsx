@@ -28,9 +28,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import {optInUser, optOutUser, trackFrontendEvent} from "@/config/posthog";
 import {type SupportedLanguage, SUPPORTED_LANGUAGES} from "@/utils/languages";
-import {ExternalLink} from "../../utils/external-links";
 import {usePageSize} from "../../hooks/use-page-size";
 import {AwsProvidersSection} from "../../components/aws";
 import {AzureProvidersSection} from "../../components/azure";
@@ -42,7 +40,6 @@ export const SettingsPage: FC = () => {
     const {t} = useTranslation('pages/settings');
     const appName = getAppName();
     const dispatch = useAppDispatch();
-    const metricsEnabled = useAppSelector(state => state.settings.metricsEnabled);
     const storageUnitView = useAppSelector(state => state.settings.storageUnitView);
     const fontSize = useAppSelector(state => state.settings.fontSize);
     const borderRadius = useAppSelector(state => state.settings.borderRadius);
@@ -74,21 +71,6 @@ export const SettingsPage: FC = () => {
         handleSelectChange: handleDefaultPageSizeChange,
         handleCustomApply: handleCustomPageSizeApply,
     } = usePageSize(defaultPageSize, pageSizeOptions);
-
-    useEffect(() => {
-        void trackFrontendEvent('ui.settings_viewed');
-    }, []);
-
-    const handleMetricsToggle = useCallback((enabled: boolean) => {
-        if (enabled) {
-            void optInUser();
-            void trackFrontendEvent('ui.telemetry_toggled', {enabled: true});
-        } else {
-            void trackFrontendEvent('ui.telemetry_toggled', {enabled: false});
-            void optOutUser();
-        }
-        dispatch(SettingsActions.setMetricsEnabled(enabled));
-    }, [dispatch]);
 
     const handleStorageUnitViewToggle = useCallback((view: 'list' | 'card' | null) => {
         if (view != null) dispatch(SettingsActions.setStorageUnitView(view));
@@ -126,35 +108,7 @@ export const SettingsPage: FC = () => {
         <InternalPage routes={[InternalRoutes.Settings as IInternalRoute]}>
             <div className="flex flex-col items-center w-full max-w-2xl mx-auto py-10 gap-8">
                 <div className="w-full flex flex-col gap-0">
-                    <div className="flex flex-col gap-2">
-                        <p className="text-2xl font-bold flex items-center gap-2">
-                            {t('telemetryTitle')}
-                        </p>
-                    </div>
                     <div className="flex flex-col gap-xl py-6">
-                        <div className="flex flex-col gap-4">
-                                <h3 className="text-base">
-                                    {t('telemetryDescription', { appName })}&nbsp;
-                                    {t('dataCollectionDetails', {
-                                        privacyPolicyLink: <ExternalLink
-                                            href={"https://clidey.com/privacy-policy"}
-                                            className={"underline text-blue-500"}>{t('privacyPolicy')}</ExternalLink>
-                                    })}
-                                    <br/>
-                                    <br/>
-                                    {t('posthogInfo', { appName })}&nbsp;
-                                    {t('sensitiveDataInfo')}
-                                    <br/>
-                                    <br/>
-                                    {t('contactUsInfo')}
-                                </h3>
-                                <br/>
-                                <div className="flex justify-between">
-                                    <Label>{metricsEnabled ? t('enableTelemetry') : t('disableTelemetry')}</Label>
-                                    <Switch checked={metricsEnabled} onCheckedChange={handleMetricsToggle}/>
-                                </div>
-                                <Separator className="mt-4" />
-                            </div>
                         <div className="flex flex-col gap-sm mb-2">
                             <p className="text-lg font-bold">
                                 {t('personalizeTitle')}

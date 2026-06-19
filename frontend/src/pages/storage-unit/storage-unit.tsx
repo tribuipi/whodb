@@ -21,8 +21,7 @@ import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/search-input";
 import { SheetTitle } from "@/components/ui/sheet";
 import { StackList, StackListItem } from "@/components/ui/stack-list";
-import { TableCell, TableHead, TableRow } from "@/components/ui/table";
-import { TableHeadRow, VirtualizedTableBody } from "@clidey/ux";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type {
     GetColumnsBatchQuery,
@@ -590,47 +589,44 @@ export const StorageUnitPage: FC = () => {
         <div className={cn("flex flex-wrap gap-lg w-full h-[80vh]", {
             "hidden": view !== "list",
         })}>
-            <VirtualizedTableBody
-                    rowCount={filterStorageUnits.length}
-                    header={
-                        <TableHeadRow>
+            <Table>
+                    <TableHeader>
+                        <TableRow>
                             <TableHead>{t('nameLabel')}</TableHead>
                             {/** Dynamically render shared attribute keys as columns */}
                             {sharedAttributeKeys.map(key => (
                                 <TableHead key={key}>{key}</TableHead>
                             ))}
                             <TableHead>{t('actions')}</TableHead>
-                        </TableHeadRow>
-                    }>
-                    {(rowIndex: number) => {
-                        const unit = filterStorageUnits[rowIndex];
-                        if (!unit) {
-                            return null;
-                        }
-                        const attrMap = Object.fromEntries(unit.Attributes.map(attr => [attr.Key, attr.Value]));
-                        return (
-                            <TableRow key={unit.Name} className="group">
-                                <TableCell>{unit.Name}</TableCell>
-                                {sharedAttributeKeys.map(key => (
-                                    <TableCell key={key}>{formatAttributeValue(key, attrMap[key])}</TableCell>
-                                ))}
-                                <TableCell className="relative">
-                                    <div className="flex gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Button
-                                            onClick={() => { handleOpenUnit(unit); }}
-                                            data-testid="data-button"
-                                            variant="secondary"
-                                            size="sm"
-                                            className="!cursor-pointer"
-                                        >
-                                            <CircleStackIcon className="w-4 h-4" /> {t('data')}
-                                        </Button>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        );
-                    }}
-                </VirtualizedTableBody>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {filterStorageUnits.map((unit) => {
+                            const attrMap = Object.fromEntries(unit.Attributes.map(attr => [attr.Key, attr.Value]));
+                            return (
+                                <TableRow key={unit.Name} className="group">
+                                    <TableCell>{unit.Name}</TableCell>
+                                    {sharedAttributeKeys.map(key => (
+                                        <TableCell key={key}>{formatAttributeValue(key, attrMap[key])}</TableCell>
+                                    ))}
+                                    <TableCell className="relative">
+                                        <div className="flex gap-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Button
+                                                onClick={() => { handleOpenUnit(unit); }}
+                                                data-testid="data-button"
+                                                variant="secondary"
+                                                size="sm"
+                                                className="!cursor-pointer"
+                                            >
+                                                <CircleStackIcon className="w-4 h-4" /> {t('data')}
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
             {expandedUnit && (
                 <div className="w-full mt-4">
                     {(() => {

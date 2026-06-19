@@ -41,3 +41,8 @@ cd frontend
 pnpm install
 pnpm start
 ```
+
+### Build docker image
+```bash
+docker build -f core/Dockerfile -t whodb:dev .
+```

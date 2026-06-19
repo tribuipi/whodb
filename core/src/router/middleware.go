@@ -28,7 +28,6 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/clidey/whodb/core/src/analytics"
 	coreaudit "github.com/clidey/whodb/core/src/audit"
 	"github.com/clidey/whodb/core/src/common"
 )
@@ -38,20 +37,20 @@ func contextMiddleware(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), common.RouterKey_ResponseWriter, w)
 		ctx = propagation.TraceContext{}.Extract(ctx, propagation.HeaderCarrier(r.Header))
 
-		metadata := analytics.BuildMetadata(r)
-		if metadata.RequestID == "" {
-			if requestID := middleware.GetReqID(ctx); requestID != "" {
-				metadata.RequestID = requestID
+		requestID := strings.TrimSpace(r.Header.Get("X-Request-Id"))
+		if requestID == "" {
+			if reqID := middleware.GetReqID(ctx); reqID != "" {
+				requestID = reqID
 			}
 		}
 
 		request := coreaudit.Request{
-			ID:        metadata.RequestID,
+			ID:        requestID,
 			Host:      r.Host,
 			Method:    r.Method,
 			Path:      r.URL.Path,
 			RemoteIP:  clientIPFromRequest(r),
-			UserAgent: metadata.UserAgent,
+			UserAgent: r.UserAgent(),
 			Protocol:  r.Proto,
 		}
 		spanContext := trace.SpanContextFromContext(ctx)
@@ -60,7 +59,6 @@ func contextMiddleware(next http.Handler) http.Handler {
 			request.SpanID = spanContext.SpanID().String()
 		}
 
-		ctx = analytics.WithMetadata(ctx, metadata)
 		ctx = coreaudit.WithRequest(ctx, request)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

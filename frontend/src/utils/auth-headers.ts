@@ -15,7 +15,6 @@
  */
 
 import {reduxStore} from '../store';
-import {getAnalyticsDistinctId} from '../config/posthog';
 
 /**
  * Optional auth header provider registered by extensions (e.g. EE JWT-based auth).
@@ -42,8 +41,6 @@ function mapSourceCredentialValues(values: readonly SourceCredentialValueLike[] 
 export const registerAuthHeaderProvider = (fn: () => string | null): void => {
     authHeaderProvider = fn;
 };
-
-const analyticsHeaderName = 'X-WhoDB-Analytics-Id';
 
 /**
  * Checks if the app is running in a desktop/webview environment
@@ -126,11 +123,6 @@ export function getAuthorizationHeader(): string | null {
  */
 export function addAuthHeader(headers: HeadersInit = {}): HeadersInit {
     const authHeader = getAuthorizationHeader();
-    const id = getAnalyticsDistinctId()
-    headers = {
-        ...headers,
-        [analyticsHeaderName]: id ?? ""
-    }
     if (authHeader) {
         return {
             ...headers,

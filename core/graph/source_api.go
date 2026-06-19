@@ -27,7 +27,6 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 
 	"github.com/clidey/whodb/core/graph/model"
-	"github.com/clidey/whodb/core/src/analytics"
 	"github.com/clidey/whodb/core/src/audit"
 	"github.com/clidey/whodb/core/src/auth"
 	"github.com/clidey/whodb/core/src/env"
@@ -90,29 +89,7 @@ func performSourceLogin(ctx context.Context, credentials *source.Credentials, pr
 		return nil, err
 	}
 
-	identity := strings.TrimSpace(analytics.MetadataFromContext(ctx).DistinctID)
-	hasIdentity := identity != "" && identity != "disabled"
-
-	if hasIdentity {
-		properties := map[string]any{
-			"source_type":        credentials.SourceType,
-			"profile_id_present": hasProfileID,
-			"connector":          spec.Connector,
-			"profile_source":     profileSource,
-			"is_saved_profile":   profileSource != "",
-		}
-		analytics.CaptureWithDistinctID(ctx, identity, "login.attempt", properties)
-	}
-
 	if !availability.IsAvailable(ctx) {
-		if hasIdentity {
-			analytics.CaptureWithDistinctID(ctx, identity, "login.denied", map[string]any{
-				"source_type":        credentials.SourceType,
-				"profile_id_present": hasProfileID,
-				"connector":          spec.Connector,
-				"profile_source":     profileSource,
-			})
-		}
 		err := errors.New("unauthorized")
 		recordAudit(err)
 		return nil, err
@@ -120,42 +97,8 @@ func performSourceLogin(ctx context.Context, credentials *source.Credentials, pr
 
 	resp, err := auth.LoginSource(ctx, credentials)
 	if err != nil {
-		if hasIdentity {
-			analytics.CaptureError(ctx, "login.execute", err, map[string]any{
-				"source_type":        credentials.SourceType,
-				"profile_id_present": hasProfileID,
-				"connector":          spec.Connector,
-				"profile_source":     profileSource,
-			})
-		}
 		recordAudit(err)
 		return nil, err
-	}
-
-	if hasIdentity {
-		traits := map[string]any{
-			"profile_id_present": hasProfileID,
-			"source_type":        credentials.SourceType,
-			"connector":          spec.Connector,
-		}
-		if profileSource != "" {
-			traits["profile_source"] = profileSource
-			traits["saved_profile"] = true
-		}
-		if hashedHost := analytics.HashIdentifier(credentials.CloneValues()["Hostname"]); hashedHost != "" {
-			traits["hostname_hash"] = hashedHost
-		}
-		if hashedDatabase := analytics.HashIdentifier(credentials.CloneValues()["Database"]); hashedDatabase != "" {
-			traits["database_hash"] = hashedDatabase
-		}
-
-		analytics.IdentifyWithDistinctID(ctx, identity, traits)
-		analytics.CaptureWithDistinctID(ctx, identity, "login.success", map[string]any{
-			"source_type":        credentials.SourceType,
-			"profile_id_present": hasProfileID,
-			"connector":          spec.Connector,
-			"profile_source":     profileSource,
-		})
 	}
 
 	recordAudit(nil)

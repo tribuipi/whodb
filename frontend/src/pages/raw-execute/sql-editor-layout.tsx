@@ -1,7 +1,7 @@
 import type { FC, ReactNode } from "react";
 import { useState, useCallback } from "react";
 
-const LEFT_DEFAULT = 220;
+const LEFT_DEFAULT = 400;
 const LEFT_MIN = 160;
 const LEFT_MAX = 420;
 const RIGHT_DEFAULT = 360;

@@ -22,7 +22,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { ModeToggle } from '@/components/ui/mode-toggle';
 import { Separator } from '@/components/ui/separator';
 import {SearchSelect} from '../../components/ux';
 import {
@@ -41,34 +40,27 @@ import {useNavigate, useSearchParams} from "react-router-dom";
 import logoImage from "../../../public/images/logo.svg";
 import {
     AdjustmentsHorizontalIcon,
-    ChatBubbleLeftRightIcon,
     CheckCircleIcon,
     ChevronDownIcon,
-    CodeBracketIcon,
-    ShareIcon,
-    SparklesIcon,
-    TableCellsIcon
 } from '../../components/heroicons';
 import {Icons} from "../../components/icons";
 import {Loading} from "../../components/loading";
 import {Container} from "../../components/page";
 import {updateProfileLastAccessed} from "../../components/profile-info-tooltip";
 import type {SourceTypeItem} from "../../config/source-types";
-import {extensions, featureFlags, getAppName, sources} from '../../config/features';
+import {extensions, getAppName, sources} from '../../config/features';
 import {InternalRoutes} from "../../config/routes";
 import {useSourceTypeItems} from "../../hooks/useSourceCatalog";
 import {useDesktopFile} from '../../hooks/useDesktop';
 import {useTranslation} from '@/hooks/use-translation';
 import {AuthActions} from "../../store/auth";
 import {DatabaseActions} from "../../store/database";
-import {TourActions} from "../../store/tour";
 import {SettingsActions} from "../../store/settings";
 import {isSupportedLanguage} from "@/utils/languages";
 import {HealthActions} from "../../store/health";
 import {useAppDispatch, useAppSelector} from "../../store/hooks";
 import {isDesktopApp} from '../../utils/external-links';
 import {v4 as uuidv4} from 'uuid';
-import {hasCompletedOnboarding, markOnboardingComplete} from '../../utils/onboarding';
 import {
     AwsConnectionPicker,
     DatabaseIconWithBadge,
@@ -130,7 +122,7 @@ function getLoginUiSearchParams(searchParams: URLSearchParams): URLSearchParams 
 function getStorageUnitPath(searchParams: URLSearchParams): string {
     const uiParams = getLoginUiSearchParams(searchParams);
     const uiSearch = uiParams.toString();
-    return `${InternalRoutes.Dashboard.StorageUnit.path}${uiSearch ? `?${uiSearch}` : ""}`;
+    return `${InternalRoutes.RawExecute.path}${uiSearch ? `?${uiSearch}` : ""}`;
 }
 
 const EMPTY_DATABASE_TYPE: SourceTypeItem = {
@@ -194,7 +186,6 @@ export const LoginForm: FC<LoginFormProps> = ({
     advancedDirection = "horizontal",
 }) => {
     const { t } = useTranslation('pages/login');
-    const appName = getAppName();
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const currentProfileId = useAppSelector(state => state.auth.current?.Id);
@@ -204,11 +195,6 @@ export const LoginForm: FC<LoginFormProps> = ({
     const handleLoginWithSourceProfileSubmitRef = useRef<(overrideProfileId?: string) => void>(() => {});
     const [pendingAutoLogin, setPendingAutoLogin] = useState(false);
     const { setTheme } = useTheme();
-
-    const FIRST_LOGIN_KEY = 'whodb_has_logged_in';
-    const [isFirstLogin, setIsFirstLogin] = useState(() => {
-        return !localStorage.getItem(FIRST_LOGIN_KEY);
-    });
 
     const [login, { loading: loginLoading }] = useMutation(LoginSourceDocument);
     const [testConnection, { loading: testConnectionLoading }] = useMutation(TestSourceConnectionDocument);
@@ -279,14 +265,6 @@ export const LoginForm: FC<LoginFormProps> = ({
     const loading = useMemo(() => {
         return loginLoading || loginWithSourceProfileLoading || isAutoLoggingIn;
     }, [loginLoading, loginWithSourceProfileLoading, isAutoLoggingIn]);
-
-    const markFirstLoginComplete = useCallback(() => {
-        if (isFirstLogin) {
-            localStorage.setItem(FIRST_LOGIN_KEY, 'true');
-            setIsFirstLogin(false);
-            markOnboardingComplete();
-        }
-    }, [isFirstLogin, FIRST_LOGIN_KEY]);
 
     const handleLoginError = useCallback((loginError: unknown, allowDriverInstallPrompt = false) => {
         setIsAutoLoggingIn(false);
@@ -360,7 +338,6 @@ export const LoginForm: FC<LoginFormProps> = ({
                 await clearGraphqlStore();
                 shouldUpdateLastAccessed.current = true;
                 dispatch(AuthActions.login(profileData));
-                markFirstLoginComplete();
 
                 const storageUnitPath = getStorageUnitPath(searchParams);
 
@@ -380,7 +357,7 @@ export const LoginForm: FC<LoginFormProps> = ({
                 handleLoginError(error, true);
             }
         })();
-    }, [advancedForm, database, databaseType, dispatch, handleLoginError, hostName, login, markFirstLoginComplete, navigate, onLoginSuccess, password, searchParams, setSearchParams, t, username]);
+    }, [advancedForm, database, databaseType, dispatch, handleLoginError, hostName, login, navigate, onLoginSuccess, password, searchParams, setSearchParams, t, username]);
 
     const handleTestConnection = useCallback(() => {
         const values = buildRecordInputs(hostName, database, username, password, advancedForm);
@@ -433,7 +410,6 @@ export const LoginForm: FC<LoginFormProps> = ({
                 if (profile != null) {
                     dispatch(AuthActions.login(createProfilePayloadFromSourceProfile(profile)));
                 }
-                markFirstLoginComplete();
 
                 const storageUnitPath = getStorageUnitPath(searchParams);
 
@@ -452,54 +428,11 @@ export const LoginForm: FC<LoginFormProps> = ({
                 handleLoginError(error);
             }
         })();
-    }, [dispatch, handleLoginError, loginWithSourceProfile, markFirstLoginComplete, navigate, onLoginSuccess, profiles?.SourceProfiles, searchParams, selectedAvailableProfile, setSearchParams, t]);
+    }, [dispatch, handleLoginError, loginWithSourceProfile, navigate, onLoginSuccess, profiles?.SourceProfiles, searchParams, selectedAvailableProfile, setSearchParams, t]);
 
     // Keep refs in sync with latest callback versions each render to avoid stale closures
     handleSubmitRef.current = handleSubmit;
     handleLoginWithSourceProfileSubmitRef.current = handleLoginWithSourceProfileSubmit;
-
-    const handleSampleDatabaseLogin = useCallback(() => {
-        const sampleProfile = profiles?.SourceProfiles.find(p => p.Source === "builtin");
-        if (!sampleProfile) {
-            return toast.error(t('sampleDatabaseNotFound'));
-        }
-
-        setError(undefined);
-
-        void (async () => {
-            try {
-                const { data } = await loginWithSourceProfile({
-                    variables: {
-                        profile: {
-                            Id: sampleProfile.Id,
-                        },
-                    },
-                });
-
-                if (!data?.LoginWithSourceProfile.Status) {
-                    setIsAutoLoggingIn(false);
-                    toast.error(t('loginFailed'));
-                    return;
-                }
-
-                updateProfileLastAccessed(sampleProfile.Id);
-                await clearGraphqlStore();
-                dispatch(AuthActions.login(createProfilePayloadFromSourceProfile(sampleProfile)));
-                markFirstLoginComplete();
-                if (featureFlags.autoStartTourOnLogin) {
-                    dispatch(TourActions.scheduleTourOnLoad('sample-database-tour'));
-                }
-                if (onLoginSuccess) {
-                    onLoginSuccess();
-                } else {
-                    void navigate(InternalRoutes.Dashboard.StorageUnit.path);
-                }
-                toast.success(t('welcomeToWhodb', { appName }));
-            } catch (error) {
-                handleLoginError(error);
-            }
-        })();
-    }, [appName, dispatch, handleLoginError, loginWithSourceProfile, markFirstLoginComplete, navigate, onLoginSuccess, profiles?.SourceProfiles, t]);
 
     const handleDatabaseTypeChange = useCallback((item: SourceTypeItem) => {
         setHostName("");
@@ -677,10 +610,6 @@ export const LoginForm: FC<LoginFormProps> = ({
     }, [profiles?.SourceProfiles, awsProviderEnabled, azureProviderEnabled, gcpProviderEnabled]);
 
     const hasAvailableProfiles = availableProfiles.length > 0;
-
-    const sampleProfile = useMemo(() => {
-        return profiles?.SourceProfiles.find(p => p.Source === "builtin");
-    }, [profiles?.SourceProfiles]);
 
     // Handle URL parameters for pre-filling credentials or auto-login
     // Note: This effect intentionally does NOT clear selectedAvailableProfile because:
@@ -916,18 +845,10 @@ export const LoginForm: FC<LoginFormProps> = ({
         );
     }
 
-    const showSidePanel = sampleProfile && !hideHeader && featureFlags.sampleDatabaseTour && isFirstLogin && !hasCompletedOnboarding();
-
     return (
         <div className={classNames("w-fit h-fit", className, {
             "w-full h-full": advancedDirection === "vertical",
-            "flex gap-8": showSidePanel && advancedDirection === "horizontal",
         })} data-testid="login-form-container">
-            <div className={cn("fixed top-4 right-4 z-20", {
-                "hidden": !showSidePanel,
-            })} data-testid="mode-toggle-login">
-                <ModeToggle />
-            </div>
             <div className={classNames("flex flex-col grow gap-lg", {
                 "justify-between": advancedDirection === "horizontal",
                 "h-full": advancedDirection === "vertical" && availableProfiles.length === 0,
@@ -953,7 +874,7 @@ export const LoginForm: FC<LoginFormProps> = ({
                 })} data-testid="login-form">
                     <div className={classNames("flex flex-col gap-lg grow", advancedDirection === "vertical" ? "w-full" : "w-[350px]")}>
                         <div className={cn("flex flex-col grow gap-lg", {
-                            "justify-center": advancedDirection === "horizontal" && !showSidePanel,
+                            "justify-center": advancedDirection === "horizontal",
                         })}>
                             {disableCredentialForm && !hasAvailableProfiles ? (
                                 <Card className="p-6 max-w-md">
@@ -1105,91 +1026,6 @@ export const LoginForm: FC<LoginFormProps> = ({
                     </>
                 )}
             </div>
-            {
-                showSidePanel && advancedDirection === "horizontal" && (
-                    <Card className="flex flex-col gap-6 p-8 w-[380px] shadow-xl" data-testid="sample-database-panel" aria-labelledby="sample-db-heading">
-                        <div className="flex flex-col gap-4">
-                            <div className="flex items-center gap-3">
-                                <div className="h-14 w-14 rounded-2xl flex justify-center items-center bg-gradient-to-br from-brand to-brand/80 shadow-lg" aria-hidden="true">
-                                    <SparklesIcon className="w-7 h-7 text-brand-foreground" />
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <h2 id="sample-db-heading" className="text-2xl font-bold text-foreground">
-                                        {t('tryWhodb', { appName })}
-                                    </h2>
-                                    <Badge variant="secondary" className="w-fit">
-                                        {t('noSetupRequired')}
-                                    </Badge>
-                                </div>
-                            </div>
-
-                            <p className="text-base text-muted-foreground leading-relaxed">
-                                {t('experienceDescription', { appName })}
-                            </p>
-                        </div>
-
-                        <Separator />
-
-                        <div className="flex flex-col gap-3" role="list" aria-label={t('whatsIncluded')}>
-                            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
-                                {t('whatsIncluded')}
-                            </h3>
-                            <div className="flex flex-col gap-3">
-                                <div className="flex items-start gap-3" role="listitem">
-                                    <div className="h-6 w-6 rounded-lg flex justify-center items-center bg-brand/10 mt-0.5" aria-hidden="true">
-                                        <ChatBubbleLeftRightIcon className="w-3.5 h-3.5 stroke-brand" />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-sm font-medium text-foreground">{t('aiChatAssistant')}</p>
-                                        <p className="text-xs text-muted-foreground">{t('aiChatDescription')}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-3" role="listitem">
-                                    <div className="h-6 w-6 rounded-lg flex justify-center items-center bg-brand/10 mt-0.5" aria-hidden="true">
-                                        <ShareIcon className="w-3.5 h-3.5 stroke-brand" />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-sm font-medium text-foreground">{t('visualSchema')}</p>
-                                        <p className="text-xs text-muted-foreground">{t('visualSchemaDescription')}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-3" role="listitem">
-                                    <div className="h-6 w-6 rounded-lg flex justify-center items-center bg-brand/10 mt-0.5" aria-hidden="true">
-                                        <TableCellsIcon className="w-3.5 h-3.5 stroke-brand" />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-sm font-medium text-foreground">{t('dataGrid')}</p>
-                                        <p className="text-xs text-muted-foreground">{t('dataGridDescription')}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-start gap-3" role="listitem">
-                                    <div className="h-6 w-6 rounded-lg flex justify-center items-center bg-brand/10 mt-0.5" aria-hidden="true">
-                                        <CodeBracketIcon className="w-3.5 h-3.5 stroke-brand" />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-sm font-medium text-foreground">{t('sqlEditor')}</p>
-                                        <p className="text-xs text-muted-foreground">{t('sqlEditorDescription')}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <Button
-                            onClick={handleSampleDatabaseLogin}
-                            data-testid="get-started-sample-db"
-                            size="lg"
-                            className="w-full mt-2"
-                        >
-                            <SparklesIcon className="w-4 h-4" aria-hidden="true" />
-                            {t('getStarted')}
-                        </Button>
-
-                        <p className="text-xs text-center text-muted-foreground">
-                            {t('quickStartFooter')}
-                        </p>
-                    </Card>
-                )
-            }
         {(() => {
             const DriverInstallDialog = getComponent('driver-install-dialog') as React.LazyExoticComponent<FC<{driverName: string; onInstalled: () => void; onCancel: () => void}>> | undefined;
             if (!DriverInstallDialog || !missingDriver) return null;

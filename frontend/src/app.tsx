@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-import {useMutation, useQuery} from "@apollo/client/react";
+import {useQuery} from "@apollo/client/react";
 import {Toaster} from "@/components/ui/sonner";
-import {SettingsConfigDocument, UpdateSettingsDocument} from '@graphql';
+import {SettingsConfigDocument} from '@graphql';
 import {Suspense, useEffect} from "react";
 import {Route, Routes} from "react-router-dom";
-import {getStoredConsentState, optInUser, optOutUser, resetAnalyticsIdentity} from "./config/posthog";
 import {getRoutes, PrivateRoute, PublicRoutes} from './config/routes';
 import {getRegisteredPublicRoutes} from './config/route-registry';
 import {NavigateToDefault} from "./pages/chat/default-chat-route";
@@ -36,10 +35,8 @@ import {ServerDownOverlay, DatabaseDownOverlay} from "./components/health/health
 import {HealthActions} from "./store/health";
 
 export const App = () => {
-    const [updateSettings] = useMutation(UpdateSettingsDocument);
     const {data: settingsConfigData} = useQuery(SettingsConfigDocument);
     const dispatch = useAppDispatch();
-  const metricsEnabled = useAppSelector(state => state.settings.metricsEnabled);
   const authStatus = useAppSelector(state => state.auth.status);
   const settingsConfig = settingsConfigData?.SettingsConfig;
   const newUIEnabled = settingsConfig?.EnableNewUI === true;
@@ -75,59 +72,6 @@ export const App = () => {
       dispatch(SettingsActions.setAzureProviderEnabled(settingsConfig.AzureProviderEnabled));
       dispatch(SettingsActions.setGCPProviderEnabled(settingsConfig.GCPProviderEnabled));
   }, [dispatch, settingsConfig]);
-
-  useEffect(() => {
-      const consent = getStoredConsentState();
-
-      if (consent === 'denied' && metricsEnabled) {
-          dispatch(SettingsActions.setMetricsEnabled(false));
-          return;
-      }
-
-      if (consent === 'granted' && !metricsEnabled) {
-          dispatch(SettingsActions.setMetricsEnabled(true));
-          return;
-      }
-
-      if (consent === 'unknown') {
-          return;
-      }
-
-      if (!metricsEnabled) {
-          void optOutUser();
-          return;
-      }
-
-      void optInUser();
-  }, [metricsEnabled, dispatch]);
-
-    useEffect(() => {
-        const consent = getStoredConsentState();
-        if (consent !== 'granted') {
-            if (!metricsEnabled || consent === 'denied') {
-                resetAnalyticsIdentity().catch(() => undefined);
-            }
-            return;
-        }
-
-        if (!metricsEnabled) {
-            resetAnalyticsIdentity().catch(() => undefined);
-        }
-    }, [metricsEnabled]);
-
-  useEffect(() => {
-    if (authStatus !== 'logged-in') {
-      return;
-    }
-
-    void updateSettings({
-      variables: {
-        newSettings: {
-          MetricsEnabled: String(metricsEnabled)
-        }
-      }
-    });
-  }, [authStatus, updateSettings, metricsEnabled]);
 
   // Start health check service when user logs in, stop when they log out
 

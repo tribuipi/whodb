@@ -84,6 +84,7 @@ import { findSourceObjectType } from "../../config/source-types";
 import {buildSourceObjectRef, buildSourceParentObjectRef} from "../../utils/source-refs";
 import {formatAttributeValue} from "../../utils/functions";
 import {ph} from "../../utils/privacy";
+import {quoteIdentifier} from "../../utils/format-sql";
 
 type SourceBrowserObject = GetStorageUnitsQuery['StorageUnit'][number];
 
@@ -275,9 +276,11 @@ export const ExploreStorageUnit: FC = () => {
     }, [sourceContent?.MIMEType, sourceContent?.Text]);
 
     const initialScratchpadQuery = useMemo(() => {
-        const qualified = schema ? `${schema}.${unitName}` : unitName;
+        const name = unitName ?? '';
+        const quotedName = quoteIdentifier(name, currentType);
+        const qualified = schema ? `${quoteIdentifier(schema, currentType)}.${quotedName}` : quotedName;
         return `SELECT * FROM ${qualified} LIMIT 5`;
-    }, [schema, unitName]);
+    }, [schema, unitName, currentType]);
 
     const scratchpadQueryWithConditions = useMemo(() => {
         const whereClause = whereConditionToSql(whereCondition);

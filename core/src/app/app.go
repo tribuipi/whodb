@@ -34,7 +34,6 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 
 	"github.com/clidey/whodb/core/src"
-	"github.com/clidey/whodb/core/src/analytics"
 	"github.com/clidey/whodb/core/src/engine"
 	"github.com/clidey/whodb/core/src/env"
 	"github.com/clidey/whodb/core/src/log"
@@ -143,18 +142,6 @@ func Run(config AppConfig, staticFiles embed.FS) {
 	pluginNames := registeredPluginNames()
 	log.Alwaysf("go=%s os=%s arch=%s mode=%s plugins=[%s]",
 		runtime.Version(), runtime.GOOS, runtime.GOARCH, mode, strings.Join(pluginNames, ", "))
-
-	settingsCfg := settings.Get()
-
-	if err := analytics.Initialize(analytics.Config{
-		APIKey:      env.PosthogAPIKey,
-		Host:        env.PosthogHost,
-		Environment: env.ApplicationEnvironment,
-		AppVersion:  env.ApplicationVersion,
-	}); err == nil {
-		defer analytics.Shutdown()
-	}
-	analytics.SetEnabled(settingsCfg.MetricsEnabled)
 
 	src.InitializeEngine()
 

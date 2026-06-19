@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { SqlEditorActions } from "../../store/sql-editor";
-import { formatSql } from "../../utils/format-sql";
+import { formatSql, quoteIdentifier } from "../../utils/format-sql";
 import { ChatPanel } from "./chat-panel";
 import { EditorTabs } from "./editor-tabs";
 import { ObjectTree } from "./object-tree";
@@ -24,15 +24,14 @@ export const RawExecutePage: FC = () => {
     dispatch(SqlEditorActions.ensureTab());
   }, [dispatch]);
 
-  const activeTab = tabs.find(tab => tab.id === activeTabId);
-
   const left = (
     <div className="flex flex-col h-full">
       <SourceSelectors />
       <div className="flex-1 min-h-0">
         <ObjectTree
           onSelectObject={obj => {
-            const qualified = schema ? `${schema}.${obj.Name}` : obj.Name;
+            const quotedName = quoteIdentifier(obj.Name, currentType);
+            const qualified = schema ? `${quoteIdentifier(schema, currentType)}.${quotedName}` : quotedName;
             dispatch(SqlEditorActions.addSqlTab({
               name: obj.Name,
               code: formatSql(`SELECT * FROM ${qualified} LIMIT 100;`, currentType),
@@ -51,11 +50,13 @@ export const RawExecutePage: FC = () => {
     <div className="flex flex-col h-full">
       <EditorTabs rightCollapsed={rightCollapsed} onToggleRight={() => { setRightCollapsed(c => !c); }} />
       <div className="flex-1 min-h-0">
-        {activeTab?.kind === "structure"
-          ? <StructureTab key={activeTab.id} tabId={activeTab.id} />
-          : activeTab != null
-            ? <SqlTab key={activeTab.id} tabId={activeTab.id} />
-            : null}
+        {tabs.map(tab => (
+          <div key={tab.id} className={activeTabId === tab.id ? "h-full" : "hidden"}>
+            {tab.kind === "structure"
+              ? <StructureTab tabId={tab.id} />
+              : <SqlTab tabId={tab.id} />}
+          </div>
+        ))}
       </div>
     </div>
   );
