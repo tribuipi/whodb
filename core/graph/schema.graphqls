@@ -902,6 +902,7 @@ type Query {
   SourceColumnsBatch(refs: [SourceObjectRefInput!]!): [SourceObjectColumns!]!
   SourceFieldConstraints(ref: SourceObjectRefInput!): [SourceFieldConstraints!]!
   RunSourceQuery(query: String!): RowsResult!
+  DefaultTableQuery(ref: SourceObjectRefInput!, limit: Int!, schema: String): String!
   SourceGraph(ref: SourceObjectRefInput): [GraphUnit!]!
   AIProviders: [AIProvider!]!
   AIModel(providerId: String, modelType: String!, token: String): [String!]!

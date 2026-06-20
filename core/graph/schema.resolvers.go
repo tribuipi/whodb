@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
-
 	"github.com/clidey/whodb/core/graph/model"
 	"github.com/clidey/whodb/core/src"
 	"github.com/clidey/whodb/core/src/audit"
@@ -1324,6 +1323,28 @@ func (r *queryResolver) RunSourceQuery(ctx context.Context, query string) (*mode
 		return nil, err
 	}
 	return rowsResultToModel(rowsResult), nil
+}
+
+// DefaultTableQuery is the resolver for the DefaultTableQuery field.
+func (r *queryResolver) DefaultTableQuery(ctx context.Context, ref model.SourceObjectRefInput, limit int, schema *string) (string, error) {
+	spec, _, err := getSourceSpecForContext(ctx)
+	if err != nil {
+		return "", err
+	}
+	plugin := src.MainEngine.Choose(engine.DatabaseType(spec.ID))
+	if plugin == nil {
+		return "", errors.New("unknown source type")
+	}
+	objectRef := sourceRefFromInput(&ref)
+	if objectRef == nil || len(objectRef.Path) == 0 {
+		return "", errors.New("invalid ref: missing path")
+	}
+	table := objectRef.Path[len(objectRef.Path)-1]
+	schemaStr := ""
+	if schema != nil {
+		schemaStr = *schema
+	}
+	return plugin.DefaultSelectQuery(schemaStr, table, limit), nil
 }
 
 // SourceGraph is the resolver for the SourceGraph field.

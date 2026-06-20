@@ -331,6 +331,7 @@ type ComplexityRoot struct {
 		AzureSubscriptions           func(childComplexity int) int
 		CloudProvider                func(childComplexity int, id string) int
 		CloudProviders               func(childComplexity int) int
+		DefaultTableQuery            func(childComplexity int, ref model.SourceObjectRefInput, limit int, schema *string) int
 		DiscoveredConnections        func(childComplexity int) int
 		GCPProvider                  func(childComplexity int, id string) int
 		GCPProviders                 func(childComplexity int) int
@@ -656,6 +657,7 @@ type QueryResolver interface {
 	SourceColumnsBatch(ctx context.Context, refs []*model.SourceObjectRefInput) ([]*model.SourceObjectColumns, error)
 	SourceFieldConstraints(ctx context.Context, ref model.SourceObjectRefInput) ([]*model.SourceFieldConstraints, error)
 	RunSourceQuery(ctx context.Context, query string) (*model.RowsResult, error)
+	DefaultTableQuery(ctx context.Context, ref model.SourceObjectRefInput, limit int, schema *string) (string, error)
 	SourceGraph(ctx context.Context, ref *model.SourceObjectRefInput) ([]*model.GraphUnit, error)
 	AIProviders(ctx context.Context) ([]*model.AIProvider, error)
 	AIModel(ctx context.Context, providerID *string, modelType string, token *string) ([]string, error)
@@ -2128,6 +2130,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.CloudProviders(childComplexity), true
+	case "Query.DefaultTableQuery":
+		if e.ComplexityRoot.Query.DefaultTableQuery == nil {
+			break
+		}
+
+		args, err := ec.field_Query_DefaultTableQuery_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.DefaultTableQuery(childComplexity, args["ref"].(model.SourceObjectRefInput), args["limit"].(int), args["schema"].(*string)), true
 	case "Query.DiscoveredConnections":
 		if e.ComplexityRoot.Query.DiscoveredConnections == nil {
 			break
@@ -5238,6 +5251,36 @@ func (ec *executionContext) field_Query_CloudProvider_args(ctx context.Context, 
 		return nil, err
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_DefaultTableQuery_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "ref",
+		func(ctx context.Context, v any) (model.SourceObjectRefInput, error) {
+			return ec.unmarshalNSourceObjectRefInput2githubᚗcomᚋclideyᚋwhodbᚋcoreᚋgraphᚋmodelᚐSourceObjectRefInput(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["ref"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "limit",
+		func(ctx context.Context, v any) (int, error) {
+			return ec.unmarshalNInt2int(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["limit"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "schema",
+		func(ctx context.Context, v any) (*string, error) {
+			return ec.unmarshalOString2ᚖstring(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["schema"] = arg2
 	return args, nil
 }
 
@@ -11393,6 +11436,50 @@ func (ec *executionContext) fieldContext_Query_RunSourceQuery(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_RunSourceQuery_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_DefaultTableQuery(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Query_DefaultTableQuery(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().DefaultTableQuery(ctx, fc.Args["ref"].(model.SourceObjectRefInput), fc.Args["limit"].(int), fc.Args["schema"].(*string))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Query_DefaultTableQuery(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_DefaultTableQuery_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -20542,6 +20629,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_RunSourceQuery(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "DefaultTableQuery":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_DefaultTableQuery(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}

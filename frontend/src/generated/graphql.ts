@@ -697,6 +697,7 @@ export type Query = {
   AzureSubscriptions: Array<AzureSubscription>;
   CloudProvider?: Maybe<CloudProvider>;
   CloudProviders: Array<CloudProvider>;
+  DefaultTableQuery: Scalars['String']['output'];
   DiscoveredConnections: Array<DiscoveredConnection>;
   GCPProvider?: Maybe<GcpProvider>;
   GCPProviders: Array<GcpProvider>;
@@ -758,6 +759,13 @@ export type QueryAzureProviderArgs = {
 
 export type QueryCloudProviderArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryDefaultTableQueryArgs = {
+  limit: Scalars['Int']['input'];
+  ref: SourceObjectRefInput;
+  schema?: InputMaybe<Scalars['String']['input']>;
 };
 
 
