@@ -275,10 +275,12 @@ export const ExploreStorageUnit: FC = () => {
         return undefined;
     }, [sourceContent?.MIMEType, sourceContent?.Text]);
 
-    const { data: defaultQueryData } = useQuery(DefaultTableQueryDocument, {
-        variables: { ref: { Kind: currentUnitRef!.Kind, Path: currentUnitRef!.Path, Locator: currentUnitRef!.Locator }, limit: 5, schema: schema ?? null },
-        skip: !currentUnitRef,
-    });
+    const { data: defaultQueryData } = useQuery(
+        DefaultTableQueryDocument,
+        currentUnitRef
+            ? { variables: { ref: { Kind: currentUnitRef.Kind, Path: currentUnitRef.Path, Locator: currentUnitRef.Locator }, limit: 5, schema: schema ?? null } }
+            : skipToken,
+    );
     const initialScratchpadQuery = defaultQueryData?.DefaultTableQuery ?? '';
 
     const scratchpadQueryWithConditions = useMemo(() => {
