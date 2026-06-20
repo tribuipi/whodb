@@ -500,6 +500,12 @@ export const ExploreStorageUnit: FC = () => {
     }, [isTabularObject, unit]);
 
     useEffect(() => {
+        if (initialScratchpadQuery) {
+            setCode(initialScratchpadQuery);
+        }
+    }, [initialScratchpadQuery]);
+
+    useEffect(() => {
         if (isTabularObject && sortConditions.length > 0) {
             handleSubmitRequest();
         }
