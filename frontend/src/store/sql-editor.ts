@@ -48,6 +48,13 @@ export const sqlEditorSlice = createSlice({
       }
     },
     addSqlTab: (state, action: PayloadAction<{ name?: string; code?: string; autoRun?: boolean } | undefined>) => {
+      if (action.payload?.name) {
+        const existing = state.tabs.find(t => t.kind === 'sql' && t.name === action.payload!.name);
+        if (existing) {
+          state.activeTabId = existing.id;
+          return;
+        }
+      }
       const id = uuidv4();
       state.tabs.push({
         id,
