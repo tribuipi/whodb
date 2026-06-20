@@ -1,0 +1,3 @@
+query DefaultTableQuery($ref: SourceObjectRefInput!, $limit: Int!, $schema: String) {
+  DefaultTableQuery(ref: $ref, limit: $limit, schema: $schema)
+}
