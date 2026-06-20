@@ -1,9 +1,10 @@
-import { useLazyQuery } from "@apollo/client/react";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
+import { useLazyQuery } from "@apollo/client/react";
+import { DefaultTableQueryDocument } from "@graphql";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { SqlEditorActions } from "../../store/sql-editor";
-import { DefaultTableQueryDocument } from "@graphql";
+import { formatSql } from "../../utils/format-sql";
 import { ChatPanel } from "./chat-panel";
 import { EditorTabs } from "./editor-tabs";
 import { ObjectTree } from "./object-tree";
@@ -18,6 +19,7 @@ export const RawExecutePage: FC = () => {
   const tabs = useAppSelector(state => state.sqlEditor.tabs);
   const activeTabId = useAppSelector(state => state.sqlEditor.activeTabId);
   const schema = useAppSelector(state => state.database.schema);
+  const currentType = useAppSelector(state => state.auth.current?.Type);
   const [rightCollapsed, setRightCollapsed] = useState(true);
   const [fetchDefaultQuery] = useLazyQuery(DefaultTableQueryDocument);
 
@@ -37,7 +39,7 @@ export const RawExecutePage: FC = () => {
             if (!data?.DefaultTableQuery) return;
             dispatch(SqlEditorActions.addSqlTab({
               name: obj.Name,
-              code: data.DefaultTableQuery,
+              code: formatSql(data.DefaultTableQuery, currentType),
               autoRun: true,
             }));
           }}
