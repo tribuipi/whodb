@@ -582,6 +582,29 @@ func (p *GormPlugin) GetDatabaseType() engine.DatabaseType {
 	return p.Type
 }
 
+// QuoteChar returns the identifier quote character for this dialect.
+func (p *GormPlugin) QuoteChar() string {
+	switch p.Type {
+	case engine.DatabaseType_MySQL, engine.DatabaseType_MariaDB,
+		engine.DatabaseType_ClickHouse, engine.DatabaseType_TiDB,
+		engine.DatabaseType_StarRocks:
+		return "`"
+	default:
+		return `"`
+	}
+}
+
+// DefaultSelectQuery returns a dialect-correct SELECT ... LIMIT query.
+func (p *GormPlugin) DefaultSelectQuery(schema, table string, limit int) string {
+	q := p.QuoteChar()
+	quote := func(s string) string { return q + strings.ReplaceAll(s, q, q+q) + q }
+	qualified := quote(table)
+	if schema != "" {
+		qualified = quote(schema) + "." + qualified
+	}
+	return fmt.Sprintf("SELECT * FROM %s LIMIT %d", qualified, limit)
+}
+
 // WithTransaction executes the given operation within a database transaction
 func (p *GormPlugin) WithTransaction(config *engine.PluginConfig, operation func(tx any) error) error {
 	_, err := plugins.WithConnection(config, p.DB, func(db *gorm.DB) (bool, error) {

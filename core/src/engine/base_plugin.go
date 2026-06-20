@@ -108,6 +108,9 @@ func (b *BasePlugin) FormatValue(val any) string {
 	return fmt.Sprintf("%v", val)
 }
 
+// DefaultSelectQuery returns empty string; BasePlugin does not implement SQL SELECT syntax.
+func (b *BasePlugin) DefaultSelectQuery(_, _ string, _ int) string { return "" }
+
 func (b *BasePlugin) GetColumnsForTable(_ *PluginConfig, _ string, _ string) ([]Column, error) {
 	return nil, errors.ErrUnsupported
 }

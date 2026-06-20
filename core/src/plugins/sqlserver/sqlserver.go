@@ -18,6 +18,7 @@ package sqlserver
 
 import (
 	"database/sql"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -57,6 +58,16 @@ func (p *SQLServerPlugin) GetDatabases(config *engine.PluginConfig) ([]string, e
 
 func (p *SQLServerPlugin) GetAllSchemasQuery() string {
 	return "SELECT SCHEMA_NAME AS schemaname FROM INFORMATION_SCHEMA.SCHEMATA"
+}
+
+// DefaultSelectQuery returns a T-SQL SELECT TOP query for SQL Server.
+func (p *SQLServerPlugin) DefaultSelectQuery(schema, table string, limit int) string {
+	quote := func(s string) string { return "[" + strings.ReplaceAll(s, "]", "]]") + "]" }
+	qualified := quote(table)
+	if schema != "" {
+		qualified = quote(schema) + "." + qualified
+	}
+	return fmt.Sprintf("SELECT TOP %d * FROM %s", limit, qualified)
 }
 
 func (p *SQLServerPlugin) GetTableInfoQuery() string {

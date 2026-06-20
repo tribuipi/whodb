@@ -571,6 +571,9 @@ func (p *RedisPlugin) FormatValue(val any) string {
 	return fmt.Sprintf("%v", val)
 }
 
+// DefaultSelectQuery returns empty string; Redis does not use SQL SELECT syntax.
+func (p *RedisPlugin) DefaultSelectQuery(schema, table string, limit int) string { return "" }
+
 func init() {
 	engine.RegisterPlugin(NewRedisPlugin())
 }

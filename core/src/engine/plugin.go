@@ -84,6 +84,9 @@ type PluginFunctions interface {
 	Chat(config *PluginConfig, schema string, previousConversation string, prompt string) ([]*ChatMessage, error)
 	ExportData(config *PluginConfig, schema string, storageUnit string, writer func([]string) error, selectedRows []map[string]any) error
 	FormatValue(val any) string
+	// DefaultSelectQuery returns a dialect-correct SELECT query string for the given table.
+	// schema may be empty for databases that do not use schemas.
+	DefaultSelectQuery(schema, table string, limit int) string
 	GetColumnsForTable(config *PluginConfig, schema string, storageUnit string) ([]Column, error)
 
 	// MarkGeneratedColumns enriches columns with auto-increment and computed column flags

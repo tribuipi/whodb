@@ -180,6 +180,9 @@ func (p *MemcachedPlugin) FormatValue(val any) string {
 	return fmt.Sprintf("%v", val)
 }
 
+// DefaultSelectQuery returns empty string; Memcached does not use SQL SELECT syntax.
+func (p *MemcachedPlugin) DefaultSelectQuery(schema, table string, limit int) string { return "" }
+
 func init() {
 	engine.RegisterPlugin(NewMemcachedPlugin())
 }

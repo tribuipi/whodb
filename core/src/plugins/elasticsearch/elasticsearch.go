@@ -220,6 +220,11 @@ func (p *ElasticSearchPlugin) FormatValue(val any) string {
 	return fmt.Sprintf("%v", val)
 }
 
+// DefaultSelectQuery returns empty string; Elasticsearch does not use SQL SELECT syntax.
+func (p *ElasticSearchPlugin) DefaultSelectQuery(schema, table string, limit int) string {
+	return ""
+}
+
 func init() {
 	engine.RegisterPlugin(NewElasticSearchPlugin())
 }

@@ -204,6 +204,9 @@ func (p *MongoDBPlugin) FormatValue(val any) string {
 	return fmt.Sprintf("%v", val)
 }
 
+// DefaultSelectQuery returns empty string; MongoDB does not use SQL SELECT syntax.
+func (p *MongoDBPlugin) DefaultSelectQuery(schema, table string, limit int) string { return "" }
+
 // GetColumnConstraints retrieves MongoDB schema validation rules and maps them to the constraint format
 // used by the mock data generator. Supports $jsonSchema validator with:
 // - required fields → nullable: false
