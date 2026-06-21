@@ -19,6 +19,16 @@ en_US:
   updateAvailable: "Update available: {version}"
   sslSecured: "SSL: {mode}"
   switchProfileDescription: "Choose a profile to continue, or add a new one."
+  manageConnections: Manage connections...
+  manageConnectionsTitle: Manage Connections
+  addNewConnection: Add New Connection
+  editConnection: Edit
+  deleteConnection: Delete
+  deleteConnectionConfirmTitle: Delete connection?
+  deleteConnectionConfirmDescription: "Remove \"{name}\" from your connections?"
+  environmentBadge: Environment
+  environmentBadgeTooltip: "This connection is managed via environment variables and cannot be edited or deleted."
+  cancel: Cancel
 
 ar_AE:
   mainNavigation: "الملاحة الرئيسية"
