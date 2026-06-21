@@ -1,6 +1,6 @@
 import { skipToken, useQuery } from "@apollo/client/react";
 import type { FC, ReactElement } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SearchSelect } from "../../components/ux";
 import { SourceFieldOptionsDocument } from "@graphql";
 import { useProfileSwitch } from "@/hooks/use-profile-switch";
@@ -16,9 +16,8 @@ import { isGcpConnection } from "@/components/gcp";
 import { isAwsHostname, isAzureHostname, isGcpHostname } from "@/utils/cloud-connection-prefill";
 import { ph } from "@/utils/privacy";
 import { CommandItem } from "@/components/ui/command";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { PlusCircleIcon } from "../../components/heroicons";
-import { LoginForm } from "../auth/login";
+import { AdjustmentsHorizontalIcon } from "../../components/heroicons";
+import { ManageConnectionsDialog } from "./manage-connections-dialog";
 
 /**
  * Profile and database dropdowns rendered in the SQL editor's left-panel header.
@@ -36,7 +35,7 @@ export const SourceSelectors: FC = () => {
     const { supportsDatabaseSwitching } = useSourceContract(current?.Type);
     const { switchProfile } = useProfileSwitch({ skipNavigation: true });
     const { items: sourceTypeItems } = useSourceTypeItems();
-    const [showLoginCard, setShowLoginCard] = useState(false);
+    const [showManageConnections, setShowManageConnections] = useState(false);
 
     const databaseQueryOptions = current != null && supportsDatabaseSwitching && current.Type
         ? { variables: { sourceType: current.Type } }
@@ -88,10 +87,6 @@ export const SourceSelectors: FC = () => {
         [availableDatabases],
     );
 
-    const handleAddProfile = useCallback(() => {
-        setTimeout(() =>{  setShowLoginCard(true); }, 100);
-    }, []);
-
     return (
         <>
             <div
@@ -110,10 +105,10 @@ export const SourceSelectors: FC = () => {
                     searchPlaceholder={t('searchProfile')}
                     buttonClassName={ph.mask}
                     extraOptions={!isEmbedded ? (
-                        <CommandItem key="__add__" value="__add__" onSelect={handleAddProfile}>
-                            <span className="flex items-center gap-sm text-green-500">
-                                <PlusCircleIcon className="w-4 h-4 stroke-green-500" />
-                                {t('addAnotherProfile')}
+                        <CommandItem key="__manage__" value="__manage__" onSelect={() => setTimeout(() =>{  setShowManageConnections(true); }, 100)}>
+                            <span className="flex items-center gap-sm">
+                                <AdjustmentsHorizontalIcon className="w-4 h-4" />
+                                {t('manageConnections')}
                             </span>
                         </CommandItem>
                     ) : undefined}
@@ -134,14 +129,7 @@ export const SourceSelectors: FC = () => {
                     />
                 )}
             </div>
-            <Sheet open={showLoginCard} onOpenChange={setShowLoginCard}>
-                <SheetContent side="right" className="p-8">
-                    <span className="sr-only">
-                        <SheetTitle>{t('databaseLogin')}</SheetTitle>
-                    </span>
-                    <LoginForm advancedDirection="vertical" onLoginSuccess={() =>{  setShowLoginCard(false); }} />
-                </SheetContent>
-            </Sheet>
+            <ManageConnectionsDialog open={showManageConnections} onOpenChange={setShowManageConnections} />
         </>
     );
 };
