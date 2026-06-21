@@ -172,12 +172,12 @@ export const ManageConnectionsDialog: FC<ManageConnectionsDialogProps> = ({
     return (
         <>
             <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent className="max-w-lg" showCloseButton>
+                <DialogContent className="max-w-lg flex flex-col" style={{ minWidth: "800px", minHeight: "400px" }} showCloseButton>
                     <DialogHeader>
                         <DialogTitle>{t("manageConnectionsTitle")}</DialogTitle>
                     </DialogHeader>
 
-                    <div className="flex flex-col divide-y divide-neutral-200 dark:divide-neutral-800 max-h-[60vh] overflow-y-auto">
+                    <div className="flex flex-col divide-y divide-neutral-200 dark:divide-neutral-800 flex-1 overflow-y-auto">
                         {profiles.map(profile => {
                             const external = isExternallyManaged(profile);
                             const sourceTypeItem = findSourceTypeItem(sourceTypeItems, profile.Type);
