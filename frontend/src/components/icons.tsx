@@ -632,7 +632,7 @@ const ceLogos = {
         <g clip-path="url(#clip1_8666_6627)">
           <mask
             id="mask0_8666_6627"
-            style="mask-type:luminance"
+            style={{ maskType: "luminance" }}
             maskUnits="userSpaceOnUse"
             x="0"
             y="0"
