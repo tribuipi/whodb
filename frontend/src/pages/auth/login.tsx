@@ -177,6 +177,16 @@ export interface LoginFormProps {
     // Optionally override container className
     className?: string;
     advancedDirection?: "horizontal" | "vertical";
+    initialValues?: LoginFormInitialValues;
+}
+
+export interface LoginFormInitialValues {
+    databaseType: string;
+    hostname: string;
+    username: string;
+    password: string;
+    database: string;
+    advancedForm: Record<string, string>;
 }
 
 export const LoginForm: FC<LoginFormProps> = ({
@@ -184,6 +194,7 @@ export const LoginForm: FC<LoginFormProps> = ({
     hideHeader = false,
     className = "",
     advancedDirection = "horizontal",
+    initialValues,
 }) => {
     const { t } = useTranslation('pages/login');
     const dispatch = useAppDispatch();
@@ -193,6 +204,7 @@ export const LoginForm: FC<LoginFormProps> = ({
     const usernameInputRef = useRef<HTMLInputElement>(null);
     const handleSubmitRef = useRef<() => void>(() => {});
     const handleLoginWithSourceProfileSubmitRef = useRef<(overrideProfileId?: string) => void>(() => {});
+    const initialValuesApplied = useRef(false);
     const [pendingAutoLogin, setPendingAutoLogin] = useState(false);
     const { setTheme } = useTheme();
 
@@ -255,6 +267,24 @@ export const LoginForm: FC<LoginFormProps> = ({
             setAdvancedForm(nextType.extra ?? {});
         }
     }, [databaseType.id, databaseTypeItems]);
+
+    // Seed form state from initialValues once, after database types have loaded.
+    // Must run after the databaseTypeItems effect so our type/advancedForm take precedence.
+    useEffect(() => {
+        if (!initialValues || initialValuesApplied.current || !databaseTypesLoaded || databaseTypeItems.length === 0) return;
+        const dbType = databaseTypeItems.find(item => item.id === initialValues.databaseType);
+        if (!dbType) return;
+        initialValuesApplied.current = true;
+        setDatabaseType(dbType);
+        setHostName(initialValues.hostname);
+        setUsername(initialValues.username);
+        setPassword(initialValues.password);
+        setDatabase(initialValues.database);
+        setAdvancedForm(initialValues.advancedForm);
+        if (Object.keys(initialValues.advancedForm).length > 0) {
+            setShowAdvanced(true);
+        }
+    }, [initialValues, databaseTypesLoaded, databaseTypeItems]);
 
     useEffect(() => {
         if (databaseTypesError) {
