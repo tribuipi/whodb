@@ -40,6 +40,7 @@ import { AuthActions, type LocalLoginProfile } from "@/store/auth";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { LoginForm, type LoginFormInitialValues } from "../auth/login";
 
+/** Props for ManageConnectionsDialog. */
 export interface ManageConnectionsDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -66,6 +67,7 @@ function buildInitialValues(profile: LocalLoginProfile): LoginFormInitialValues 
     };
 }
 
+/** Dialog for viewing, editing, and deleting saved connections. */
 export const ManageConnectionsDialog: FC<ManageConnectionsDialogProps> = ({
     open,
     onOpenChange,
@@ -101,10 +103,15 @@ export const ManageConnectionsDialog: FC<ManageConnectionsDialogProps> = ({
         }
     }, [dispatch]);
 
+    const handleSwitchError = useCallback(() => {
+        pendingDeleteIdRef.current = null;
+    }, []);
+
     const switchOptions = useMemo(() => ({
         skipNavigation: true as const,
         onSuccess: handleSwitchSuccess,
-    }), [handleSwitchSuccess]);
+        onError: handleSwitchError,
+    }), [handleSwitchSuccess, handleSwitchError]);
 
     const { switchProfile } = useProfileSwitch(switchOptions);
 

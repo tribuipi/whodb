@@ -180,6 +180,7 @@ export interface LoginFormProps {
     initialValues?: LoginFormInitialValues;
 }
 
+/** Initial values to seed a LoginForm for editing an existing connection. */
 export interface LoginFormInitialValues {
     databaseType: string;
     hostname: string;
