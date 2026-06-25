@@ -1,5 +1,6 @@
 import { AgGridReact } from "ag-grid-react";
 import type {
+  ColDef,
   GridApi,
   GridReadyEvent,
   CellClickedEvent,
@@ -7,6 +8,7 @@ import type {
   CellContextMenuEvent,
   SelectionChangedEvent,
   CellEditingStoppedEvent,
+  SortChangedEvent,
 } from "ag-grid-community";
 import {
   Suspense,
@@ -213,8 +215,43 @@ export function ResultGrid(props: ResultGridProps) {
   );
   const rowData = useMemo(() => buildRowData(data.rows), [data.rows]);
 
+  // Row numbers as a pinned-left column. ag-grid's native `rowNumbers` option is
+  // Enterprise-only, so render an absolute (offset across pages) index column instead.
+  const rowNumberColumn = useMemo<ColDef>(() => {
+    const offset =
+      ((props.pagination?.currentPage ?? 1) - 1) *
+      (props.pagination?.pageSize ?? 0);
+    return {
+      colId: "__rowNumber",
+      headerName: "",
+      pinned: "left",
+      width: 60,
+      minWidth: 50,
+      maxWidth: 80,
+      sortable: false,
+      filter: false,
+      resizable: false,
+      editable: false,
+      suppressMovable: true,
+      cellClass:
+        "text-center text-neutral-400 dark:text-neutral-500 select-none",
+      valueGetter: (params) => offset + (params.node?.rowIndex ?? 0) + 1,
+    };
+  }, [props.pagination?.currentPage, props.pagination?.pageSize]);
+
+  const columnDefsWithRowNumber = useMemo(
+    () => [rowNumberColumn, ...columnDefs],
+    [rowNumberColumn, columnDefs],
+  );
+
   const onGridReady = useCallback((e: GridReadyEvent) => {
     apiRef.current = e.api;
+  }, []);
+
+  // Row numbers track display order; ag-grid caches valueGetter results, so re-evaluate
+  // the row-number column after a (native) sort reorders the rows.
+  const onSortChanged = useCallback((e: SortChangedEvent) => {
+    e.api.refreshCells({ columns: ["__rowNumber"], force: true });
   }, []);
 
   // Quick-filter search via the imperative searchRef.
@@ -498,10 +535,11 @@ export function ResultGrid(props: ResultGridProps) {
         <div style={{ height: "100%", width: "100%" }}>
           <AgGridReact
             theme={theme}
-            columnDefs={columnDefs}
+            columnDefs={columnDefsWithRowNumber}
             rowData={rowData}
             rowHeight={rowHeight}
             onGridReady={onGridReady}
+            onSortChanged={onSortChanged}
             onCellClicked={onCellClicked}
             onCellDoubleClicked={onCellDoubleClicked}
             onCellContextMenu={onCellContextMenu}
