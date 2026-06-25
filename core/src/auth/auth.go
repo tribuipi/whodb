@@ -92,10 +92,13 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		}
 
 		isMultipart := strings.HasPrefix(r.Header.Get("Content-Type"), "multipart/")
+		isExport := r.URL.Path == "/api/export"
 
-		if isMultipart {
-			// Multipart uploads (file uploads) use a higher body limit.
-			// Skip body buffering — auth relies on the Authorization header.
+		if isMultipart || isExport {
+			// Multipart uploads (file uploads) and data exports (bulk row data)
+			// carry legitimately large bodies and authenticate via the
+			// Authorization header/cookie, not the body content. Use a higher
+			// limit and skip body buffering.
 			r.Body = http.MaxBytesReader(w, r.Body, maxUploadBodySize)
 		} else {
 			r.Body = http.MaxBytesReader(w, r.Body, maxRequestBodySize)

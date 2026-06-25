@@ -300,6 +300,32 @@ func TestAuthMiddlewareResolvesIDOnlyCredentialsFromKeyring(t *testing.T) {
 	}
 }
 
+func TestAuthMiddlewareAllowsLargeExportBody(t *testing.T) {
+	creds := testSourceCredentials("Postgres", "db.local", "alice", "pw", "app")
+	payload, _ := json.Marshal(&creds)
+	token := base64.StdEncoding.EncodeToString(payload)
+
+	// Export bodies carry bulk row data and can exceed the 1MB JSON limit.
+	body := bytes.Repeat([]byte("a"), maxRequestBodySize+1)
+	req := httptest.NewRequest(http.MethodPost, "/api/export", bytes.NewReader(body))
+	req.Header.Set("Authorization", "Bearer "+token)
+	rr := httptest.NewRecorder()
+
+	reached := false
+	handler := AuthMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		reached = true
+		w.WriteHeader(http.StatusOK)
+	}))
+	handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected export with large body to pass, got %d", rr.Code)
+	}
+	if !reached {
+		t.Fatal("expected request to reach handler")
+	}
+}
+
 func TestAuthMiddlewareRejectsOversizeBody(t *testing.T) {
 	body := bytes.Repeat([]byte("a"), maxRequestBodySize+1)
 	req := httptest.NewRequest(http.MethodPost, "/api/query", bytes.NewReader(body))
